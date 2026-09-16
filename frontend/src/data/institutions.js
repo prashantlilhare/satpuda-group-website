@@ -1,0 +1,107 @@
+import imgEngineering from "../assets/images/institutions/engineering.webp";
+import imgTeacherEd from "../assets/images/institutions/teacher-education.webp";
+import imgIti from "../assets/images/institutions/iti.webp";
+import imgSchool from "../assets/images/institutions/school.webp";
+
+/**
+ * The four institutions of Satpuda Group.
+ * `established` is only set where a year is corroborated by an official source.
+ */
+export const institutions = [
+  {
+    id: "btech-polytechnic",
+    to: "/institutes/btech-polytechnic",
+    name: "Satpuda College of Engineering & Polytechnic",
+    shortName: "Engineering & Polytechnic",
+    kicker: "Degree & Diploma",
+    image: imgEngineering,
+    imageAlt:
+      "The Satpuda College of Engineering & Polytechnic building seen across its front lawn",
+    summary:
+      "Four-year B.Tech degrees and three-year diploma programmes across five engineering disciplines, approved by AICTE and affiliated to RGPV Bhopal.",
+    blurb:
+      "Degree and diploma engineering across computing, mining, civil, mechanical and electrical disciplines.",
+    credentials: [
+      "Approved by AICTE, New Delhi",
+      "Affiliated to RGPV, Bhopal",
+      "Approved by DTE, Government of Madhya Pradesh",
+    ],
+    highlights: ["5 B.Tech branches", "4 diploma branches", "10-acre campus"],
+    featured: true,
+  },
+  {
+    id: "ded-bed",
+    to: "/institutes/ded-bed",
+    name: "Teacher Education — D.Ed & B.Ed",
+    shortName: "D.Ed & B.Ed",
+    kicker: "Teacher Education",
+    image: imgTeacherEd,
+    imageAlt: "Students seated in a Satpuda classroom during a teaching session",
+    summary:
+      "Preparation for a career in the classroom — pedagogy, child development, curriculum design and supervised teaching practice.",
+    blurb: "Preparing teachers through pedagogy, child development and classroom practice.",
+    credentials: [],
+    highlights: ["Pedagogy & practice", "School internship", "Child development"],
+    featured: false,
+  },
+  {
+    id: "iti",
+    to: "/institutes/iti",
+    name: "Satpuda ITI, Garra",
+    shortName: "ITI",
+    kicker: "Vocational Training",
+    image: imgIti,
+    imageAlt: "Satpuda trainees on an industrial workshop floor during practical training",
+    summary:
+      "Craftsman Training Scheme trades affiliated to NCVT — hands-on, job-oriented technical training for students after Class 10.",
+    blurb: "NCVT trade training that puts tools in students' hands from day one.",
+    established: 1999,
+    credentials: [
+      "Affiliated to NCVT / DGT",
+      "Accredited by QCI, New Delhi",
+    ],
+    highlights: ["Electrician", "Fitter", "Mechanic Diesel", "COPA"],
+    featured: false,
+  },
+  {
+    id: "school",
+    to: "/institutes/school",
+    name: "Satpuda Valley Public School",
+    shortName: "School",
+    kicker: "CBSE · Co-educational",
+    image: imgSchool,
+    imageAlt: "Satpuda students playing basketball on the campus sports court",
+    summary:
+      "A CBSE-affiliated, co-educational school on the Satpuda campus, educating students in Balaghat since 2009.",
+    blurb: "CBSE schooling with room for sport, culture and curiosity.",
+    established: 2009,
+    credentials: ["CBSE affiliated", "Co-educational"],
+    highlights: ["Science & computer labs", "Sports & culture", "Library"],
+    featured: false,
+  },
+];
+
+export const getInstitution = (id) => institutions.find((i) => i.id === id);
+
+/**
+ * Group milestones. Only years corroborated by official/primary sources are
+ * listed with a date — the engineering college is shown without one because
+ * published sources disagree on its founding year.
+ */
+export const milestones = [
+  {
+    year: "1999",
+    title: "Satpuda ITI, Garra",
+    body: "Maharana Pratap Shikshan Samiti opens its first institution — an industrial training institute bringing NCVT trade certification to Balaghat.",
+  },
+  {
+    year: "2009",
+    title: "Satpuda Valley Public School",
+    body: "A CBSE-affiliated, co-educational school joins the group, extending its work from vocational training into foundational schooling.",
+  },
+  {
+    year: "Today",
+    title: "Engineering, Polytechnic & Teacher Education",
+    body: "The Satpuda campus at Manjhapur adds AICTE-approved degree and diploma engineering, affiliated to RGPV Bhopal, alongside teacher education programmes.",
+  },
+];

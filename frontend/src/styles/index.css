@@ -1,0 +1,451 @@
+@import "tailwindcss";
+
+/* ============================================================
+   SATPUDA GROUP — DESIGN SYSTEM
+   Palette derived from the official logo (Adobe CMYK JPEG,
+   converted to sRGB): royal blue #294791, orange #EC5819.
+   ============================================================ */
+
+@theme {
+  /* --- Brand: royal blue (from logo field) --- */
+  --color-royal-50: #eef2fb;
+  --color-royal-100: #d8e0f4;
+  --color-royal-200: #b3c2e8;
+  --color-royal-300: #8299d6;
+  --color-royal-400: #5570b8;
+  --color-royal-500: #3a559f;
+  --color-royal-600: #294791; /* ← exact logo blue */
+  --color-royal-700: #223a76;
+  --color-royal-800: #1a2c5a;
+  --color-royal-900: #142244;
+  --color-royal-950: #0c1529;
+
+  /* --- Brand: orange (from logo mark) --- */
+  --color-ember-50: #fff4ee;
+  --color-ember-100: #ffe4d5;
+  --color-ember-200: #ffc5a8;
+  --color-ember-300: #ff9d70;
+  --color-ember-400: #fa7639;
+  --color-ember-500: #ec5819; /* ← exact logo orange */
+  --color-ember-600: #d34510;
+  --color-ember-700: #ae3410;
+  --color-ember-800: #8b2c14;
+  --color-ember-900: #722714;
+
+  /* --- Warm institutional neutrals (paper, not cold grey) --- */
+  --color-paper: #faf8f5;
+  --color-paper-dim: #f2eee8;
+  --color-sand: #e7e1d7;
+  --color-stone-line: #ddd5c8;
+  --color-ink: #191817;
+  --color-ink-soft: #55504a;
+  --color-ink-mute: #7d766d;
+
+  /* --- Typography --- */
+  --font-display: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-deva: "Tiro Devanagari Sanskrit", "Nirmala UI", serif;
+
+  /* --- Motion --- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* --- Layout --- */
+  --spacing-gutter: clamp(1.25rem, 5vw, 5rem);
+
+  /* --- Fixed-header metrics ---------------------------------------
+   * Single source of truth for the navbar's height. The header is
+   * position:fixed, so every surface that has to clear it — the <main>
+   * landmark, the mobile menu panel, anchor jumps and focus scrolling —
+   * derives from these tokens instead of repeating a magic number that
+   * silently drifts out of sync.
+   *
+   * Measured identical at every breakpoint from 320px to 1920px, so a
+   * single set of values is correct; no responsive variants needed.
+   */
+  --nav-utility-h: 2.75rem; /* utility bar (h-11); collapses when scrolled */
+  --nav-bar-h: 5.25rem; /* main bar, at rest */
+  --nav-bar-h-compact: 4.5rem; /* main bar, once scrolled */
+  --nav-h: calc(var(--nav-utility-h) + var(--nav-bar-h)); /* 8rem at rest */
+  --nav-h-compact: var(--nav-bar-h-compact); /* 4.5rem scrolled */
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Anchor jumps, :target and keyboard-focus scrolling all stop clear of
+       the fixed header rather than landing underneath it. Uses the compact
+       height because the header is always collapsed once the page has
+       scrolled, plus a little breathing room above the target. */
+    scroll-padding-top: calc(var(--nav-h-compact) + 1.5rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* guards against any child briefly exceeding the viewport */
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-variation-settings: "SOFT" 0, "WONK" 0;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  p {
+    text-wrap: pretty;
+    margin: 0;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Visible, on-brand focus ring everywhere */
+  :focus-visible {
+    outline: 2px solid var(--color-ember-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Dark sections re-tint the ring so it stays visible */
+  .on-dark :focus-visible {
+    outline-color: var(--color-ember-300);
+  }
+
+  ::selection {
+    background-color: var(--color-royal-600);
+    color: #fff;
+  }
+}
+
+/* ============================================================
+   COMPONENT UTILITIES
+   ============================================================ */
+
+@layer components {
+  /* --- Page shell -------------------------------------------------- */
+  .shell {
+    width: 100%;
+    max-width: 88rem;
+    margin-inline: auto;
+    padding-inline: var(--spacing-gutter);
+  }
+
+  .shell-narrow {
+    width: 100%;
+    max-width: 62rem;
+    margin-inline: auto;
+    padding-inline: var(--spacing-gutter);
+  }
+
+  /* --- Editorial type scale ---------------------------------------- */
+  .t-display {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 7.4vw, 6rem);
+    font-weight: 600;
+    font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+    line-height: 0.98;
+    letter-spacing: -0.032em;
+  }
+
+  .t-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5.4vw, 4rem);
+    font-weight: 600;
+    font-variation-settings: "opsz" 120;
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+  }
+
+  .t-h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 3.9vw, 3rem);
+    font-weight: 600;
+    font-variation-settings: "opsz" 72;
+    line-height: 1.08;
+    letter-spacing: -0.024em;
+  }
+
+  .t-h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+    font-weight: 600;
+    font-variation-settings: "opsz" 36;
+    line-height: 1.2;
+    letter-spacing: -0.018em;
+  }
+
+  .t-lead {
+    font-size: clamp(1.0625rem, 1.35vw, 1.3125rem);
+    line-height: 1.6;
+    color: var(--color-ink-soft);
+  }
+
+  .t-body {
+    font-size: 1.0625rem;
+    line-height: 1.72;
+    color: var(--color-ink-soft);
+  }
+
+  /* --- Eyebrow / kicker -------------------------------------------- */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-royal-600);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.75rem;
+    height: 2px;
+    background-color: var(--color-ember-500);
+    flex: none;
+  }
+
+  .on-dark .eyebrow {
+    color: var(--color-ember-300);
+  }
+
+  /* --- Devanagari motto -------------------------------------------- */
+  .motto {
+    font-family: var(--font-deva);
+    letter-spacing: 0.01em;
+  }
+
+  /* --- Rules --------------------------------------------------------*/
+  .rule {
+    border: 0;
+    border-top: 1px solid var(--color-stone-line);
+  }
+
+  .on-dark .rule {
+    border-top-color: rgb(255 255 255 / 0.14);
+  }
+
+  /* --- Link with animated underline -------------------------------- */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.4s var(--ease-out-expo);
+  }
+
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity 0.75s var(--ease-out-expo),
+    transform 0.75s var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ============================================================
+   HERO SLIDER — Ken Burns drift
+   ============================================================ */
+
+@keyframes kenburns {
+  from {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.16) translate3d(-1.2%, -1.4%, 0);
+  }
+}
+
+.kenburns {
+  animation: kenburns 9s linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kenburns {
+    animation: none;
+    transform: scale(1.04);
+  }
+}
+
+/* Slide copy entrance — staggered, cheap, replayable */
+@keyframes slide-copy-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.slide-copy > * {
+  animation: slide-copy-in 0.85s var(--ease-out-expo) both;
+}
+
+.slide-copy > *:nth-child(1) {
+  animation-delay: 0.08s;
+}
+.slide-copy > *:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.slide-copy > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.slide-copy > *:nth-child(4) {
+  animation-delay: 0.42s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-copy > * {
+    animation: none;
+  }
+}
+
+/* Autoplay progress bar */
+@keyframes bar-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.bar-fill {
+  transform-origin: left center;
+  animation: bar-fill linear forwards;
+  animation-duration: var(--bar-duration, 6500ms);
+}
+
+.bar-fill[data-paused="true"] {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-fill {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+/* ============================================================
+   MISC
+   ============================================================ */
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  transition: transform 0.25s var(--ease-out-expo);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Marquee for the values ticker */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  animation: marquee-x 38s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Thin, unobtrusive scrollbar on the brand */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-paper-dim);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-royal-300);
+    border: 3px solid var(--color-paper-dim);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-royal-500);
+  }
+}
