@@ -5,6 +5,7 @@ import { schoolPillars } from "../data/programs";
 import { campusImages } from "../data/about";
 import { socials } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 const gallery = [
   { src: campusImages.sports, alt: "Students playing basketball on the campus court", span: "lg:col-span-7" },
@@ -34,7 +35,7 @@ export default function School() {
       />
 
       {/* ---------------- key facts ---------------- */}
-      <section className="border-b border-stone-line bg-paper py-12 sm:py-14">
+      <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {[
@@ -43,7 +44,7 @@ export default function School() {
               { value: "Co-ed", label: "Composition" },
               { value: "Garra", label: "Campus, Balaghat" },
             ].map((f, i) => (
-              <Reveal key={f.label} delay={i * 80}>
+              <Reveal key={f.label} delay={stagger(i)}>
                 <div className="border-t-2 border-royal-600 pt-5">
                   <Fact value={f.value} label={f.label} />
                 </div>
@@ -54,19 +55,19 @@ export default function School() {
       </section>
 
       {/* ---------------- about ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>About the school</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
-                <h2 className="t-h2 mt-6 max-w-xl text-ink">
+              <Reveal delay={stagger(1)}>
+                <h2 className="t-h2 mt-5 max-w-xl text-ink">
                   Where a Satpuda education usually starts.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                   <p>
                     Satpuda Valley Public School was opened in 2009 by Maharana Pratap Shikshan
@@ -87,7 +88,7 @@ export default function School() {
                 </div>
               </Reveal>
 
-              <Reveal delay={210}>
+              <Reveal delay={stagger(3)}>
                 <p className="mt-9">
                   <TextLink href={fb.href} external>
                     Follow the school on Facebook
@@ -96,7 +97,7 @@ export default function School() {
               </Reveal>
             </div>
 
-            <Reveal delay={120} className="group">
+            <Reveal delay={stagger(2)} className="group">
               <Figure
                 src={campusImages.campusAerial}
                 alt="The Satpuda campus grounds"
@@ -108,17 +109,17 @@ export default function School() {
       </section>
 
       {/* ---------------- pillars ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Academic environment"
             title="Four things the school week makes room for."
           />
 
-          <div className="mt-14 grid gap-x-12 gap-y-1 sm:grid-cols-2">
+          <div className="section-body grid gap-x-12 gap-y-1 sm:grid-cols-2">
             {schoolPillars.map((p, i) => (
-              <Reveal key={p.title} delay={(i % 2) * 90}>
-                <article className="group border-t border-stone-line py-8 transition-colors duration-400 hover:border-ember-500">
+              <Reveal key={p.title} delay={stagger(i % 2)}>
+                <article className="group border-t border-stone-line py-8 transition-colors duration-400 hover:border-royal-600">
                   <div className="flex items-baseline gap-4">
                     <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                       {String(i + 1).padStart(2, "0")}
@@ -138,7 +139,7 @@ export default function School() {
       </section>
 
       {/* ---------------- gallery ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="Campus life"
@@ -146,16 +147,16 @@ export default function School() {
             lead="Sport, culture and the library are treated as part of the week, not as rewards for finishing the syllabus."
           />
 
-          <div className="mt-14 grid gap-5 lg:grid-cols-12">
+          <div className="section-body grid gap-5 lg:grid-cols-12">
             {gallery.map((img, i) => (
-              <Reveal key={img.src} delay={(i % 2) * 110} className={`group ${img.span}`}>
+              <Reveal key={img.src} delay={stagger(i % 2)} className={`group ${img.span}`}>
                 <Figure src={img.src} alt={img.alt} ratio="16 / 10" />
               </Reveal>
             ))}
           </div>
 
-          <Reveal delay={120}>
-            <p className="mt-12 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
+          <Reveal delay={stagger(2)}>
+            <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
               Class-wise admission criteria, the fee structure, session dates and transport routes
               are confirmed at the school office. Photographs on this page are from the Satpuda
               campus.

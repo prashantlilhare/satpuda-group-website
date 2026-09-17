@@ -2,8 +2,10 @@
 
 /* ============================================================
    SATPUDA GROUP — DESIGN SYSTEM
-   Palette derived from the official logo (Adobe CMYK JPEG,
-   converted to sRGB): royal blue #294791, orange #EC5819.
+   Palette anchored on the official logo's royal blue #294791.
+   Blue is primary; the emblem red is the secondary accent, used
+   sparingly — rules, eyebrow marks, active indicators and a
+   single accent CTA per view. Never as the default hover colour.
    ============================================================ */
 
 @theme {
@@ -20,17 +22,24 @@
   --color-royal-900: #142244;
   --color-royal-950: #0c1529;
 
-  /* --- Brand: orange (from logo mark) --- */
-  --color-ember-50: #fff4ee;
-  --color-ember-100: #ffe4d5;
-  --color-ember-200: #ffc5a8;
-  --color-ember-300: #ff9d70;
-  --color-ember-400: #fa7639;
-  --color-ember-500: #ec5819; /* ← exact logo orange */
-  --color-ember-600: #d34510;
-  --color-ember-700: #ae3410;
-  --color-ember-800: #8b2c14;
-  --color-ember-900: #722714;
+  /* --- Brand: emblem red (secondary accent) ---------------------
+   * A warm crimson that keeps kinship with the emblem's vermilion
+   * while reading unambiguously as red beside the royal blue.
+   * Every step below is chosen to meet WCAG AA in the role it plays:
+   *   500 — accent fills carrying white text   (white on 500: 4.58)
+   *   600 — accent text on the paper neutrals  (on paper-dim: 5.15)
+   *   300 — accent text on the dark royal bands (on 900: 8.16)
+   */
+  --color-ember-50: #fef3f2;
+  --color-ember-100: #fde3e0;
+  --color-ember-200: #facbc6;
+  --color-ember-300: #f4a89f;
+  --color-ember-400: #e9705f;
+  --color-ember-500: #d93a26; /* ← accent fill; white text passes AA */
+  --color-ember-600: #bc2d1b; /* ← accent text on light backgrounds */
+  --color-ember-700: #9c2617;
+  --color-ember-800: #7f2216;
+  --color-ember-900: #6a2016;
 
   /* --- Warm institutional neutrals (paper, not cold grey) --- */
   --color-paper: #faf8f5;
@@ -39,7 +48,9 @@
   --color-stone-line: #ddd5c8;
   --color-ink: #191817;
   --color-ink-soft: #55504a;
-  --color-ink-mute: #7d766d;
+  /* Darkened from #7d766d: the old value carried small print at 3.88
+     on paper-dim, below the 4.5 AA floor. Now 4.89 there, 5.34 on paper. */
+  --color-ink-mute: #6d665e;
 
   /* --- Typography --- */
   --font-display: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
@@ -54,6 +65,24 @@
 
   /* --- Layout --- */
   --spacing-gutter: clamp(1.25rem, 5vw, 5rem);
+
+  /* --- Vertical rhythm -------------------------------------------
+   * One scale for every section on the site, so the gap between two
+   * bands is a decision made once rather than re-typed per page.
+   *
+   * These replace the old `py-20 sm:py-28 lg:py-32` triples. Those
+   * stepped at hard breakpoints, so rotating a phone at 640px jumped
+   * the padding 80px → 112px in a single pixel; the clamps ramp
+   * smoothly instead, and land on exactly the old values at the
+   * extremes (5rem on a phone, 8rem on a wide desktop).
+   */
+  --space-section: clamp(5rem, 2.5rem + 7.8vw, 8rem); /* standard band */
+  --space-section-tight: clamp(3.5rem, 2rem + 4.7vw, 5rem); /* minor band */
+  --space-strip: clamp(2.5rem, 1.75rem + 2.3vw, 3.5rem); /* facts/notice strip */
+
+  /* Gap from a section heading down to the content it introduces.
+     Previously spelled mt-10 / mt-12 / mt-14 / mt-16 / mt-20 at random. */
+  --space-heading: clamp(2.75rem, 1.75rem + 3.1vw, 4rem);
 
   /* --- Fixed-header metrics ---------------------------------------
    * Single source of truth for the navbar's height. The header is
@@ -155,6 +184,19 @@
   }
 }
 
+/* Sticky side columns clear the *compact* header — the bar is always
+   collapsed by the time a sticky column can be pinned — plus a breath.
+   Previously `lg:top-32`, which cleared the at-rest header and so floated
+   3.5rem lower than it ever needed to.
+
+   Declared with `@utility` rather than inside @layer components because it
+   is used as `lg:sticky-aside`; only real utilities accept variants. */
+@utility sticky-aside {
+  position: sticky;
+  top: calc(var(--nav-h-compact) + 2rem);
+  align-self: start;
+}
+
 /* ============================================================
    COMPONENT UTILITIES
    ============================================================ */
@@ -173,6 +215,32 @@
     max-width: 62rem;
     margin-inline: auto;
     padding-inline: var(--spacing-gutter);
+  }
+
+  /* --- Section rhythm ----------------------------------------------
+   * `.section` is the default band. `.section-tight` is for secondary
+   * bands (cross-links, sources, galleries) that should read as
+   * subordinate to the section above them, and `.section-strip` for
+   * the thin fact/notice rails that sit directly under a page hero.
+   *
+   * Each is padding only, so a section can still drop one side with
+   * `pt-0` / `pb-0` where two bands are meant to meet flush.
+   */
+  .section {
+    padding-block: var(--space-section);
+  }
+
+  .section-tight {
+    padding-block: var(--space-section-tight);
+  }
+
+  .section-strip {
+    padding-block: var(--space-strip);
+  }
+
+  /* Standard gap below a section heading. */
+  .section-body {
+    margin-top: var(--space-heading);
   }
 
   /* --- Editorial type scale ---------------------------------------- */
@@ -276,6 +344,78 @@
   .link-underline:hover,
   .link-underline:focus-visible {
     background-size: 100% 1px;
+  }
+
+  /* --- Card elevation ----------------------------------------------
+   * The site's cards are flat, bordered blocks, so the lift is small —
+   * 4px — and the shadow is tinted with the brand navy rather than
+   * black: a grey drop-shadow on warm paper reads as dirt.
+   *
+   * It declares the colour transition as well, rather than leaving the
+   * element to add `transition-colors`. That utility sets
+   * `transition-property` outright and, being a utility, outranks this
+   * layer — so the lift would snap while the background faded.
+   */
+  .card-lift {
+    transition:
+      transform 0.45s var(--ease-out-expo),
+      box-shadow 0.45s var(--ease-out-expo),
+      background-color 0.4s var(--ease-out-expo),
+      border-color 0.4s var(--ease-out-expo);
+  }
+
+  .group:hover .card-lift,
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -24px rgb(20 34 68 / 0.45);
+  }
+
+  .on-dark .group:hover .card-lift,
+  .on-dark .card-lift:hover {
+    box-shadow: 0 18px 44px -22px rgb(0 0 0 / 0.55);
+  }
+
+  /* Shadow-only elevation, for cards that tile a `gap-px` hairline grid.
+     Those cards sit on a stone-coloured grid background showing through 1px
+     gaps, so translating one upward would expose a 4px bar of that colour
+     under it. Raising it in place reads as depth without tearing the grid;
+     the z-index lifts the shadow above the neighbouring cells. */
+  .card-raise {
+    transition:
+      box-shadow 0.4s var(--ease-out-expo),
+      background-color 0.4s var(--ease-out-expo);
+  }
+
+  .card-raise:hover {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 14px 34px -20px rgb(20 34 68 / 0.42);
+  }
+
+  /* --- Nav link underline ------------------------------------------
+   * The active page's underline is drawn full width; hovering any
+   * other item grows the same rule from the left. Previously the
+   * underline only ever existed in the active state, so a pointer
+   * moving across the nav got no feedback beyond a colour shift.
+   */
+  .nav-underline {
+    position: absolute;
+    bottom: -0.125rem;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-color: var(--color-ember-500);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.4s var(--ease-out-expo);
+  }
+
+  .nav-underline[data-active="true"],
+  a:hover > .nav-underline,
+  button:hover > .nav-underline,
+  a:focus-visible > .nav-underline,
+  button:focus-visible > .nav-underline {
+    transform: scaleX(1);
   }
 }
 
@@ -428,6 +568,31 @@
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION — global backstop
+   ============================================================
+
+   The named animations above each opt out individually, but most of
+   the motion on this site comes from Tailwind `transition-*` and
+   `hover:scale-*` utilities scattered across components, which no
+   amount of per-keyframe guarding would catch.
+
+   This collapses every transition and animation to an imperceptible
+   duration rather than removing them, so state still *changes* —
+   hovers, dropdowns and the mobile menu all keep working — it just
+   arrives instantly instead of travelling.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

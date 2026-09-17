@@ -5,6 +5,7 @@ import { btechBranches, diplomaBranches, engineeringAdmission } from "../data/pr
 import { campusImages } from "../data/about";
 import { getInstitution } from "../data/institutions";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 const inst = getInstitution("btech-polytechnic");
 
@@ -54,11 +55,11 @@ export default function BTechPolytechnic() {
       />
 
       {/* ---------------- approvals ---------------- */}
-      <section className="border-b border-stone-line bg-paper py-12 sm:py-14">
+      <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
           <div className="grid gap-8 sm:grid-cols-3">
             {inst.credentials.map((c, i) => (
-              <Reveal key={c} delay={i * 90}>
+              <Reveal key={c} delay={stagger(i)}>
                 <div className="flex items-start gap-4 border-t-2 border-royal-600 pt-5">
                   <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                     {String(i + 1).padStart(2, "0")}
@@ -72,19 +73,19 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- overview ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>The college</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
-                <h2 className="t-h2 mt-6 max-w-xl text-ink">
+              <Reveal delay={stagger(1)}>
+                <h2 className="t-h2 mt-5 max-w-xl text-ink">
                   Engineering taught where the industry actually is.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                   <p>
                     Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
@@ -104,13 +105,13 @@ export default function BTechPolytechnic() {
                 </div>
               </Reveal>
 
-              <div className="mt-12 grid grid-cols-2 gap-8 sm:max-w-md">
-                <Reveal delay={200}>
+              <div className="mt-10 grid grid-cols-2 gap-8 sm:max-w-md">
+                <Reveal delay={stagger(3)}>
                   <div className="border-t border-stone-line pt-5">
                     <Fact value="05" label="B.Tech branches" />
                   </div>
                 </Reveal>
-                <Reveal delay={270}>
+                <Reveal delay={stagger(4)}>
                   <div className="border-t border-stone-line pt-5">
                     <Fact value="04" label="Diploma branches" />
                   </div>
@@ -118,7 +119,7 @@ export default function BTechPolytechnic() {
               </div>
             </div>
 
-            <Reveal delay={120} className="group">
+            <Reveal delay={stagger(2)} className="group">
               <Figure
                 src={campusImages.campusAerial}
                 alt="The Satpuda campus seen across its lawns"
@@ -130,7 +131,7 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- B.TECH BRANCHES ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Degree programmes"
@@ -138,10 +139,10 @@ export default function BTechPolytechnic() {
             lead="Four years, eight semesters, affiliated to RGPV Bhopal."
           />
 
-          <div className="mt-14 grid gap-px bg-stone-line sm:grid-cols-2 lg:grid-cols-3">
+          <div className="section-body grid gap-px bg-stone-line sm:grid-cols-2 lg:grid-cols-3">
             {btechBranches.map((b, i) => (
-              <Reveal key={b.code} delay={(i % 3) * 90}>
-                <article className="group flex h-full flex-col bg-paper-dim p-7 transition-colors duration-400 hover:bg-paper sm:p-8">
+              <Reveal key={b.code} delay={stagger(i % 3)}>
+                <article className="card-raise group flex h-full flex-col bg-paper-dim p-7 hover:bg-paper sm:p-8">
                   <div className="flex items-baseline justify-between gap-4">
                     <span className="font-display text-xs font-semibold tracking-[0.08em] text-ember-600">
                       {b.code}
@@ -177,17 +178,17 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- DIPLOMA ---------------- */}
-      <section className="on-dark bg-royal-900 py-20 text-white sm:py-28">
+      <section className="section on-dark bg-royal-900 text-white">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>Diploma programmes</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
+              <Reveal delay={stagger(1)}>
                 <h2 className="t-h2 mt-5 text-white">Polytechnic — a three-year route in.</h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
                   Open after Class 10 and approved by the Directorate of Technical Education,
                   Government of Madhya Pradesh. A diploma can stand on its own as a technical
@@ -198,7 +199,7 @@ export default function BTechPolytechnic() {
 
             <div>
               {diplomaBranches.map((d, i) => (
-                <Reveal key={d.name} delay={i * 90}>
+                <Reveal key={d.name} delay={stagger(i)}>
                   <article className="group grid grid-cols-[2.75rem_1fr] gap-4 border-t border-white/15 py-7 transition-colors duration-400 hover:border-ember-500 sm:grid-cols-[4rem_1fr] sm:gap-7">
                     <span className="font-display text-xs font-semibold tabular-nums text-ember-400">
                       {String(i + 1).padStart(2, "0")}
@@ -220,7 +221,7 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- FACILITIES ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="Labs & infrastructure"
@@ -228,9 +229,9 @@ export default function BTechPolytechnic() {
             lead="Laboratory and workshop time is scheduled as core teaching, not as a demonstration attached to a lecture."
           />
 
-          <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:gap-x-12 lg:gap-y-14">
+          <div className="section-body grid gap-10 sm:grid-cols-2 lg:gap-x-12 lg:gap-y-14">
             {facilities.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 2) * 100} className="group">
+              <Reveal key={f.title} delay={stagger(i % 2)} className="group">
                 <article>
                   <Figure src={f.image} alt={f.alt} ratio="16 / 10" />
                   <h3 className="mt-6 font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-ink">
@@ -247,14 +248,14 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- ADMISSION ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Eligibility & admission"
             title="What you need, and how you apply."
           />
 
-          <div className="mt-14 grid gap-px bg-stone-line lg:grid-cols-2">
+          <div className="section-body grid gap-px bg-stone-line lg:grid-cols-2">
             {engineeringAdmission.map((a) => (
               <Reveal key={a.label}>
                 <div className="h-full bg-paper-dim p-8 sm:p-10">
@@ -288,7 +289,7 @@ export default function BTechPolytechnic() {
             ))}
           </div>
 
-          <Reveal delay={120}>
+          <Reveal delay={stagger(2)}>
             <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
               Intake, fee structure, scholarship eligibility and counselling dates change every
               session and are not published here. Contact the institution for current details.

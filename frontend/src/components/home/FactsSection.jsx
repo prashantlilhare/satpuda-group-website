@@ -1,5 +1,6 @@
 import { Eyebrow, Fact, Reveal } from "../ui/Primitives";
 import { milestones } from "../../data/institutions";
+import { stagger } from "../ui/stagger";
 
 /**
  * Deliberately restricted to figures that can be checked against an official
@@ -15,7 +16,7 @@ const facts = [
 
 export function FactsSection() {
   return (
-    <section className="on-dark bg-royal-900 py-20 text-white sm:py-28">
+    <section className="section on-dark bg-royal-900 text-white">
       <div className="shell">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
           {/* ---------- facts ---------- */}
@@ -23,15 +24,15 @@ export function FactsSection() {
             <Reveal>
               <Eyebrow>The group at a glance</Eyebrow>
             </Reveal>
-            <Reveal delay={70}>
+            <Reveal delay={stagger(1)}>
               <h2 className="t-h2 mt-5 max-w-md text-white">
                 Figures we can stand behind.
               </h2>
             </Reveal>
 
-            <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-12">
+            <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-12">
               {facts.map((f, i) => (
-                <Reveal key={f.label} delay={i * 90}>
+                <Reveal key={f.label} delay={stagger(i)}>
                   <div className="border-t border-white/18 pt-6">
                     <Fact value={f.value} label={f.label} sub={f.sub} dark />
                   </div>
@@ -48,7 +49,7 @@ export function FactsSection() {
 
             <ol className="mt-10">
               {milestones.map((m, i) => (
-                <Reveal key={m.year} delay={i * 110}>
+                <Reveal key={m.year} delay={stagger(i)}>
                   <li className="relative grid grid-cols-[4.5rem_1fr] gap-5 pb-11 sm:grid-cols-[6rem_1fr] sm:gap-7">
                     {/* connector */}
                     {i < milestones.length - 1 && (

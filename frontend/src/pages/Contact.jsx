@@ -6,6 +6,7 @@ import { Button, Eyebrow, Reveal, SectionHeading, TextLink } from "../components
 import { contact, instituteLinks } from "../data/site";
 import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 /* ------------------------------------------------------------------ */
 /* FORM                                                                */
@@ -280,7 +281,7 @@ export default function Contact() {
       />
 
       {/* ---------------- details + form ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
             {/* --- details --- */}
@@ -290,7 +291,7 @@ export default function Contact() {
               </Reveal>
 
               <dl className="mt-9">
-                <Reveal delay={70}>
+                <Reveal delay={stagger(1)}>
                   <div className="flex gap-5 border-t border-stone-line py-6">
                     <MapPin aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-ember-500" />
                     <div>
@@ -310,7 +311,7 @@ export default function Contact() {
                   </div>
                 </Reveal>
 
-                <Reveal delay={140}>
+                <Reveal delay={stagger(2)}>
                   <div className="flex gap-5 border-t border-stone-line py-6">
                     <Phone aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-ember-500" />
                     <div>
@@ -332,7 +333,7 @@ export default function Contact() {
                   </div>
                 </Reveal>
 
-                <Reveal delay={210}>
+                <Reveal delay={stagger(3)}>
                   <div className="flex gap-5 border-t border-stone-line py-6">
                     <Mail aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-ember-500" />
                     <div className="min-w-0">
@@ -351,7 +352,7 @@ export default function Contact() {
                   </div>
                 </Reveal>
 
-                <Reveal delay={280}>
+                <Reveal delay={stagger(4)}>
                   <div className="flex gap-5 border-y border-stone-line py-6">
                     <Clock aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-ember-500" />
                     <div>
@@ -364,7 +365,7 @@ export default function Contact() {
                 </Reveal>
               </dl>
 
-              <Reveal delay={340}>
+              <Reveal delay={stagger(5)}>
                 <p className="mt-8">
                   <TextLink href={mapsHref} external>
                     Open the campus in Google Maps
@@ -382,7 +383,7 @@ export default function Contact() {
                   urgent.
                 </p>
               </Reveal>
-              <Reveal delay={120} className="mt-10">
+              <Reveal delay={stagger(2)} className="mt-10">
                 <ContactForm />
               </Reveal>
             </div>
@@ -391,7 +392,7 @@ export default function Contact() {
       </section>
 
       {/* ---------------- institution routing ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-24">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="By institution"
@@ -399,12 +400,12 @@ export default function Contact() {
             lead="All four institutions share the campus address and the numbers above. Start from the one you are interested in."
           />
 
-          <div className="mt-12 grid gap-px bg-stone-line sm:grid-cols-2 lg:grid-cols-4">
+          <div className="section-body grid gap-px bg-stone-line sm:grid-cols-2 lg:grid-cols-4">
             {instituteLinks.map((item, i) => (
-              <Reveal key={item.to} delay={i * 80}>
+              <Reveal key={item.to} delay={stagger(i)}>
                 <Link
                   to={item.to}
-                  className="group flex h-full flex-col bg-paper-dim p-7 transition-colors duration-400 hover:bg-paper"
+                  className="card-raise group flex h-full flex-col bg-paper-dim p-7 hover:bg-paper"
                 >
                   <h3 className="font-display text-[1.1875rem] font-semibold tracking-[-0.018em] text-ink transition-colors duration-300 group-hover:text-royal-700">
                     {item.label}
@@ -423,7 +424,7 @@ export default function Contact() {
       </section>
 
       {/* ---------------- map ---------------- */}
-      <section className="bg-paper pb-20 sm:pb-28">
+      <section className="section bg-paper">
         <div className="shell">
           <Reveal>
             <div className="relative isolate overflow-hidden border border-stone-line">
@@ -449,7 +450,7 @@ export default function Contact() {
                   href={mapsHref}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="group/map mt-6 inline-flex items-center gap-2.5 bg-white px-5 py-3 text-[0.875rem] font-semibold text-royal-700 transition-colors duration-300 hover:bg-ember-500 hover:text-white"
+                  className="group/map mt-6 inline-flex items-center gap-2.5 bg-white px-5 py-3 text-[0.875rem] font-semibold text-royal-700 transition-[background-color,color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:bg-royal-50 hover:text-royal-800 hover:shadow-[0_12px_28px_-14px_rgba(0,0,0,0.5)] active:translate-y-0"
                 >
                   Get directions
                   <ExternalLink

@@ -35,7 +35,7 @@ export function Footer() {
 
   return (
     <footer className="on-dark bg-royal-950 text-white">
-      <div className="shell py-18 sm:py-24">
+      <div className="shell section-tight">
         <div className="grid gap-14 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1.4fr] lg:gap-10">
           {/* --- brand --- */}
           <div className="max-w-sm">
@@ -48,7 +48,7 @@ export function Footer() {
                 >
                   Satpuda Group
                 </span>
-                <span className="mt-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.17em] text-white/50">
+                <span className="mt-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.17em] text-white/60">
                   Balaghat · Madhya Pradesh
                 </span>
               </span>
@@ -60,7 +60,7 @@ export function Footer() {
             </p>
 
             <p className="motto mt-7 text-lg text-ember-300">{site.motto}</p>
-            <p className="mt-1.5 text-[0.8125rem] italic text-white/40">
+            <p className="mt-1.5 text-[0.8125rem] italic text-white/60">
               “{site.mottoMeaning}”
             </p>
           </div>
@@ -159,7 +159,7 @@ export function Footer() {
       {/* --- bottom bar --- */}
       <div className="border-t border-white/10">
         <div className="shell flex flex-col gap-4 py-7 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[0.8125rem] text-white/45">
+          <p className="text-[0.8125rem] text-white/60">
             © {year} {site.name}. All rights reserved.
           </p>
           <nav aria-label="Legal">
@@ -167,7 +167,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="link-underline text-[0.8125rem] text-white/45 transition-colors hover:text-white/80"
+                  className="link-underline text-[0.8125rem] text-white/60 transition-colors hover:text-white/80"
                 >
                   Privacy Policy
                 </Link>
@@ -175,7 +175,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/terms"
-                  className="link-underline text-[0.8125rem] text-white/45 transition-colors hover:text-white/80"
+                  className="link-underline text-[0.8125rem] text-white/60 transition-colors hover:text-white/80"
                 >
                   Terms of Use
                 </Link>

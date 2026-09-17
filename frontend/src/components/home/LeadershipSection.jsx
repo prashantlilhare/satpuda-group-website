@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Figure, Reveal, SectionHeading } from "../ui/Primitives";
 import { director, principal } from "../../data/leadership";
+import { stagger } from "../ui/stagger";
 
 const cards = [
   {
@@ -21,7 +22,7 @@ const cards = [
 
 export function LeadershipSection() {
   return (
-    <section className="bg-paper-dim py-20 sm:py-28 lg:py-32">
+    <section className="section bg-paper-dim">
       <div className="shell">
         <SectionHeading
           eyebrow="Leadership"
@@ -29,9 +30,9 @@ export function LeadershipSection() {
           lead="Two messages, in their own words — on what the group is trying to build, and what students can expect when they arrive."
         />
 
-        <div className="mt-16 grid gap-10 md:grid-cols-2 lg:gap-14">
+        <div className="section-body grid gap-10 md:grid-cols-2 lg:gap-14">
           {cards.map(({ person, to, quote, linkLabel }, i) => (
-            <Reveal key={person.name} delay={i * 120}>
+            <Reveal key={person.name} delay={stagger(i)}>
               <Link to={to} className="group block">
                 <article className="flex flex-col gap-7 sm:flex-row sm:gap-8">
                   <div className="w-full shrink-0 sm:w-[11.5rem] lg:w-[13rem]">

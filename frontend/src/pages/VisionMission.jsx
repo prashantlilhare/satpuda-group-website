@@ -4,6 +4,7 @@ import { Eyebrow, Figure, Reveal } from "../components/ui/Primitives";
 import { campusImages, mission, values, vision } from "../data/about";
 import { site } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 export default function VisionMission() {
   useSeo({
@@ -24,7 +25,7 @@ export default function VisionMission() {
       />
 
       {/* ---------------- VISION ---------------- */}
-      <section className="bg-paper py-20 sm:py-28 lg:py-32">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr] lg:gap-16">
             <Reveal>
@@ -42,13 +43,13 @@ export default function VisionMission() {
             </Reveal>
 
             <div className="lg:pt-3">
-              <Reveal delay={110}>
+              <Reveal delay={stagger(2)}>
                 <p className="font-display text-[1.625rem] leading-[1.3] tracking-[-0.022em] text-ink sm:text-[2rem]">
                   {vision.statement}
                 </p>
               </Reveal>
 
-              <Reveal delay={200} className="group mt-12">
+              <Reveal delay={stagger(3)} className="group mt-12">
                 <Figure
                   src={campusImages.computerLab}
                   alt="Students working in a Satpuda computer laboratory"
@@ -61,7 +62,7 @@ export default function VisionMission() {
       </section>
 
       {/* ---------------- MISSION ---------------- */}
-      <section className="on-dark bg-royal-900 py-20 text-white sm:py-28 lg:py-32">
+      <section className="section on-dark bg-royal-900 text-white">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr] lg:gap-16">
             <Reveal>
@@ -79,15 +80,15 @@ export default function VisionMission() {
             </Reveal>
 
             <div className="lg:pt-3">
-              <Reveal delay={110}>
+              <Reveal delay={stagger(2)}>
                 <p className="font-display text-[1.625rem] leading-[1.3] tracking-[-0.022em] text-white sm:text-[2rem]">
                   {mission.statement}
                 </p>
               </Reveal>
 
-              <ol className="mt-14">
+              <ol className="section-body">
                 {mission.points.map((p, i) => (
-                  <Reveal key={p.title} delay={140 + i * 100}>
+                  <Reveal key={p.title} delay={stagger(2 + i)}>
                     <li className="grid grid-cols-[3rem_1fr] gap-5 border-t border-white/15 py-7 sm:grid-cols-[4.5rem_1fr] sm:gap-8">
                       <span className="font-display text-sm font-semibold tabular-nums text-ember-400">
                         {String(i + 1).padStart(2, "0")}
@@ -110,21 +111,21 @@ export default function VisionMission() {
       </section>
 
       {/* ---------------- VALUES ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <div className="max-w-2xl">
             <Reveal>
               <Eyebrow>Our values</Eyebrow>
             </Reveal>
-            <Reveal delay={70}>
+            <Reveal delay={stagger(1)}>
               <h2 className="t-h2 mt-5 text-ink">Six words that decide the difficult calls.</h2>
             </Reveal>
           </div>
 
-          <div className="mt-14 grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
+          <div className="section-body grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
             {values.map((v, i) => (
-              <Reveal key={v.title} delay={(i % 3) * 90}>
-                <article className="group border-t border-stone-line py-7 transition-colors duration-400 hover:border-ember-500">
+              <Reveal key={v.title} delay={stagger(i % 3)}>
+                <article className="group border-t border-stone-line py-7 transition-colors duration-400 hover:border-royal-600">
                   <div className="flex items-baseline gap-4">
                     <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                       {String(i + 1).padStart(2, "0")}
@@ -139,8 +140,8 @@ export default function VisionMission() {
             ))}
           </div>
 
-          <Reveal delay={200}>
-            <div className="mt-16 border-t border-stone-line pt-10 text-center">
+          <Reveal delay={stagger(3)}>
+            <div className="section-body border-t border-stone-line pt-10 text-center">
               <p className="motto text-[1.5rem] leading-snug text-royal-700 sm:text-[1.875rem]">
                 {site.motto}
               </p>

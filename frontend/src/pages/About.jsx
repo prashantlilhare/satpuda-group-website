@@ -7,6 +7,7 @@ import { campusImages, values } from "../data/about";
 import { institutions, milestones } from "../data/institutions";
 import { site, sources } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 export default function About() {
   useSeo({
@@ -28,7 +29,7 @@ export default function About() {
       />
 
       {/* ---------------- editorial opening ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
             <Reveal>
@@ -39,7 +40,7 @@ export default function About() {
               </p>
             </Reveal>
 
-            <Reveal delay={120}>
+            <Reveal delay={stagger(2)}>
               <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft lg:pt-16">
                 <p>
                   {site.trust} opened Satpuda ITI at Garra in 1999. Balaghat sits in a mineral belt
@@ -63,13 +64,13 @@ export default function About() {
           </div>
 
           {/* --- image band --- */}
-          <div className="mt-20 grid gap-5 sm:grid-cols-3">
+          <div className="section-body grid gap-5 sm:grid-cols-3">
             {[
               { src: campusImages.campusFront, alt: "The Satpuda college building from its front approach" },
               { src: campusImages.seminarHall, alt: "A seminar session in the campus hall" },
               { src: campusImages.librarySmart, alt: "The campus smart library" },
             ].map((img, i) => (
-              <Reveal key={img.src} delay={i * 110} className="group">
+              <Reveal key={img.src} delay={stagger(i)} className="group">
                 <Figure src={img.src} alt={img.alt} ratio="4 / 3" />
               </Reveal>
             ))}
@@ -78,13 +79,13 @@ export default function About() {
       </section>
 
       {/* ---------------- milestones ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading eyebrow="Milestones" title="How the group grew." />
 
-          <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+          <ol className="section-body grid gap-10 md:grid-cols-3 md:gap-8">
             {milestones.map((m, i) => (
-              <Reveal key={m.year} delay={i * 110}>
+              <Reveal key={m.year} delay={stagger(i)}>
                 <li className="border-t-2 border-royal-600 pt-7">
                   <p
                     className="font-display text-[2.25rem] font-semibold leading-none tracking-[-0.03em] text-royal-700"
@@ -104,7 +105,7 @@ export default function About() {
       </section>
 
       {/* ---------------- the four institutions ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="The institutions"
@@ -112,12 +113,12 @@ export default function About() {
             lead="Each has its own affiliation, its own intake and its own teaching staff."
           />
 
-          <div className="mt-14 grid gap-px bg-stone-line sm:grid-cols-2">
+          <div className="section-body grid gap-px bg-stone-line sm:grid-cols-2">
             {institutions.map((inst, i) => (
-              <Reveal key={inst.id} delay={(i % 2) * 90}>
+              <Reveal key={inst.id} delay={stagger(i % 2)}>
                 <Link
                   to={inst.to}
-                  className="group flex h-full flex-col bg-paper p-7 transition-colors duration-400 hover:bg-paper-dim sm:p-9"
+                  className="card-raise group flex h-full flex-col bg-paper p-7 hover:bg-paper-dim sm:p-9"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <p className="text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-600">
@@ -154,31 +155,31 @@ export default function About() {
       </section>
 
       {/* ---------------- values ---------------- */}
-      <section className="on-dark bg-royal-900 py-20 text-white sm:py-28">
+      <section className="section on-dark bg-royal-900 text-white">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>What we hold to</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
+              <Reveal delay={stagger(1)}>
                 <h2 className="t-h2 mt-5 text-white">Six values, used as tests.</h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
                   They are the questions we ask when a decision about teaching, discipline or
                   admissions is genuinely difficult.
                 </p>
               </Reveal>
-              <Reveal delay={210}>
+              <Reveal delay={stagger(3)}>
                 <p className="motto mt-10 text-2xl text-ember-300">{site.motto}</p>
-                <p className="mt-2 text-sm italic text-white/45">“{site.mottoMeaning}”</p>
+                <p className="mt-2 text-sm italic text-white/60">“{site.mottoMeaning}”</p>
               </Reveal>
             </div>
 
             <div className="grid gap-x-10 gap-y-1 sm:grid-cols-2">
               {values.map((v, i) => (
-                <Reveal key={v.title} delay={(i % 2) * 80}>
+                <Reveal key={v.title} delay={stagger(i % 2)}>
                   <div className="border-t border-white/15 py-6">
                     <h3 className="font-display text-[1.125rem] font-semibold tracking-[-0.015em] text-white">
                       {v.title}
@@ -195,7 +196,7 @@ export default function About() {
       </section>
 
       {/* ---------------- sources ---------------- */}
-      <section className="bg-paper py-16 sm:py-20">
+      <section className="section-tight bg-paper">
         <div className="shell">
           <Reveal>
             <div className="border-t border-stone-line pt-8">

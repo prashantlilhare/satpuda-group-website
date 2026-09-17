@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Reveal, SectionHeading, TextLink } from "../ui/Primitives";
 import { btechBranches, diplomaBranches, itiTrades, teacherEducation } from "../../data/programs";
+import { stagger } from "../ui/stagger";
 
 const families = [
   {
@@ -32,16 +33,16 @@ const families = [
 
 export function ProgramsSection() {
   return (
-    <section className="bg-paper py-20 sm:py-28 lg:py-32">
+    <section className="section bg-paper">
       <div className="shell">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-20">
-          <div className="lg:sticky lg:top-32 lg:self-start">
+          <div className="lg:sticky-aside">
             <SectionHeading
               eyebrow="Academic programmes"
               title="What you can study here."
               lead="Degree and diploma engineering, NCVT trade certification and teacher education — all on the Satpuda campus at Manjhapur."
             />
-            <Reveal delay={210}>
+            <Reveal delay={stagger(3)}>
               <p className="mt-8 text-sm leading-relaxed text-ink-mute">
                 Programme durations and eligibility follow AICTE, RGPV and NCVT norms. For the
                 current session's intake, fees and admission dates, please contact the institution
@@ -52,7 +53,7 @@ export function ProgramsSection() {
 
           <div>
             {families.map((family, i) => (
-              <Reveal key={family.label} delay={i * 80}>
+              <Reveal key={family.label} delay={stagger(i)}>
                 <Link
                   to={family.to}
                   className="group block border-t border-stone-line py-8 transition-colors duration-400 hover:border-royal-600 sm:py-9"
@@ -92,7 +93,7 @@ export function ProgramsSection() {
               </Reveal>
             ))}
 
-            <Reveal delay={340}>
+            <Reveal delay={stagger(5)}>
               <div className="border-t border-stone-line pt-8">
                 <TextLink to="/contact">Ask about admissions for this session</TextLink>
               </div>

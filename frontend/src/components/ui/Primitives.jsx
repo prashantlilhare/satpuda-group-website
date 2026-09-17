@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
+import { stagger } from "./stagger";
 
 /* ------------------------------------------------------------------ */
 /* Reveal — scroll-triggered entrance                                  */
@@ -33,20 +34,31 @@ export function Eyebrow({ children, className = "" }) {
 /* Button — shared visual language for links and real buttons          */
 /* ------------------------------------------------------------------ */
 
+/* The lift is deliberately small — 2px — and paired with a tinted shadow
+   rather than a grey one, so a row of buttons reads as paper being picked
+   up rather than as a card popping. `active:` returns it to the surface so
+   a press still feels like a press. */
 const BASE =
   "group/btn inline-flex items-center justify-center gap-2.5 font-sans text-[0.9375rem] font-semibold " +
-  "tracking-[-0.01em] px-6 py-3.5 transition-[background-color,color,border-color,transform] " +
-  "duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:translate-y-px disabled:opacity-55 " +
-  "disabled:pointer-events-none";
+  "tracking-[-0.01em] px-6 py-3.5 transition-[background-color,color,border-color,transform,box-shadow] " +
+  "duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 active:translate-y-0 " +
+  "disabled:opacity-55 disabled:pointer-events-none disabled:hover:translate-y-0";
 
 const VARIANTS = {
-  primary: "bg-royal-600 text-white hover:bg-royal-700",
-  ember: "bg-ember-500 text-white hover:bg-ember-600",
+  primary:
+    "bg-royal-600 text-white hover:bg-royal-700 hover:shadow-[0_12px_26px_-14px_rgba(20,34,68,0.75)]",
+  ember:
+    "bg-ember-500 text-white hover:bg-ember-600 hover:shadow-[0_12px_26px_-14px_rgba(156,38,23,0.8)]",
   outline:
-    "border border-royal-600/30 text-royal-700 hover:border-royal-600 hover:bg-royal-600 hover:text-white",
+    "border border-royal-600/30 text-royal-700 hover:border-royal-600 hover:bg-royal-600 hover:text-white " +
+    "hover:shadow-[0_12px_26px_-14px_rgba(20,34,68,0.7)]",
   ghostLight:
     "border border-white/35 text-white hover:bg-white hover:text-royal-700 hover:border-white",
-  solidLight: "bg-white text-royal-700 hover:bg-ember-500 hover:text-white",
+  /* Stays white on hover. Flipping the one light button on a royal band to
+     red made red read as "the hover colour" site-wide; it is an accent. */
+  solidLight:
+    "bg-white text-royal-700 hover:bg-royal-50 hover:text-royal-800 " +
+    "hover:shadow-[0_12px_28px_-14px_rgba(0,0,0,0.45)]",
 };
 
 export function Button({
@@ -144,11 +156,11 @@ export function SectionHeading({
           <Eyebrow className={centred ? "justify-center" : ""}>{eyebrow}</Eyebrow>
         </Reveal>
       )}
-      <Reveal delay={70}>
+      <Reveal delay={stagger(1)}>
         <Tag className="t-h2 mt-5 text-ink">{title}</Tag>
       </Reveal>
       {lead && (
-        <Reveal delay={140}>
+        <Reveal delay={stagger(2)}>
           <p className="t-lead mt-5">{lead}</p>
         </Reveal>
       )}

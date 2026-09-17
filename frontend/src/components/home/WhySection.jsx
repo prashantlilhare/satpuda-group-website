@@ -1,9 +1,10 @@
 import { Reveal, SectionHeading } from "../ui/Primitives";
 import { differentiators } from "../../data/about";
+import { stagger } from "../ui/stagger";
 
 export function WhySection() {
   return (
-    <section className="bg-paper-dim py-20 sm:py-28 lg:py-32">
+    <section className="section bg-paper-dim">
       <div className="shell">
         <SectionHeading
           eyebrow="Why Satpuda Group"
@@ -11,10 +12,10 @@ export function WhySection() {
           lead="Not claims about rankings or placement percentages — the things you can verify from the campus, the approvals and the record."
         />
 
-        <div className="mt-16 grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
+        <div className="section-body grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
           {differentiators.map((d, i) => (
-            <Reveal key={d.title} delay={(i % 3) * 90}>
-              <article className="group border-t border-stone-line py-8 transition-colors duration-400 hover:border-ember-500">
+            <Reveal key={d.title} delay={stagger(i % 3)}>
+              <article className="group border-t border-stone-line py-8 transition-colors duration-400 hover:border-royal-600">
                 <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                   {String(i + 1).padStart(2, "0")}
                 </span>

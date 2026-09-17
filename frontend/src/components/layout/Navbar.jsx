@@ -55,12 +55,11 @@ function DesktopDropdown({ item, openId, setOpenId }) {
           aria-hidden="true"
           className={`h-3.5 w-3.5 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
-        <span
-          aria-hidden="true"
-          className={`absolute -bottom-0.5 left-0 h-[2px] bg-ember-500 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            isActive ? "w-full" : "w-0"
-          }`}
-        />
+        {/* Drawn full-width while this section is current or its panel is
+            open, and grown from the left on hover/focus — previously the
+            rule existed only in the active state, so pointing at any other
+            item gave no feedback beyond a colour shift. */}
+        <span aria-hidden="true" data-active={isActive || isOpen} className="nav-underline" />
       </button>
 
       <div
@@ -162,7 +161,7 @@ function MobileAccordion({ item, index, onNavigate }) {
                   }
                 >
                   <span className="block text-[1.0625rem] font-medium">{child.label}</span>
-                  <span className="mt-0.5 block text-[0.8125rem] leading-snug text-white/45">
+                  <span className="mt-0.5 block text-[0.8125rem] leading-snug text-white/60">
                     {child.blurb}
                   </span>
                 </NavLink>
@@ -306,7 +305,7 @@ export function Navbar() {
         <div className="shell flex h-11 items-center justify-between gap-6">
           <p className="motto truncate text-[0.8125rem] text-ember-200">
             {site.motto}
-            <span className="ml-2.5 hidden text-white/45 sm:inline">
+            <span className="ml-2.5 hidden text-white/60 sm:inline">
               — knowledge is that which liberates
             </span>
           </p>
@@ -366,12 +365,7 @@ export function Navbar() {
                       {({ isActive }) => (
                         <>
                           {item.label}
-                          <span
-                            aria-hidden="true"
-                            className={`absolute -bottom-0.5 left-0 h-[2px] bg-ember-500 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                              isActive ? "w-full" : "w-0"
-                            }`}
-                          />
+                          <span aria-hidden="true" data-active={isActive} className="nav-underline" />
                         </>
                       )}
                     </NavLink>
@@ -384,7 +378,10 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             <Link
               to="/contact"
-              className="group/cta hidden items-center gap-2 bg-royal-600 px-5 py-3 text-[0.875rem] font-semibold text-white transition-colors duration-300 hover:bg-ember-500 lg:inline-flex"
+              // Deepens within the blue rather than flipping to red: the header
+              // CTA is the most-seen button on the site, and turning it red on
+              // hover made red read as "the hover colour" rather than an accent.
+              className="group/cta hidden items-center gap-2 bg-royal-600 px-5 py-3 text-[0.875rem] font-semibold text-white transition-[background-color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:bg-royal-700 hover:shadow-[0_12px_24px_-14px_rgba(20,34,68,0.8)] active:translate-y-0 lg:inline-flex"
             >
               Enquire now
               <span
@@ -488,7 +485,7 @@ export function Navbar() {
                 {contact.email}
               </a>
             </div>
-            <p className="motto pt-5 text-center text-sm text-white/35">{site.motto}</p>
+            <p className="motto pt-5 text-center text-sm text-white/55">{site.motto}</p>
           </div>
         </div>
       </div>
