@@ -69,6 +69,7 @@ export function IntroSection() {
           <div className="relative pb-10 sm:pb-14">
             <Reveal className="group">
               <Figure
+                mask
                 src={campusImages.campusFront}
                 alt="The Satpuda College of Engineering & Polytechnic building and its front approach"
                 ratio="4 / 5"

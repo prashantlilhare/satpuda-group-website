@@ -76,6 +76,7 @@ export default function DEdBEd() {
 
             <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.classroom}
                 alt="A teaching session in progress in a Satpuda classroom"
                 ratio="4 / 5"

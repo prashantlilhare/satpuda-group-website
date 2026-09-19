@@ -18,7 +18,7 @@ export function CampusSection() {
           {/* large lead item */}
           <Reveal className="group lg:col-span-7">
             <article>
-              <Figure src={first.image} alt={first.alt} ratio="16 / 10" />
+              <Figure mask src={first.image} alt={first.alt} ratio="16 / 10" />
               <div className="mt-6 flex items-start gap-5">
                 <span aria-hidden="true" className="mt-2.5 h-px w-10 shrink-0 bg-ember-500" />
                 <div>

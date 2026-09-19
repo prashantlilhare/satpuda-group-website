@@ -106,6 +106,7 @@ export default function ITI() {
 
             <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.workshop}
                 alt="Trainees on an industrial workshop floor during practical training"
                 ratio="4 / 5"

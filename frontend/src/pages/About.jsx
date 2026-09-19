@@ -83,7 +83,7 @@ export default function About() {
         <div className="shell">
           <SectionHeading eyebrow="Milestones" title="How the group grew." />
 
-          <ol className="section-body grid gap-10 md:grid-cols-3 md:gap-8">
+          <ol className="section-body grid gap-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
             {milestones.map((m, i) => (
               <Reveal key={m.year} delay={stagger(i)}>
                 <li className="border-t-2 border-royal-600 pt-7">

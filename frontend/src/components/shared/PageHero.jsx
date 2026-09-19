@@ -19,7 +19,7 @@ export function PageHero({ eyebrow, title, lead, crumbs = [], image, imageAlt = 
             loading="eager"
             fetchPriority="high"
             decoding="async"
-            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.22]"
+            className="hero-backdrop absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.22]"
           />
           <div
             aria-hidden="true"

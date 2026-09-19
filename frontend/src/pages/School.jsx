@@ -99,6 +99,7 @@ export default function School() {
 
             <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.campusAerial}
                 alt="The Satpuda campus grounds"
                 ratio="4 / 5"

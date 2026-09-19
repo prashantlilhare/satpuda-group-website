@@ -51,6 +51,7 @@ export default function VisionMission() {
 
               <Reveal delay={stagger(3)} className="group mt-12">
                 <Figure
+                  mask
                   src={campusImages.computerLab}
                   alt="Students working in a Satpuda computer laboratory"
                   ratio="16 / 9"

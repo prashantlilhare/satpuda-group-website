@@ -38,6 +38,7 @@ export default function PrincipalMessage() {
           {/* portrait band — a different composition from the Director page */}
           <Reveal className="group">
             <Figure
+              mask
               src={principal.portrait}
               alt={principal.portraitAlt}
               ratio="16 / 9"

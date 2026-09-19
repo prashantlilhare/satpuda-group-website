@@ -36,6 +36,7 @@ function useFocusMainOnNavigate() {
 
 export function Layout() {
   useFocusMainOnNavigate();
+  const { pathname } = useLocation();
 
   return (
     <>
@@ -54,9 +55,15 @@ export function Layout() {
           the document, so if it shrank as the header collapsed on scroll the
           whole page would jump upward. */}
       <main id="main" tabIndex={-1} className="pt-[var(--nav-h)] focus-visible:outline-none">
-        <Suspense fallback={<RouteFallback />}>
-          <Outlet />
-        </Suspense>
+        {/* Keyed on the path so each route plays its own entrance — see
+            `.page-enter`. The key remounts the boundary too, which is what
+            makes a page that was already loaded still arrive rather than
+            simply appear. */}
+        <div key={pathname} className="page-enter">
+          <Suspense fallback={<RouteFallback />}>
+            <Outlet />
+          </Suspense>
+        </div>
       </main>
 
       <Footer />

@@ -47,10 +47,13 @@ function validate(values) {
 
 function Field({ label, name, error, children, hint }) {
   return (
-    <div>
+    /* `group` + `focus-within` so the label follows its own control into
+       focus — the field being filled in is then legible from the label
+       down, not just from the border. */
+    <div className="group">
       <label
         htmlFor={name}
-        className="block text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute"
+        className="block text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute transition-colors duration-300 group-focus-within:text-royal-700"
       >
         {label}
       </label>
@@ -65,10 +68,15 @@ function Field({ label, name, error, children, hint }) {
   );
 }
 
+/* The focus state is a tinted halo rather than the platform ring: the field
+   is already bordered, so a second hard outline around it reads as an error.
+   `box-shadow` rather than `ring`, so nothing is added to the layout. */
 const inputCls =
   "w-full border border-stone-line bg-white px-4 py-3.5 text-[0.9375rem] text-ink " +
-  "transition-colors duration-300 placeholder:text-ink-mute/70 hover:border-royal-300 " +
-  "focus:border-royal-600 focus:outline-none focus-visible:outline-none";
+  "transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] " +
+  "placeholder:text-ink-mute/70 hover:border-royal-300 " +
+  "focus:border-royal-600 focus:shadow-[0_0_0_3px_rgba(41,71,145,0.12)] " +
+  "focus:outline-none focus-visible:outline-none";
 
 function ContactForm() {
   const [values, setValues] = useState(EMPTY);

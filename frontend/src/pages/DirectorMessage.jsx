@@ -34,6 +34,7 @@ export default function DirectorMessage() {
             <div className="lg:sticky-aside">
               <Reveal className="group">
                 <Figure
+                  mask
                   src={director.portrait}
                   alt={director.portraitAlt}
                   ratio="4 / 5"

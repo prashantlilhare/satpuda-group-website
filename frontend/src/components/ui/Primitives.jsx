@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
@@ -180,13 +181,18 @@ export function Figure({
   className = "",
   imgClassName = "",
   zoom = true,
+  /* Wipes the frame open as it enters, instead of the picture fading in
+     with the block around it. For the one large photograph a section
+     opens on — see `.img-mask`; on a row of thumbnails it reads as
+     fidget. Needs a `<Reveal>` somewhere above it to trigger from. */
+  mask = false,
   position = "center",
   loading = "lazy",
   children,
 }) {
   return (
     <figure
-      className={`relative overflow-hidden bg-royal-900/5 ${className}`}
+      className={`relative overflow-hidden bg-royal-900/5 ${mask ? "img-mask" : ""} ${className}`}
       style={{ aspectRatio: ratio }}
     >
       <img
@@ -208,16 +214,65 @@ export function Figure({
 /* Fact — a labelled figure/stat, used only for verifiable numbers     */
 /* ------------------------------------------------------------------ */
 
+const COUNT_MS = 1150;
+
+/** Where a count starts: a year climbs its last stretch, a count starts at 0. */
+function countFrom(target) {
+  return target > 999 ? target - 22 : 0;
+}
+
+/**
+ * Counts a figure up as it comes into view.
+ *
+ * Only ever used on a value that is entirely digits — "04" counts, "NCVT"
+ * and "Co-ed" do not — and the result is padded back to the width it was
+ * written at, so `04` never renders as `4`. The type is tabular, so the
+ * digits do not shuffle sideways while they change.
+ *
+ * With reduced motion (or no IntersectionObserver) `useReveal` reports
+ * visible straight away and the state starts on the answer, so the figure
+ * is simply printed.
+ */
+function CountUp({ value }) {
+  const target = Number(value);
+  const [ref, visible] = useReveal({ threshold: 0.35 });
+  const [shown, setShown] = useState(() => (visible ? target : countFrom(target)));
+
+  useEffect(() => {
+    if (!visible) return;
+    /* `useReveal` reports visible from the first render under reduced
+       motion, so the state was initialised on the answer already — there
+       is nothing to do but leave it there. */
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const from = countFrom(target);
+    const started = performance.now();
+    let frame = requestAnimationFrame(function step(now) {
+      const p = Math.min(1, (now - started) / COUNT_MS);
+      /* Out-cubic: most of the distance early, then a slow last few. */
+      const eased = 1 - Math.pow(1 - p, 3);
+      setShown(Math.round(from + (target - from) * eased));
+      if (p < 1) frame = requestAnimationFrame(step);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [visible, target]);
+
+  return <span ref={ref}>{String(shown).padStart(value.length, "0")}</span>;
+}
+
 export function Fact({ value, label, sub, dark = false }) {
+  const counts = /^\d+$/.test(value);
+
   return (
     <div>
       <p
-        className={`font-display text-[clamp(2.25rem,4.4vw,3.25rem)] font-semibold leading-none tracking-[-0.03em] ${
+        className={`font-display text-[clamp(2.25rem,4.4vw,3.25rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums ${
           dark ? "text-white" : "text-royal-700"
         }`}
         style={{ fontVariationSettings: '"opsz" 72' }}
       >
-        {value}
+        {counts ? <CountUp value={value} /> : value}
       </p>
       <p
         className={`mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.13em] ${

@@ -121,6 +121,7 @@ export default function BTechPolytechnic() {
 
             <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.campusAerial}
                 alt="The Satpuda campus seen across its lawns"
                 ratio="4 / 5"
