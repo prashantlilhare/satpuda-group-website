@@ -64,25 +64,17 @@
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* --- Layout --- */
-  --spacing-gutter: clamp(1.25rem, 5vw, 5rem);
+  --spacing-gutter: clamp(1rem, 3vw, 2.5rem);
 
   /* --- Vertical rhythm -------------------------------------------
-   * One scale for every section on the site, so the gap between two
-   * bands is a decision made once rather than re-typed per page.
-   *
-   * These replace the old `py-20 sm:py-28 lg:py-32` triples. Those
-   * stepped at hard breakpoints, so rotating a phone at 640px jumped
-   * the padding 80px → 112px in a single pixel; the clamps ramp
-   * smoothly instead, and land on exactly the old values at the
-   * extremes (5rem on a phone, 8rem on a wide desktop).
+   * Reduced spacing for a more compact, connected feel as requested.
    */
-  --space-section: clamp(5rem, 2.5rem + 7.8vw, 8rem); /* standard band */
-  --space-section-tight: clamp(3.5rem, 2rem + 4.7vw, 5rem); /* minor band */
-  --space-strip: clamp(2.5rem, 1.75rem + 2.3vw, 3.5rem); /* facts/notice strip */
+  --space-section: clamp(3rem, 2rem + 3vw, 5rem); /* standard band */
+  --space-section-tight: clamp(2rem, 1.5rem + 2vw, 3rem); /* minor band */
+  --space-strip: clamp(1.5rem, 1rem + 1vw, 2.5rem); /* facts/notice strip */
 
-  /* Gap from a section heading down to the content it introduces.
-     Previously spelled mt-10 / mt-12 / mt-14 / mt-16 / mt-20 at random. */
-  --space-heading: clamp(2.75rem, 1.75rem + 3.1vw, 4rem);
+  /* Gap from a section heading down to the content it introduces. */
+  --space-heading: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
 
   /* --- Fixed-header metrics ---------------------------------------
    * Single source of truth for the navbar's height. The header is
@@ -1126,8 +1118,10 @@
      figure `usePinProgress` divides by. Three legs at ~47vh of usable
      travel each once the lead-in and tail are taken off — enough to read
      each milestone, short of the dead space a longer pin would leave. */
-  .tl-track {
-    padding-bottom: 170vh;
+  .tl-track::after {
+    content: "";
+    display: block;
+    height: 170vh;
   }
 
   .tl-panel {
@@ -1160,15 +1154,6 @@
   will-change: transform;
 }
 
-.tl-token-img {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  transition: opacity 0.5s var(--ease-out-expo);
-}
-
 /* Milestone copy. One transform for the whole block, so the year, the
    heading and the paragraph arrive as a single piece of text rather than
    as three separately animated elements. A milestone still to come waits
@@ -1182,16 +1167,21 @@
 }
 
 .tl-item[data-state="ahead"] {
-  opacity: 0.32;
-  transform: translate3d(40px, 0, 0);
+  opacity: 0;
+  transform: translate3d(100vw, 0, 0);
+  pointer-events: none;
 }
 
 .tl-item[data-state="past"] {
-  opacity: 0.5;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
 }
 
 .tl-item[data-state="current"] {
   opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
 }
 
 /* The fixed marker under each milestone — visible where the token is
@@ -1213,6 +1203,170 @@
 
 .tl-dot[data-state="current"] {
   background-color: var(--color-ember-500);
+}
+
+/* ============================================================
+   ITI TRADES — HOVER SHINE & LOADING TEXT EFFECT
+   ============================================================ */
+@keyframes tradeShineBeam {
+  0% {
+    transform: translateX(-140%) skewX(-25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(280%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes tradeTextShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes tradeTextLoadIn {
+  0% {
+    opacity: 0.2;
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes tradeGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(41, 71, 145, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 24px 2px rgba(217, 58, 38, 0.25);
+  }
+}
+
+.trade-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trade-card:hover {
+  background: linear-gradient(110deg, #ffffff 0%, #fffbf8 45%, #f4f7fd 100%);
+  border-color: rgba(41, 71, 145, 0.45);
+  box-shadow: 0 16px 36px -10px rgba(41, 71, 145, 0.14), 0 4px 18px rgba(217, 58, 38, 0.08);
+}
+
+/* Bright sweeping beam left-to-right */
+.trade-card .trade-shine-overlay {
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: 0;
+  width: 65%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(251, 191, 36, 0.4) 65%,
+    rgba(217, 58, 38, 0.35) 75%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-25deg);
+  pointer-events: none;
+  z-index: 15;
+}
+
+.trade-card:hover .trade-shine-overlay {
+  animation: tradeShineBeam 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Top bright color sweep line */
+.trade-card .trade-accent-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #294791, #d93a26, #f59e0b, #294791);
+  background-size: 200% auto;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+.trade-card:hover .trade-accent-line {
+  transform: scaleX(1);
+  animation: tradeTextShimmer 2s infinite linear;
+}
+
+/* Text loading animations on hover */
+.trade-card:hover .trade-load-0 {
+  animation: tradeTextLoadIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.trade-card:hover .trade-load-1 {
+  animation: tradeTextLoadIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s forwards;
+}
+
+.trade-card:hover .trade-load-2 {
+  animation: tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+}
+
+.trade-card:hover .trade-load-3 {
+  animation: tradeTextLoadIn 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.18s forwards;
+}
+
+.trade-card:hover .trade-load-4 {
+  animation: tradeTextLoadIn 0.58s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards;
+}
+
+/* Shimmer text sweep across title on hover */
+.trade-card:hover .trade-title-shimmer {
+  background: linear-gradient(
+    90deg,
+    #191817 0%,
+    #294791 20%,
+    #d93a26 40%,
+    #f59e0b 50%,
+    #ffffff 55%,
+    #294791 75%,
+    #191817 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: tradeTextShimmer 1.8s infinite linear, tradeTextLoadIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s forwards;
+}
+
+/* Shimmer text sweep across body paragraph on hover */
+.trade-card:hover .trade-body-shimmer {
+  background: linear-gradient(
+    90deg,
+    #55504a 0%,
+    #223a76 25%,
+    #d93a26 45%,
+    #ffffff 55%,
+    #223a76 75%,
+    #55504a 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: tradeTextShimmer 2.2s infinite linear 0.1s, tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
 }
 
 /* ============================================================

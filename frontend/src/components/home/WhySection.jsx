@@ -7,13 +7,11 @@ import { useSequencedReveal } from "../../hooks/useSequencedReveal";
    Identical boxes, so the hand-off between the two is invisible. */
 const DIGIT = "why-digit font-display text-xs font-semibold tabular-nums";
 
-/* Gap between one card setting off and the next. A card's own entrance runs
-   a little under 1.2s (the timeline lives in `index.css`), so the sequence
-   reads as one disc at a time crossing the page — 01 → 06 in order, never
-   two mid-morph together. Phones get a shorter step to match their shorter,
-   flatter motion. */
-const STEP = 800;
-const STEP_COMPACT = 620;
+/* Gap between one card setting off and the next. Reduced so the next card
+   triggers while the previous is still animating its arrival, creating a
+   more overlapping cascade effect. */
+const STEP = 500;
+const STEP_COMPACT = 350;
 
 /* Rolling speed, px per second. The distance a disc has to cover depends on
    where its card sits, so the duration is derived from it rather than fixed:

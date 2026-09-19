@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { Eyebrow, Fact, Figure, Reveal, SectionHeading } from "../components/ui/Primitives";
@@ -8,6 +9,21 @@ import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
 const inst = getInstitution("btech-polytechnic");
+
+const btechBranchImages = {
+  CSE: campusImages.computerLab,
+  MIN: campusImages.campusAerial,
+  CIV: campusImages.campusFront,
+  MECH: campusImages.workshop,
+  EE: campusImages.electronicsBench,
+};
+
+const diplomaBranchImages = [
+  campusImages.campusFront,
+  campusImages.electronicsBench,
+  campusImages.workshop,
+  campusImages.campusAerial,
+];
 
 const facilities = [
   {
@@ -37,6 +53,13 @@ const facilities = [
 ];
 
 export default function BTechPolytechnic() {
+  const [hoveredDiploma, setHoveredDiploma] = useState(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    setCursorPos({ x: e.clientX, y: e.clientY });
+  };
+
   useSeo({
     title: "B.Tech & Polytechnic",
     description:
@@ -46,6 +69,35 @@ export default function BTechPolytechnic() {
 
   return (
     <>
+      {/* Floating Cursor-following Image Preview (Global outside div, Portrait format) */}
+      <div
+        className="pointer-events-none fixed z-[9999] transition-all duration-300 ease-out"
+        style={{
+          left: 0,
+          top: 0,
+          transform: `translate3d(${cursorPos.x + 32}px, ${cursorPos.y - 144}px, 0)`,
+          opacity: hoveredDiploma !== null ? 1 : 0,
+          pointerEvents: "none",
+        }}
+      >
+        <div className="w-56 h-72 overflow-hidden rounded-2xl border border-white/20 bg-royal-950 shadow-2xl relative">
+          <img
+            src={diplomaBranchImages[hoveredDiploma ?? 0] || campusImages.campusFront}
+            alt={diplomaBranches[hoveredDiploma ?? 0]?.name}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+          <div className="absolute bottom-4 left-5 right-5">
+            <span className="text-[10px] font-mono text-ember-400 font-bold tracking-widest block mb-1.5">
+              0{(hoveredDiploma ?? 0) + 1}
+            </span>
+            <span className="text-[0.9375rem] font-semibold text-white tracking-wide block leading-tight">
+              {diplomaBranches[hoveredDiploma ?? 0]?.name}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <PageHero
         eyebrow="Institute"
         title="B.Tech & Polytechnic"
@@ -140,46 +192,83 @@ export default function BTechPolytechnic() {
             lead="Four years, eight semesters, affiliated to RGPV Bhopal."
           />
 
-          <div className="section-body grid gap-px bg-stone-line sm:grid-cols-2 lg:grid-cols-3">
-            {btechBranches.map((b, i) => (
-              <Reveal key={b.code} delay={stagger(i % 3)}>
-                <article className="card-raise group flex h-full flex-col bg-paper-dim p-7 hover:bg-paper sm:p-8">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="font-display text-xs font-semibold tracking-[0.08em] text-ember-600">
-                      {b.code}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="h-px w-8 origin-right bg-stone-line transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-14 group-hover:bg-ember-500"
+          <div className="section-body grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {btechBranches.map((b, i) => {
+              const bgImg = btechBranchImages[b.code] || campusImages.campusFront;
+              return (
+                <Reveal key={b.code} delay={stagger(i % 3)}>
+                  <article className="group relative flex h-full min-h-[350px] flex-col justify-end overflow-hidden rounded-2xl border border-stone-line/10 bg-royal-950 p-7 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-2xl hover:border-ember-500/50">
+                    {/* Background Image - ALWAYS VISIBLE */}
+                    <img
+                      src={bgImg}
+                      alt={b.name}
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover scale-100 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
                     />
-                  </div>
 
-                  <h3 className="mt-5 font-display text-[1.3125rem] font-semibold leading-tight tracking-[-0.02em] text-ink">
-                    {b.name}
-                  </h3>
-                  <p className="mt-4 flex-1 text-[0.9375rem] leading-[1.7] text-ink-soft">
-                    {b.body}
-                  </p>
+                    {/* Dark gradient overlay - always visible at bottom to make white text readable */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-colors duration-500 group-hover:from-black/95 group-hover:via-black/75 group-hover:to-black/40"
+                    />
 
-                  <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-stone-line pt-5">
-                    {b.topics.map((t) => (
-                      <li key={t} className="text-[0.8125rem] text-ink-mute">
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </Reveal>
-            ))}
+                    {/* Ambient subtle accent glow on hover */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-ember-600/20 via-transparent to-royal-600/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    />
 
-            {/* filler cell keeps the 3-col grid tidy without inventing content */}
-            <div className="hidden bg-paper-dim lg:block" aria-hidden="true" />
+                    {/* Content overlay */}
+                    <div className="relative z-10 flex flex-col justify-end">
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <span className="font-display text-xs font-bold tracking-[0.1em] px-2.5 py-1 rounded-md bg-white/10 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 group-hover:bg-ember-500 group-hover:border-ember-400 group-hover:text-white">
+                          {b.code}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className="h-px w-8 origin-right bg-white/40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-14 group-hover:bg-ember-400"
+                        />
+                      </div>
+
+                      <h3 className="font-display text-[1.3125rem] font-semibold leading-tight tracking-[-0.02em] text-white">
+                        {b.name}
+                      </h3>
+
+                      {/* Expandable Description & Topics Container - hidden by default, expands on hover */}
+                      <div className="grid grid-rows-[0fr] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:grid-rows-[1fr]">
+                        <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
+                          <p className="mt-3 text-[0.9375rem] leading-[1.7] text-white/85">
+                            {b.body}
+                          </p>
+
+                          <ul className="mt-5 flex flex-wrap gap-1.5 pt-4 border-t border-white/15">
+                            {b.topics.map((t) => (
+                              <li
+                                key={t}
+                                className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-[0.75rem] font-medium text-white/90"
+                              >
+                                {t}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ---------------- DIPLOMA ---------------- */}
-      <section className="section on-dark bg-royal-900 text-white">
+      <section
+        onMouseMove={handleMouseMove}
+        className="section on-dark bg-royal-900 text-white relative"
+      >
+
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
             <div>
@@ -198,18 +287,22 @@ export default function BTechPolytechnic() {
               </Reveal>
             </div>
 
-            <div>
+            <div className="flex flex-col">
               {diplomaBranches.map((d, i) => (
                 <Reveal key={d.name} delay={stagger(i)}>
-                  <article className="group grid grid-cols-[2.75rem_1fr] gap-4 border-t border-white/15 py-7 transition-colors duration-400 hover:border-ember-500 sm:grid-cols-[4rem_1fr] sm:gap-7">
-                    <span className="font-display text-xs font-semibold tabular-nums text-ember-400">
+                  <article
+                    onMouseEnter={() => setHoveredDiploma(i)}
+                    onMouseLeave={() => setHoveredDiploma(null)}
+                    className="group grid grid-cols-[2.75rem_1fr] gap-4 border-t border-white/15 py-7 transition-all duration-300 hover:border-ember-500 hover:pl-2 sm:grid-cols-[4rem_1fr] sm:gap-7 cursor-pointer"
+                  >
+                    <span className="font-display text-xs font-semibold tabular-nums text-ember-400 transition-colors group-hover:text-ember-300">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div>
-                      <h3 className="font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-white">
+                      <h3 className="font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-white transition-colors duration-200 group-hover:text-ember-300">
                         {d.name}
                       </h3>
-                      <p className="mt-2.5 text-[0.9375rem] leading-[1.7] text-white/62">
+                      <p className="mt-2.5 text-[0.9375rem] leading-[1.7] text-white/62 transition-colors duration-200 group-hover:text-white/80">
                         {d.body}
                       </p>
                     </div>
