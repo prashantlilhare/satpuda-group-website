@@ -2,10 +2,11 @@ import { Eyebrow, Figure, Reveal, TextLink } from "../ui/Primitives";
 import { campusImages } from "../../data/about";
 import { site } from "../../data/site";
 import { values } from "../../data/about";
+import { stagger } from "../ui/stagger";
 
 export function IntroSection() {
   return (
-    <section className="bg-paper py-20 sm:py-28 lg:py-32">
+    <section className="section bg-paper">
       <div className="shell">
         <div className="grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-20 xl:gap-28">
           {/* ---------- copy ---------- */}
@@ -14,14 +15,14 @@ export function IntroSection() {
               <Eyebrow>About Satpuda Group</Eyebrow>
             </Reveal>
 
-            <Reveal delay={70}>
-              <h2 className="t-h2 mt-6 text-ink">
+            <Reveal delay={stagger(1)}>
+              <h2 className="t-h2 mt-5 text-ink">
                 Four institutions, one campus, and a single idea about what
                 education is for.
               </h2>
             </Reveal>
 
-            <Reveal delay={140}>
+            <Reveal delay={stagger(2)}>
               <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                 <p>
                   Satpuda Group is a family of institutions in Balaghat, Madhya Pradesh, run by{" "}
@@ -39,7 +40,7 @@ export function IntroSection() {
               </div>
             </Reveal>
 
-            <Reveal delay={210}>
+            <Reveal delay={stagger(3)}>
               <div className="mt-10 border-l-2 border-ember-500 pl-6">
                 <p className="motto text-[1.375rem] leading-snug text-royal-700 sm:text-[1.625rem]">
                   {site.motto}
@@ -51,17 +52,24 @@ export function IntroSection() {
               </div>
             </Reveal>
 
-            <Reveal delay={280}>
+            <Reveal delay={stagger(4)}>
               <p className="mt-9">
                 <TextLink to="/about">Read the full story of the group</TextLink>
               </p>
             </Reveal>
           </div>
 
-          {/* ---------- offset image pair ---------- */}
-          <div className="relative">
+          {/* ---------- offset image pair ----------
+              The inset classroom photo hangs 2.5–3.5rem below the column, so
+              the column reserves that much bottom padding. Without it the
+              overhang ate into the section's own bottom padding and this
+              section closed tighter than every other one on the page — and on
+              mobile, where this column is last, it very nearly touched the
+              values ticker below. */}
+          <div className="relative pb-10 sm:pb-14">
             <Reveal className="group">
               <Figure
+                mask
                 src={campusImages.campusFront}
                 alt="The Satpuda College of Engineering & Polytechnic building and its front approach"
                 ratio="4 / 5"
@@ -70,7 +78,7 @@ export function IntroSection() {
             </Reveal>
 
             <Reveal
-              delay={180}
+              delay={stagger(3)}
               className="group absolute -bottom-10 -left-3 w-[52%] border-[6px] border-paper sm:-bottom-14 sm:-left-6 sm:w-[54%] lg:-left-10"
             >
               <Figure
@@ -82,7 +90,7 @@ export function IntroSection() {
 
             {/* est. badge */}
             <Reveal
-              delay={260}
+              delay={stagger(4)}
               className="absolute -right-2 top-8 bg-royal-600 px-5 py-4 text-white sm:-right-6 sm:px-6 sm:py-5"
             >
               <p className="font-display text-[1.75rem] leading-none font-semibold sm:text-[2rem]">
@@ -96,8 +104,12 @@ export function IntroSection() {
         </div>
       </div>
 
-      {/* ---------- values ticker ---------- */}
-      <div className="mt-24 overflow-hidden border-y border-stone-line py-5 sm:mt-32">
+      {/* ---------- values ticker ----------
+          `section-body` rather than the old mt-24/sm:mt-32. Those stacked on
+          top of the section's own bottom padding, so on a wide screen roughly
+          14rem of empty paper separated the ticker from the section below it —
+          the single largest dead space on the homepage. */}
+      <div className="section-body overflow-hidden border-y border-stone-line py-5">
         <div className="marquee-track flex w-max items-center gap-10 sm:gap-14">
           {[...values, ...values].map((v, i) => (
             <span key={`${v.title}-${i}`} className="flex shrink-0 items-center gap-10 sm:gap-14">

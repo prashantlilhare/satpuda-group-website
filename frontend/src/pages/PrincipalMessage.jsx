@@ -6,6 +6,7 @@ import { Figure, Reveal } from "../components/ui/Primitives";
 import { director, principal } from "../data/leadership";
 import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 const gallery = [
   { src: campusImages.classroom, alt: "A teaching session in a Satpuda classroom" },
@@ -32,11 +33,12 @@ export default function PrincipalMessage() {
       />
 
       {/* ---------------- letter ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell-narrow">
           {/* portrait band — a different composition from the Director page */}
           <Reveal className="group">
             <Figure
+              mask
               src={principal.portrait}
               alt={principal.portraitAlt}
               ratio="16 / 9"
@@ -45,7 +47,7 @@ export default function PrincipalMessage() {
             />
           </Reveal>
 
-          <Reveal delay={90}>
+          <Reveal delay={stagger(1)}>
             <div className="-mt-14 ml-0 max-w-xl bg-paper p-7 sm:-mt-20 sm:ml-8 sm:p-10">
               <h2 className="font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink sm:text-[1.875rem]">
                 {principal.name}
@@ -60,7 +62,7 @@ export default function PrincipalMessage() {
           </Reveal>
 
           {/* the letter itself */}
-          <div className="mt-14 sm:mt-16">
+          <div className="section-body">
             <Reveal>
               <p className="font-display text-[1.5rem] tracking-[-0.022em] text-royal-700 sm:text-[1.75rem]">
                 {principal.salutation}
@@ -69,13 +71,13 @@ export default function PrincipalMessage() {
 
             <div className="mt-8 space-y-6 text-[1.0625rem] leading-[1.8] text-ink-soft">
               {principal.paragraphs.map((p, i) => (
-                <Reveal key={i} delay={80 + i * 80}>
+                <Reveal key={i} delay={stagger(1 + i)}>
                   <p>{p}</p>
                 </Reveal>
               ))}
             </div>
 
-            <Reveal delay={120}>
+            <Reveal delay={stagger(2)}>
               <div className="mt-12 flex items-end justify-between gap-6 border-t border-stone-line pt-8">
                 <div>
                   <p
@@ -101,20 +103,20 @@ export default function PrincipalMessage() {
       </section>
 
       {/* ---------------- campus strip ---------------- */}
-      <section className="bg-paper-dim py-16 sm:py-20">
+      <section className="section-tight bg-paper-dim">
         <div className="shell">
           <div className="grid gap-5 sm:grid-cols-3">
             {gallery.map((img, i) => (
-              <Reveal key={img.src} delay={i * 110} className="group">
+              <Reveal key={img.src} delay={stagger(i)} className="group">
                 <Figure src={img.src} alt={img.alt} ratio="4 / 3" />
               </Reveal>
             ))}
           </div>
 
-          <Reveal delay={140}>
+          <Reveal delay={stagger(2)}>
             <Link
               to="/about/director-message"
-              className="group mt-14 flex flex-col gap-6 border-t border-stone-line pt-8 sm:flex-row sm:items-center sm:justify-between"
+              className="group section-body flex flex-col gap-6 border-t border-stone-line pt-8 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex items-center gap-6">
                 <div className="w-20 shrink-0 sm:w-24">

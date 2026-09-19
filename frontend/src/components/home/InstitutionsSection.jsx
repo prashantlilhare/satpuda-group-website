@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Figure, Reveal, SectionHeading } from "../ui/Primitives";
 import { institutions } from "../../data/institutions";
+import { stagger } from "../ui/stagger";
 
 /* ------------------------------------------------------------------ */
 /* Featured — the large block                                          */
@@ -14,7 +15,7 @@ function FeaturedInstitution({ item }) {
     // screens. The photograph is a background layer behind it.
     <Link
       to={item.to}
-      className="group on-dark relative isolate flex h-full min-h-[31rem] flex-col justify-end overflow-hidden bg-royal-950 focus-visible:outline-offset-4 sm:min-h-[33rem] lg:min-h-[34rem]"
+      className="card-lift group on-dark relative isolate flex h-full min-h-[31rem] flex-col justify-end overflow-hidden bg-royal-950 focus-visible:outline-offset-4 sm:min-h-[33rem] lg:min-h-[34rem]"
     >
       <img
         src={item.image}
@@ -127,7 +128,7 @@ export function InstitutionsSection() {
   const rest = institutions.filter((i) => !i.featured);
 
   return (
-    <section className="bg-paper-dim py-20 sm:py-28 lg:py-32">
+    <section className="section bg-paper-dim">
       <div className="shell">
         <div className="flex flex-wrap items-end justify-between gap-8">
           <SectionHeading
@@ -137,12 +138,12 @@ export function InstitutionsSection() {
           />
         </div>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-14 xl:gap-20">
+        <div className="section-body grid gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-14 xl:gap-20">
           <Reveal className="h-full">
             <FeaturedInstitution item={featured} />
           </Reveal>
 
-          <Reveal delay={120}>
+          <Reveal delay={stagger(2)}>
             <div className="border-b border-stone-line">
               {rest.map((item, i) => (
                 <InstitutionRow key={item.id} item={item} index={i + 2} />

@@ -2,6 +2,7 @@ import { PageHero } from "../components/shared/PageHero";
 import { Reveal, TextLink } from "../components/ui/Primitives";
 import { contact, site } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 /**
  * Placeholder legal pages.
@@ -89,10 +90,10 @@ export default function Legal({ kind = "privacy" }) {
     <>
       <PageHero eyebrow="Legal" title={doc.title} lead={doc.lead} crumbs={[{ label: doc.title }]} />
 
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell-narrow">
           {doc.sections.map((s, i) => (
-            <Reveal key={s.heading} delay={i * 80}>
+            <Reveal key={s.heading} delay={stagger(i)}>
               <div className="border-t border-stone-line py-9">
                 <h2 className="font-display text-[1.375rem] font-semibold tracking-[-0.02em] text-ink sm:text-[1.5rem]">
                   {s.heading}

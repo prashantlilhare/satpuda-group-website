@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Button, Eyebrow, Reveal } from "../ui/Primitives";
 import { contact } from "../../data/site";
+import { stagger } from "../ui/stagger";
 
 /**
  * Closing call to action. Repeated across pages, so it carries the real
@@ -25,21 +26,21 @@ export function CTASection({
         className="pointer-events-none absolute -bottom-40 -left-20 h-[24rem] w-[24rem] rounded-full border border-white/10"
       />
 
-      <div className="shell relative py-18 sm:py-24">
+      <div className="shell section relative">
         <div className="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end lg:gap-20">
           <div>
             <Reveal>
               <Eyebrow>{eyebrow}</Eyebrow>
             </Reveal>
-            <Reveal delay={70}>
+            <Reveal delay={stagger(1)}>
               <h2 className="t-h2 mt-5 max-w-xl text-white">{title}</h2>
             </Reveal>
-            <Reveal delay={140}>
+            <Reveal delay={stagger(2)}>
               <p className="mt-6 max-w-lg text-[1.0625rem] leading-relaxed text-white/75">
                 {body}
               </p>
             </Reveal>
-            <Reveal delay={210}>
+            <Reveal delay={stagger(3)}>
               <div className="mt-9 flex flex-wrap gap-3.5">
                 <Button to={primaryTo} variant="solidLight">
                   {primaryLabel}
@@ -52,7 +53,7 @@ export function CTASection({
             </Reveal>
           </div>
 
-          <Reveal delay={140}>
+          <Reveal delay={stagger(2)}>
             <dl className="divide-y divide-white/15 border-t border-white/15">
               <div className="flex gap-4 py-5">
                 <dt className="sr-only">Address</dt>

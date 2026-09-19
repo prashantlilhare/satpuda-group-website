@@ -5,6 +5,7 @@ import { itiTrades } from "../data/programs";
 import { campusImages } from "../data/about";
 import { getInstitution } from "../data/institutions";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 const inst = getInstitution("iti");
 
@@ -27,6 +28,62 @@ const careerSteps = [
   },
 ];
 
+function TradeRow({ trade, index }) {
+  return (
+    <article className="trade-card group relative grid gap-5 border-t border-stone-line py-8 transition-all duration-400 md:grid-cols-[3.5rem_1.1fr_1.4fr] md:items-start md:gap-8 lg:grid-cols-[3.5rem_1fr_1.5fr_auto] lg:gap-10 rounded-2xl px-5 sm:px-8 cursor-pointer">
+      {/* Top radiant color bar that shoots left-to-right on hover */}
+      <div className="trade-accent-line" />
+
+      {/* Bright luminous flare / shine beam sweeping left-to-right across the div */}
+      <div className="trade-shine-overlay" />
+
+      {/* Index Number */}
+      <div className="trade-load-0">
+        <span className="font-display text-sm font-bold tabular-nums text-ember-600 transition-colors group-hover:text-ember-500">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+
+      {/* Trade Heading and Type */}
+      <div>
+        <h3 className="trade-title-shimmer font-display text-[1.375rem] font-bold tracking-[-0.02em] text-ink transition-colors duration-300 sm:text-[1.5rem]">
+          {trade.name}
+        </h3>
+        <p className="trade-load-1 mt-2 inline-block text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-mute transition-colors duration-300 group-hover:text-royal-600">
+          {trade.type}
+        </p>
+      </div>
+
+      {/* Description with loading shimmer sweep on hover */}
+      <div>
+        <p className="trade-body-shimmer text-[0.9375rem] leading-[1.7] text-ink-soft">
+          {trade.body}
+        </p>
+      </div>
+
+      {/* Duration & Eligibility */}
+      <dl className="trade-load-3 flex gap-8 lg:flex-col lg:gap-4 lg:text-right">
+        <div>
+          <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.13em] text-ink-mute">
+            Duration
+          </dt>
+          <dd className="mt-1.5 font-display text-[0.9375rem] font-bold text-ink transition-colors group-hover:text-royal-700">
+            {trade.duration}
+          </dd>
+        </div>
+        <div className="lg:max-w-[12rem]">
+          <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.13em] text-ink-mute">
+            Eligibility
+          </dt>
+          <dd className="mt-1.5 text-[0.875rem] leading-snug text-ink-soft transition-colors group-hover:text-ink">
+            {trade.eligibility}
+          </dd>
+        </div>
+      </dl>
+    </article>
+  );
+}
+
 export default function ITI() {
   useSeo({
     title: "Satpuda ITI, Garra",
@@ -46,7 +103,7 @@ export default function ITI() {
       />
 
       {/* ---------------- key facts strip ---------------- */}
-      <section className="border-b border-stone-line bg-paper py-12 sm:py-14">
+      <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {[
@@ -55,7 +112,7 @@ export default function ITI() {
               { value: "NCVT", label: "Affiliation" },
               { value: "QCI", label: "Accreditation" },
             ].map((f, i) => (
-              <Reveal key={f.label} delay={i * 80}>
+              <Reveal key={f.label} delay={stagger(i)}>
                 <div className="border-t-2 border-royal-600 pt-5">
                   <Fact value={f.value} label={f.label} />
                 </div>
@@ -66,22 +123,22 @@ export default function ITI() {
       </section>
 
       {/* ---------------- about ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>About the institute</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
-                <h2 className="t-h2 mt-6 max-w-xl text-ink">
+              <Reveal delay={stagger(1)}>
+                <h2 className="t-h2 mt-5 max-w-xl text-ink">
                   The group's first institution — and still its most direct route to work.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                   <p>
-                    Satpuda ITI opened at Garra in 1999 under {" "}
+                    Satpuda ITI opened at Garra in 1999 under{" "}
                     <strong className="font-semibold text-ink">
                       Maharana Pratap Shikshan Samiti
                     </strong>
@@ -103,8 +160,9 @@ export default function ITI() {
               </Reveal>
             </div>
 
-            <Reveal delay={120} className="group">
+            <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.workshop}
                 alt="Trainees on an industrial workshop floor during practical training"
                 ratio="4 / 5"
@@ -115,7 +173,7 @@ export default function ITI() {
       </section>
 
       {/* ---------------- trades ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Trades"
@@ -123,50 +181,19 @@ export default function ITI() {
             lead="Three engineering trades and one non-engineering trade, each leading to a National Trade Certificate."
           />
 
-          <div className="mt-14">
+          <div className="section-body">
             {itiTrades.map((t, i) => (
-              <Reveal key={t.name} delay={i * 80}>
-                <article className="group grid gap-5 border-t border-stone-line py-8 transition-colors duration-400 hover:border-royal-600 md:grid-cols-[3rem_1.1fr_1.4fr] md:items-start md:gap-8 lg:grid-cols-[3.5rem_1fr_1.5fr_auto] lg:gap-10">
-                  <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-
-                  <div>
-                    <h3 className="font-display text-[1.375rem] font-semibold tracking-[-0.02em] text-ink transition-colors duration-300 group-hover:text-royal-700 sm:text-[1.5rem]">
-                      {t.name}
-                    </h3>
-                    <p className="mt-2 text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-mute">
-                      {t.type}
-                    </p>
-                  </div>
-
-                  <p className="text-[0.9375rem] leading-[1.7] text-ink-soft">{t.body}</p>
-
-                  <dl className="flex gap-8 lg:flex-col lg:gap-4 lg:text-right">
-                    <div>
-                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.13em] text-ink-mute">
-                        Duration
-                      </dt>
-                      <dd className="mt-1.5 text-[0.9375rem] font-semibold text-ink">
-                        {t.duration}
-                      </dd>
-                    </div>
-                    <div className="lg:max-w-[12rem]">
-                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.13em] text-ink-mute">
-                        Eligibility
-                      </dt>
-                      <dd className="mt-1.5 text-[0.875rem] leading-snug text-ink-soft">
-                        {t.eligibility}
-                      </dd>
-                    </div>
-                  </dl>
-                </article>
+              <Reveal key={t.name} delay={stagger(i)}>
+                <TradeRow
+                  trade={t}
+                  index={i}
+                />
               </Reveal>
             ))}
             <div className="border-t border-stone-line" />
           </div>
 
-          <Reveal delay={120}>
+          <Reveal delay={stagger(2)}>
             <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
               Durations and eligibility follow the NCVT Craftsman Training Scheme. Seat availability
               and admission dates vary by session — contact the institute for current details.
@@ -176,19 +203,19 @@ export default function ITI() {
       </section>
 
       {/* ---------------- practical learning ---------------- */}
-      <section className="on-dark bg-royal-900 py-20 text-white sm:py-28">
+      <section className="section on-dark bg-royal-900 text-white">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>Practical learning</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
+              <Reveal delay={stagger(1)}>
                 <h2 className="t-h2 mt-5 max-w-md text-white">
                   Most of the week is spent on the floor.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
                   The Craftsman Training Scheme weights practical work heavily by design. Trainees
                   wire circuits, file and fit components, strip and rebuild engines, and operate
@@ -196,7 +223,7 @@ export default function ITI() {
                 </p>
               </Reveal>
 
-              <Reveal delay={210} className="group mt-10">
+              <Reveal delay={stagger(3)} className="group mt-10">
                 <Figure
                   src={campusImages.electronicsBench}
                   alt="Trainees working at an electrical measurement and wiring bench"
@@ -211,7 +238,7 @@ export default function ITI() {
               </Reveal>
               <ol className="mt-10">
                 {careerSteps.map((s, i) => (
-                  <Reveal key={s.title} delay={i * 100}>
+                  <Reveal key={s.title} delay={stagger(i)}>
                     <li className="grid grid-cols-[2.75rem_1fr] gap-4 border-t border-white/15 py-7 sm:grid-cols-[4rem_1fr] sm:gap-7">
                       <span className="font-display text-xs font-semibold tabular-nums text-ember-400">
                         {String(i + 1).padStart(2, "0")}

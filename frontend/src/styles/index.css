@@ -2,8 +2,10 @@
 
 /* ============================================================
    SATPUDA GROUP — DESIGN SYSTEM
-   Palette derived from the official logo (Adobe CMYK JPEG,
-   converted to sRGB): royal blue #294791, orange #EC5819.
+   Palette anchored on the official logo's royal blue #294791.
+   Blue is primary; the emblem red is the secondary accent, used
+   sparingly — rules, eyebrow marks, active indicators and a
+   single accent CTA per view. Never as the default hover colour.
    ============================================================ */
 
 @theme {
@@ -20,17 +22,24 @@
   --color-royal-900: #142244;
   --color-royal-950: #0c1529;
 
-  /* --- Brand: orange (from logo mark) --- */
-  --color-ember-50: #fff4ee;
-  --color-ember-100: #ffe4d5;
-  --color-ember-200: #ffc5a8;
-  --color-ember-300: #ff9d70;
-  --color-ember-400: #fa7639;
-  --color-ember-500: #ec5819; /* ← exact logo orange */
-  --color-ember-600: #d34510;
-  --color-ember-700: #ae3410;
-  --color-ember-800: #8b2c14;
-  --color-ember-900: #722714;
+  /* --- Brand: emblem red (secondary accent) ---------------------
+   * A warm crimson that keeps kinship with the emblem's vermilion
+   * while reading unambiguously as red beside the royal blue.
+   * Every step below is chosen to meet WCAG AA in the role it plays:
+   *   500 — accent fills carrying white text   (white on 500: 4.58)
+   *   600 — accent text on the paper neutrals  (on paper-dim: 5.15)
+   *   300 — accent text on the dark royal bands (on 900: 8.16)
+   */
+  --color-ember-50: #fef3f2;
+  --color-ember-100: #fde3e0;
+  --color-ember-200: #facbc6;
+  --color-ember-300: #f4a89f;
+  --color-ember-400: #e9705f;
+  --color-ember-500: #d93a26; /* ← accent fill; white text passes AA */
+  --color-ember-600: #bc2d1b; /* ← accent text on light backgrounds */
+  --color-ember-700: #9c2617;
+  --color-ember-800: #7f2216;
+  --color-ember-900: #6a2016;
 
   /* --- Warm institutional neutrals (paper, not cold grey) --- */
   --color-paper: #faf8f5;
@@ -39,7 +48,9 @@
   --color-stone-line: #ddd5c8;
   --color-ink: #191817;
   --color-ink-soft: #55504a;
-  --color-ink-mute: #7d766d;
+  /* Darkened from #7d766d: the old value carried small print at 3.88
+     on paper-dim, below the 4.5 AA floor. Now 4.89 there, 5.34 on paper. */
+  --color-ink-mute: #6d665e;
 
   /* --- Typography --- */
   --font-display: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
@@ -53,7 +64,17 @@
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* --- Layout --- */
-  --spacing-gutter: clamp(1.25rem, 5vw, 5rem);
+  --spacing-gutter: clamp(1rem, 3vw, 2.5rem);
+
+  /* --- Vertical rhythm -------------------------------------------
+   * Reduced spacing for a more compact, connected feel as requested.
+   */
+  --space-section: clamp(3rem, 2rem + 3vw, 5rem); /* standard band */
+  --space-section-tight: clamp(2rem, 1.5rem + 2vw, 3rem); /* minor band */
+  --space-strip: clamp(1.5rem, 1rem + 1vw, 2.5rem); /* facts/notice strip */
+
+  /* Gap from a section heading down to the content it introduces. */
+  --space-heading: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
 
   /* --- Fixed-header metrics ---------------------------------------
    * Single source of truth for the navbar's height. The header is
@@ -155,6 +176,19 @@
   }
 }
 
+/* Sticky side columns clear the *compact* header — the bar is always
+   collapsed by the time a sticky column can be pinned — plus a breath.
+   Previously `lg:top-32`, which cleared the at-rest header and so floated
+   3.5rem lower than it ever needed to.
+
+   Declared with `@utility` rather than inside @layer components because it
+   is used as `lg:sticky-aside`; only real utilities accept variants. */
+@utility sticky-aside {
+  position: sticky;
+  top: calc(var(--nav-h-compact) + 2rem);
+  align-self: start;
+}
+
 /* ============================================================
    COMPONENT UTILITIES
    ============================================================ */
@@ -173,6 +207,32 @@
     max-width: 62rem;
     margin-inline: auto;
     padding-inline: var(--spacing-gutter);
+  }
+
+  /* --- Section rhythm ----------------------------------------------
+   * `.section` is the default band. `.section-tight` is for secondary
+   * bands (cross-links, sources, galleries) that should read as
+   * subordinate to the section above them, and `.section-strip` for
+   * the thin fact/notice rails that sit directly under a page hero.
+   *
+   * Each is padding only, so a section can still drop one side with
+   * `pt-0` / `pb-0` where two bands are meant to meet flush.
+   */
+  .section {
+    padding-block: var(--space-section);
+  }
+
+  .section-tight {
+    padding-block: var(--space-section-tight);
+  }
+
+  .section-strip {
+    padding-block: var(--space-strip);
+  }
+
+  /* Standard gap below a section heading. */
+  .section-body {
+    margin-top: var(--space-heading);
   }
 
   /* --- Editorial type scale ---------------------------------------- */
@@ -277,6 +337,78 @@
   .link-underline:focus-visible {
     background-size: 100% 1px;
   }
+
+  /* --- Card elevation ----------------------------------------------
+   * The site's cards are flat, bordered blocks, so the lift is small —
+   * 4px — and the shadow is tinted with the brand navy rather than
+   * black: a grey drop-shadow on warm paper reads as dirt.
+   *
+   * It declares the colour transition as well, rather than leaving the
+   * element to add `transition-colors`. That utility sets
+   * `transition-property` outright and, being a utility, outranks this
+   * layer — so the lift would snap while the background faded.
+   */
+  .card-lift {
+    transition:
+      transform 0.35s var(--ease-out-expo),
+      box-shadow 0.45s var(--ease-out-expo),
+      background-color 0.4s var(--ease-out-expo),
+      border-color 0.4s var(--ease-out-expo);
+  }
+
+  .group:hover .card-lift,
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -24px rgb(20 34 68 / 0.45);
+  }
+
+  .on-dark .group:hover .card-lift,
+  .on-dark .card-lift:hover {
+    box-shadow: 0 18px 44px -22px rgb(0 0 0 / 0.55);
+  }
+
+  /* Shadow-only elevation, for cards that tile a `gap-px` hairline grid.
+     Those cards sit on a stone-coloured grid background showing through 1px
+     gaps, so translating one upward would expose a 4px bar of that colour
+     under it. Raising it in place reads as depth without tearing the grid;
+     the z-index lifts the shadow above the neighbouring cells. */
+  .card-raise {
+    transition:
+      box-shadow 0.4s var(--ease-out-expo),
+      background-color 0.4s var(--ease-out-expo);
+  }
+
+  .card-raise:hover {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 14px 34px -20px rgb(20 34 68 / 0.42);
+  }
+
+  /* --- Nav link underline ------------------------------------------
+   * The active page's underline is drawn full width; hovering any
+   * other item grows the same rule from the left. Previously the
+   * underline only ever existed in the active state, so a pointer
+   * moving across the nav got no feedback beyond a colour shift.
+   */
+  .nav-underline {
+    position: absolute;
+    bottom: -0.125rem;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-color: var(--color-ember-500);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.4s var(--ease-out-expo);
+  }
+
+  .nav-underline[data-active="true"],
+  a:hover > .nav-underline,
+  button:hover > .nav-underline,
+  a:focus-visible > .nav-underline,
+  button:focus-visible > .nav-underline {
+    transform: scaleX(1);
+  }
 }
 
 /* ============================================================
@@ -304,6 +436,499 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* --- Image mask ---------------------------------------------------
+ * A frame wipes open from its bottom edge instead of the picture
+ * simply fading with the block around it. Reserved for the few large
+ * photographs a page opens on; on a row of thumbnails it would read as
+ * fidget rather than intent.
+ *
+ * Stated fail-safe: the *closed* shape only exists while an enclosing
+ * `.reveal` is still waiting, so a masked figure with no reveal around
+ * it — or one in reduced motion, where a reveal starts visible — is
+ * simply open. It is never possible for a photograph to stay hidden.
+ *
+ * It waits a beat behind its block's own entrance, so the frame has
+ * arrived before its contents are drawn in.
+ */
+.img-mask {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1s var(--ease-out-expo);
+  transition-delay: calc(var(--reveal-delay, 0ms) + 90ms);
+}
+
+.reveal[data-visible="false"] .img-mask {
+  clip-path: inset(0 0 100% 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .img-mask {
+    clip-path: none;
+    transition: none;
+  }
+}
+
+/* ============================================================
+   PAGE ENTRANCE
+   ============================================================
+   A route swaps under a fixed header, so the incoming page rises the
+   last few pixels into place rather than appearing outright. It runs
+   on the page wrapper alone — every section inside it still reveals on
+   its own as you scroll — and it is deliberately short: this is the
+   one animation standing between a click and the content.
+
+   `both` leaves `transform: none` applied at the end rather than a
+   finished transform, so the wrapper stops being a containing block
+   the moment it lands.
+*/
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-in 0.5s var(--ease-out-expo) both;
+}
+
+/* The photograph behind an interior masthead settles rather than snapping
+   into place — slow, and behind a heavy scrim, so it reads as depth under
+   the heading rather than as something moving.
+
+   No `to`: the animation ends on whatever the cascade says, which is the
+   utility-set opacity on the image itself, so this does not have to know
+   what that opacity is. */
+@keyframes hero-backdrop-in {
+  from {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+}
+
+.hero-backdrop {
+  animation: hero-backdrop-in 1.6s var(--ease-out-expo) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  .hero-backdrop {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   WHY SATPUDA — rolling disc → card
+   ============================================================
+
+   Each card arrives as a disc carrying its number. It rolls in from
+   outside the screen — turning at the rate its own travel demands, so
+   it grips the page rather than sliding across it — and as it comes to
+   rest on the card's top-left corner it opens out: the disc's clip-path
+   expands into the card's own rectangle while its blue dissolves to
+   page colour, leaving the copy that was underneath it.
+
+   Row one rolls in from the left, row two from the right. The six are
+   sequenced in JavaScript rather than by a fixed CSS stagger — see
+   `useSequencedReveal` — so 01 → 06 always play in order and only one
+   disc is ever crossing the page.
+
+   Nothing here touches the card's box. The plate is absolutely
+   positioned inside the article and the copy only ever moves by
+   transform and opacity, so the grid measures the same before, during
+   and after the reveal. The top rule is held back until the plate has
+   opened, so what rolls in reads as a disc rather than a disc towing a
+   stray hairline.
+*/
+
+/* The discs travel in from beyond the page edge, so the band clips
+   rather than the card: `clip` neither establishes a formatting context
+   nor makes anything scrollable, and the band is full-bleed, so its
+   edges *are* the viewport's — a disc becomes visible at the exact
+   moment it rolls onto the screen. */
+.why-section {
+  overflow-x: clip;
+}
+
+.why-card {
+  /* Filled in per card by `WhySection`, measured from where the card
+     actually sits: how far off-screen the disc starts, how far it has
+     to turn to cover that ground without slipping, and how long the
+     roll takes at a constant pace. The values here are the fallback
+     for the frame before that measurement lands, and for a browser
+     that never runs it. */
+  --why-x: -70vw;
+  --why-spin: -540deg;
+  --why-travel: 0.66s;
+
+  --why-delay: 0ms;
+  --why-t: 1; /* duration scale — trimmed on phones */
+
+  /* The disc, anchored at the article's top-left so the rectangle it
+     opens into is the card itself. It needs `top + size` of vertical
+     room; the shortest card in the grid runs a little over 12rem even
+     at the widest column, so it never reaches the bottom edge and
+     never clips. */
+  --why-circle: 9.5rem;
+  --why-circle-top: 0.625rem;
+
+  /* Where the number's line box sits in normal flow, measured from the
+     article's top edge: the 2rem `py-8` padding plus half the 1.6rem
+     strut the number stands on. The disc's copy of the number is
+     parked at the disc's centre, scaled up to read at that size, and
+     walks back to exactly this line as the disc opens. */
+  --why-digit-cy: 2.8rem;
+  --why-digit-scale: 3.1;
+
+  /* The roll is over before the shape starts to change — a rectangle
+     caught mid-rotation reads as a mistake — but the disc is still
+     creeping the last few pixels of its travel when it does, so it
+     never opens from a dead stop. */
+  --why-travel-t: calc(var(--why-travel) * var(--why-t));
+  --why-roll: calc(var(--why-travel-t) * 0.74);
+  --why-open-at: calc(var(--why-delay) + var(--why-travel-t) * 0.78);
+
+  /* A wheel arrives at speed and settles; it does not start from rest,
+     because it was already moving before it came on screen. Slope out
+     of the gate is a little above its own average, then a long ease
+     into the corner it stops on. */
+  --why-ease-roll: cubic-bezier(0.28, 0.42, 0.24, 1);
+
+  /* Not the site-wide expo curve for the opening: expo covers
+     three-quarters of its distance in the first fifth of its time,
+     which on a shape this large reads as a snap — the circle is gone
+     before it has been seen. This keeps a short ramp in, is out-biased
+     from there, and still eases into its last frames rather than
+     stopping dead on them. */
+  --why-ease-morph: cubic-bezier(0.45, 0.02, 0.24, 1);
+
+  --why-clip-disc: inset(
+    var(--why-circle-top) calc(100% - var(--why-circle))
+      calc(100% - var(--why-circle-top) - var(--why-circle)) 0 round 999px
+  );
+  --why-clip-card: inset(0px 0px 0px 0px round 0px);
+
+  /* The 50% resolves against the digits' own box, so this stays centred
+     whatever the number renders at; the scale is about that same centre
+     and so does not disturb it. */
+  --why-digit-park: translate3d(
+      calc(var(--why-circle) / 2 - 50%),
+      calc(var(--why-circle-top) + var(--why-circle) / 2 - var(--why-digit-cy)),
+      0
+    )
+    scale(var(--why-digit-scale));
+}
+
+/* Both numbers — the disc's and the card's — share a box so the
+   hand-off between them is invisible. */
+.why-digit {
+  display: inline-block;
+}
+
+/* Four elements, not one.
+   `filter` is applied before `clip-path` on the same element, so a drop
+   shadow declared alongside the clip would be clipped away with it —
+   hence a plate carrying the travel and the shadow, a wheel inside it
+   carrying the rotation, and a disc inside that carrying the clip and
+   the fill.
+   The number is a sibling of the disc rather than a child, because its
+   destination is the card's top-left corner and the opening shape only
+   reaches that corner on its very last frame: clipped, the number would
+   be sliced away by the disc's own curve on the way there. It is
+   `relative` so it paints over the disc despite coming after it. */
+.why-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.why-wheel {
+  position: absolute;
+  inset: 0;
+  /* Matches the article's `py-8`, which is what puts the plate's number
+     on the same line as the real one. */
+  padding-block: 2rem;
+  /* The centre of the disc, so the wheel turns about its own axle. */
+  transform-origin: calc(var(--why-circle) / 2)
+    calc(var(--why-circle-top) + var(--why-circle) / 2);
+}
+
+.why-disc {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-royal-600);
+  clip-path: var(--why-clip-disc);
+}
+
+/* The rim: a hairline set in from the disc's edge, which is what gives a
+   flat circle the weight of a wheel. Set in rather than sitting on the
+   boundary, where the clip's own antialiasing would eat half of it. It
+   retires with the tint. (What reads as rotation is the number — a ring
+   is the same ring at every angle.) */
+.why-disc::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--why-circle-top) + 0.5rem);
+  left: 0.5rem;
+  width: calc(var(--why-circle) - 1rem);
+  height: calc(var(--why-circle) - 1rem);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 999px;
+}
+
+.why-plate .why-digit {
+  position: relative;
+  color: #fff;
+  transform: var(--why-digit-park);
+}
+
+.why-card[data-visible="false"] .why-num,
+.why-card[data-visible="false"] .why-copy {
+  opacity: 0;
+}
+
+.why-card[data-visible="false"] .why-face {
+  border-top-color: transparent;
+}
+
+@keyframes why-roll-in {
+  from {
+    transform: translate3d(var(--why-x), 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes why-spin {
+  from {
+    transform: rotate(var(--why-spin));
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes why-open {
+  from {
+    clip-path: var(--why-clip-disc);
+  }
+  to {
+    clip-path: var(--why-clip-card);
+  }
+}
+
+/* The tint has to outlive the first half of the opening, or there is no
+   morph to see: a disc that washes out while it is still round leaves a
+   rectangle to finish growing in the page's own colour, which is to say
+   invisibly. So it holds through the stretch where the shape is actually
+   changing and is gone by the time that shape is the whole card —
+   otherwise the morph would end on a blue panel blinking over the copy.
+   The target is the section ground rather than `--color-paper`, which is
+   a shade lighter than this band and showed as a pale panel. */
+@keyframes why-dissolve {
+  from {
+    background-color: var(--color-royal-600);
+  }
+  to {
+    background-color: var(--color-paper-dim);
+  }
+}
+
+/* The number is tied to the tint underneath it, not to its own journey
+   back to the corner: white while there is blue to sit on, the card's
+   accent red by the time there is not. */
+@keyframes why-ink {
+  from {
+    color: #fff;
+  }
+  to {
+    color: var(--color-ember-600);
+  }
+}
+
+@keyframes why-rim-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* In early, out the moment the rectangle is complete — the disc ends the
+   morph painted in the section's own colour and covering the whole card,
+   so anything still underneath it stays hidden until the plate has gone.
+   The drop shadow is retired over the window the disc opens in. One
+   animation rather than two, so nothing else has to own `opacity` on the
+   plate.
+
+   The shadow is `filter` rather than `box-shadow` because a box shadow
+   follows the element's own square border box and the clip then cuts it
+   down to a stray tick where the two happen to meet. A drop shadow is
+   taken from the alpha of what the filter is given, which by then is
+   the clipped disc, so it traces whatever shape the morph is in. */
+@keyframes why-plate-life {
+  0% {
+    opacity: 0;
+    filter: drop-shadow(0 0.75rem 1.5rem rgb(20 34 68 / 0.3));
+  }
+  6% {
+    opacity: 1;
+  }
+  50% {
+    filter: drop-shadow(0 0.75rem 1.5rem rgb(20 34 68 / 0.3));
+  }
+  80% {
+    filter: drop-shadow(0 0 0 rgb(20 34 68 / 0));
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgb(20 34 68 / 0));
+  }
+}
+
+@keyframes why-settle {
+  from {
+    transform: var(--why-digit-park);
+  }
+  to {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes why-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes why-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* No `to`, so the rule lands on whatever the cascade says it should be
+   — and `backwards` rather than `forwards` hands border-colour back to
+   the hover transition the moment the entrance is over. */
+@keyframes why-rule {
+  from {
+    border-top-color: transparent;
+  }
+}
+
+/* One timeline, stated once. Every duration and offset is scaled by
+   `--why-t`, so the whole card can be shortened on a phone without any
+   of its parts drifting out of step. At the 0.66s roll a mid-width
+   card measures for itself:
+
+     0.00s  disc rolls on from off-screen, turning as it goes
+     0.49s  wheel is upright and at rest
+     0.51s  disc begins opening out; number sets off for its line
+     0.57s  the blue starts washing out of the opening shape
+     0.66s  travel is done
+     0.85s  the shape is page-coloured; the number is on its accent red
+     0.95s  top rule fades in
+     0.97s  disc has become the card; the plate hands over and goes
+     0.99s  number and copy take over
+     1.65s  last line of copy has landed
+
+   The sequence step is 800ms (`WhySection`), so the next disc sets off
+   while this card's copy is still arriving but well after its shape has
+   settled — which is what keeps two cards from ever being seen changing
+   shape together. */
+.why-card[data-visible="true"] .why-plate {
+  animation:
+    why-roll-in var(--why-travel-t) var(--why-ease-roll) var(--why-delay) both,
+    why-plate-life calc(var(--why-travel-t) * 0.78 + 0.52s * var(--why-t)) linear
+      var(--why-delay) both;
+}
+
+.why-card[data-visible="true"] .why-wheel {
+  animation: why-spin var(--why-roll) var(--why-ease-roll) var(--why-delay) both;
+}
+
+.why-card[data-visible="true"] .why-disc {
+  animation:
+    why-open calc(0.46s * var(--why-t)) var(--why-ease-morph) var(--why-open-at) both,
+    why-dissolve calc(0.28s * var(--why-t)) linear
+      calc(var(--why-open-at) + 0.06s * var(--why-t)) both;
+}
+
+/* Out early: a ring that is still being drawn once the shape has left the
+   circle reads as a stray arc across the card. */
+.why-card[data-visible="true"] .why-disc::after {
+  animation: why-rim-out calc(0.18s * var(--why-t)) linear var(--why-open-at) both;
+}
+
+.why-card[data-visible="true"] .why-plate .why-digit {
+  animation:
+    why-settle calc(0.46s * var(--why-t)) var(--why-ease-morph) var(--why-open-at) both,
+    why-ink calc(0.28s * var(--why-t)) linear calc(var(--why-open-at) + 0.06s * var(--why-t)) both;
+}
+
+.why-card[data-visible="true"] .why-face {
+  animation: why-rule calc(0.5s * var(--why-t)) linear
+    calc(var(--why-open-at) + 0.44s * var(--why-t)) backwards;
+}
+
+.why-card[data-visible="true"] .why-num {
+  animation: why-fade-in calc(0.3s * var(--why-t)) var(--ease-out-expo)
+    calc(var(--why-open-at) + 0.44s * var(--why-t)) both;
+}
+
+.why-card[data-visible="true"] .why-copy {
+  animation: why-rise calc(0.6s * var(--why-t)) var(--ease-out-expo)
+    calc(var(--why-open-at) + var(--why-copy-delay, 0.48s) * var(--why-t)) both;
+}
+
+.why-card[data-visible="true"] .why-copy + .why-copy {
+  --why-copy-delay: 0.6s;
+}
+
+/* One column: the disc comes down to suit a narrower card, and the
+   whole timeline tightens. The travel is measured either way, and from
+   this close to the edge it is short, so the roll stays brisk. */
+@media (max-width: 639px) {
+  .why-card {
+    --why-t: 0.82;
+    --why-circle: 7.5rem;
+    --why-digit-scale: 2.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .why-plate {
+    display: none;
+  }
+
+  .why-card .why-num,
+  .why-card .why-copy {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .why-card .why-face {
+    animation: none;
   }
 }
 
@@ -360,8 +985,47 @@
   animation-delay: 0.42s;
 }
 
+/* The accent rule under the last line of the heading draws itself in from
+   the left, a beat after that line has landed — the one flourish in the
+   hero, and the only thing on it that is not simply copy arriving. */
+@keyframes hero-rule-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-rule {
+  transform-origin: left center;
+  animation: hero-rule-in 0.9s var(--ease-out-expo) 0.55s both;
+}
+
+/* The controls rail is outside the keyed copy, so this plays once when the
+   page opens rather than on every slide change. */
+@keyframes hero-controls-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-controls {
+  animation: hero-controls-in 0.9s var(--ease-out-expo) 0.6s both;
+}
+
+/* `animation: none`, not a shortened duration: the global backstop trims
+   durations but leaves delays alone, and a filled `both` would hold these
+   at their opening frame — invisible — for the length of the delay. */
 @media (prefers-reduced-motion: reduce) {
-  .slide-copy > * {
+  .slide-copy > *,
+  .hero-rule,
+  .hero-controls {
     animation: none;
   }
 }
@@ -422,12 +1086,311 @@
 }
 
 .marquee-track {
-  animation: marquee-x 38s linear infinite;
+  /* One loop = half the track (the list is rendered twice). Lower is faster;
+     stated as a variable so the pace is tunable from one place. */
+  --marquee-duration: 22s;
+  animation: marquee-x var(--marquee-duration) linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/* ============================================================
+   HOME — "HOW IT GREW" TIMELINE
+   ============================================================
+
+   A four-milestone rail whose marker is scrubbed by scroll while the
+   panel holding it is pinned. Only the pinned geometry lives here; the
+   marker's position is set inline by the component, because it is a
+   per-frame value and has no business in a stylesheet.
+
+   Everything below `lg` is deliberately absent: the component renders a
+   plain list there instead, so a narrow screen never inherits a pinned
+   panel or a 64px rail it has no room for.
+*/
+
+@media (min-width: 1024px) {
+  /* Padding rather than a height: the stretch the panel is held for is
+     then exactly 170vh whatever the panel itself measures, which is the
+     figure `usePinProgress` divides by. Three legs at ~47vh of usable
+     travel each once the lead-in and tail are taken off — enough to read
+     each milestone, short of the dead space a longer pin would leave. */
+  .tl-track::after {
+    content: "";
+    display: block;
+    height: 170vh;
+  }
+
+  .tl-panel {
+    position: sticky;
+    top: calc(var(--nav-h-compact) + 2rem);
+    min-height: calc(100vh - var(--nav-h-compact) - 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 2.5rem;
+    border-left: 1px solid rgb(255 255 255 / 0.12);
+  }
+}
+
+/* The token — a circular plate riding the rail. The first ring is the
+   royal ground punched back in around it, so the line reads as passing
+   behind the plate rather than through it; the second is a hairline
+   edge; the third is a low ember cast, not a glow. */
+.tl-token {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 5px var(--color-royal-900),
+    0 0 0 6px rgb(255 255 255 / 0.22),
+    0 14px 34px -16px rgb(217 58 38 / 0.55);
+  will-change: transform;
+}
+
+/* Milestone copy. One transform for the whole block, so the year, the
+   heading and the paragraph arrive as a single piece of text rather than
+   as three separately animated elements. A milestone still to come waits
+   offset to the right and dimmed and slides into place as the token
+   reaches it; one already passed stays where it is, muted. The offset is
+   a transform, so nothing below it moves while it travels. */
+.tl-item {
+  transition:
+    opacity 0.6s var(--ease-out-expo),
+    transform 0.6s var(--ease-out-expo);
+}
+
+.tl-item[data-state="ahead"] {
+  opacity: 0;
+  transform: translate3d(100vw, 0, 0);
+  pointer-events: none;
+}
+
+.tl-item[data-state="past"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.tl-item[data-state="current"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+/* The fixed marker under each milestone — visible where the token is
+   not, so all four positions stay readable on the rail. */
+.tl-dot {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 999px;
+  background-color: rgb(255 255 255 / 0.28);
+  transition:
+    background-color 0.5s var(--ease-out-expo),
+    opacity 0.5s var(--ease-out-expo);
+}
+
+.tl-dot[data-state="past"] {
+  background-color: var(--color-ember-500);
+  opacity: 0.6;
+}
+
+.tl-dot[data-state="current"] {
+  background-color: var(--color-ember-500);
+}
+
+/* ============================================================
+   ITI TRADES — HOVER SHINE & LOADING TEXT EFFECT
+   ============================================================ */
+@keyframes tradeShineBeam {
+  0% {
+    transform: translateX(-140%) skewX(-25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(280%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes tradeTextShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes tradeTextLoadIn {
+  0% {
+    opacity: 0.2;
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes tradeGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(41, 71, 145, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 24px 2px rgba(217, 58, 38, 0.25);
+  }
+}
+
+.trade-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trade-card:hover {
+  background: linear-gradient(110deg, #ffffff 0%, #fffbf8 45%, #f4f7fd 100%);
+  border-color: rgba(41, 71, 145, 0.45);
+  box-shadow: 0 16px 36px -10px rgba(41, 71, 145, 0.14), 0 4px 18px rgba(217, 58, 38, 0.08);
+}
+
+/* Bright sweeping beam left-to-right */
+.trade-card .trade-shine-overlay {
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: 0;
+  width: 65%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(251, 191, 36, 0.4) 65%,
+    rgba(217, 58, 38, 0.35) 75%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-25deg);
+  pointer-events: none;
+  z-index: 15;
+}
+
+.trade-card:hover .trade-shine-overlay {
+  animation: tradeShineBeam 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Top bright color sweep line */
+.trade-card .trade-accent-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #294791, #d93a26, #f59e0b, #294791);
+  background-size: 200% auto;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+.trade-card:hover .trade-accent-line {
+  transform: scaleX(1);
+  animation: tradeTextShimmer 2s infinite linear;
+}
+
+/* Text loading animations on hover */
+.trade-card:hover .trade-load-0 {
+  animation: tradeTextLoadIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.trade-card:hover .trade-load-1 {
+  animation: tradeTextLoadIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s forwards;
+}
+
+.trade-card:hover .trade-load-2 {
+  animation: tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+}
+
+.trade-card:hover .trade-load-3 {
+  animation: tradeTextLoadIn 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.18s forwards;
+}
+
+.trade-card:hover .trade-load-4 {
+  animation: tradeTextLoadIn 0.58s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards;
+}
+
+/* Shimmer text sweep across title on hover */
+.trade-card:hover .trade-title-shimmer {
+  background: linear-gradient(
+    90deg,
+    #191817 0%,
+    #294791 20%,
+    #d93a26 40%,
+    #f59e0b 50%,
+    #ffffff 55%,
+    #294791 75%,
+    #191817 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: tradeTextShimmer 1.8s infinite linear, tradeTextLoadIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s forwards;
+}
+
+/* Shimmer text sweep across body paragraph on hover */
+.trade-card:hover .trade-body-shimmer {
+  background: linear-gradient(
+    90deg,
+    #55504a 0%,
+    #223a76 25%,
+    #d93a26 45%,
+    #ffffff 55%,
+    #223a76 75%,
+    #55504a 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: tradeTextShimmer 2.2s infinite linear 0.1s, tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+}
+
+/* ============================================================
+   REDUCED MOTION — global backstop
+   ============================================================
+
+   The named animations above each opt out individually, but most of
+   the motion on this site comes from Tailwind `transition-*` and
+   `hover:scale-*` utilities scattered across components, which no
+   amount of per-keyframe guarding would catch.
+
+   This collapses every transition and animation to an imperceptible
+   duration rather than removing them, so state still *changes* —
+   hovers, dropdowns and the mobile menu all keep working — it just
+   arrives instantly instead of travelling.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

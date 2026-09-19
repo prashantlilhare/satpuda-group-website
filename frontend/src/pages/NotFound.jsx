@@ -10,7 +10,7 @@ export default function NotFound() {
   });
 
   return (
-    <section className="bg-paper py-24 sm:py-32">
+    <section className="section bg-paper">
       <div className="shell">
         <div className="max-w-2xl">
           <Eyebrow>Error 404</Eyebrow>
@@ -28,12 +28,16 @@ export default function NotFound() {
           </div>
         </div>
 
-        <div className="mt-20 grid gap-x-12 gap-y-1 border-t border-stone-line pt-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Each card carries its own top rule, matching the bordered-row
+            pattern used across the site. Previously the container drew a
+            rule and every card drew a second one underneath it, which
+            doubled up at the top of each column. */}
+        <div className="section-body grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-4">
           {instituteLinks.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="group border-b border-stone-line py-6 transition-colors duration-300"
+              className="group border-t border-stone-line py-6 transition-colors duration-400 hover:border-royal-600"
             >
               <h2 className="font-display text-[1.125rem] font-semibold tracking-[-0.018em] text-ink transition-colors duration-300 group-hover:text-royal-700">
                 {item.label}

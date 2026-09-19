@@ -1,11 +1,12 @@
 import { Figure, Reveal, SectionHeading } from "../ui/Primitives";
 import { campusExperience } from "../../data/about";
+import { stagger } from "../ui/stagger";
 
 export function CampusSection() {
   const [first, ...rest] = campusExperience;
 
   return (
-    <section className="bg-paper py-20 sm:py-28 lg:py-32">
+    <section className="section bg-paper">
       <div className="shell">
         <SectionHeading
           eyebrow="Campus & education experience"
@@ -13,11 +14,11 @@ export function CampusSection() {
           lead="Laboratories, libraries, workshop sheds, a seminar hall and sports grounds — the parts of a campus that only matter if they are open and busy."
         />
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-12 lg:gap-10">
+        <div className="section-body grid gap-8 lg:grid-cols-12 lg:gap-10">
           {/* large lead item */}
           <Reveal className="group lg:col-span-7">
             <article>
-              <Figure src={first.image} alt={first.alt} ratio="16 / 10" />
+              <Figure mask src={first.image} alt={first.alt} ratio="16 / 10" />
               <div className="mt-6 flex items-start gap-5">
                 <span aria-hidden="true" className="mt-2.5 h-px w-10 shrink-0 bg-ember-500" />
                 <div>
@@ -35,7 +36,7 @@ export function CampusSection() {
           {/* stacked supporting items */}
           <div className="grid gap-8 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-7">
             {rest.map((item, i) => (
-              <Reveal key={item.title} delay={(i + 1) * 90} className="group">
+              <Reveal key={item.title} delay={stagger(i + 1)} className="group">
                 <article className="flex gap-5">
                   <div className="w-28 shrink-0 sm:w-32 lg:w-36">
                     <Figure src={item.image} alt={item.alt} ratio="1 / 1" />

@@ -4,6 +4,7 @@ import { Eyebrow, Figure, Reveal, SectionHeading } from "../components/ui/Primit
 import { teacherEducation } from "../data/programs";
 import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 export default function DEdBEd() {
   useSeo({
@@ -24,7 +25,7 @@ export default function DEdBEd() {
       />
 
       {/* ---------------- scope notice ---------------- */}
-      <section className="border-b border-stone-line bg-paper py-10">
+      <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
           <Reveal>
             <p className="max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-soft">
@@ -39,19 +40,19 @@ export default function DEdBEd() {
       </section>
 
       {/* ---------------- why teaching ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>The work</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
-                <h2 className="t-h2 mt-6 max-w-xl text-ink">
+              <Reveal delay={stagger(1)}>
+                <h2 className="t-h2 mt-5 max-w-xl text-ink">
                   Knowing a subject and being able to teach it are two different skills.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                   <p>
                     Teacher education exists because the second skill has to be taught. A graduate
@@ -73,8 +74,9 @@ export default function DEdBEd() {
               </Reveal>
             </div>
 
-            <Reveal delay={120} className="group">
+            <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.classroom}
                 alt="A teaching session in progress in a Satpuda classroom"
                 ratio="4 / 5"
@@ -85,7 +87,7 @@ export default function DEdBEd() {
       </section>
 
       {/* ---------------- the two programmes ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="The programmes"
@@ -93,7 +95,7 @@ export default function DEdBEd() {
             lead="A D.Ed prepares teachers for the foundational and primary years; a B.Ed prepares graduates for secondary and senior secondary teaching."
           />
 
-          <div className="mt-14 space-y-16 lg:space-y-20">
+          <div className="section-body space-y-16 lg:space-y-20">
             {teacherEducation.map((prog, idx) => (
               <div key={prog.id}>
                 <Reveal>
@@ -112,7 +114,7 @@ export default function DEdBEd() {
                   </div>
                 </Reveal>
 
-                <Reveal delay={80}>
+                <Reveal delay={stagger(1)}>
                   <p className="mt-7 max-w-2xl text-[1.0625rem] leading-[1.75] text-ink-soft">
                     {prog.summary}
                   </p>
@@ -120,8 +122,8 @@ export default function DEdBEd() {
 
                 <div className="mt-10 grid gap-x-12 gap-y-1 sm:grid-cols-2">
                   {prog.modules.map((m, i) => (
-                    <Reveal key={m.title} delay={(i % 2) * 90}>
-                      <article className="group border-t border-stone-line py-6 transition-colors duration-400 hover:border-ember-500">
+                    <Reveal key={m.title} delay={stagger(i % 2)}>
+                      <article className="group border-t border-stone-line py-6 transition-colors duration-400 hover:border-royal-600">
                         <h4 className="font-display text-[1.125rem] font-semibold tracking-[-0.015em] text-ink">
                           {m.title}
                         </h4>
@@ -139,19 +141,19 @@ export default function DEdBEd() {
       </section>
 
       {/* ---------------- practice ---------------- */}
-      <section className="on-dark bg-royal-900 py-20 text-white sm:py-28">
+      <section className="section on-dark bg-royal-900 text-white">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.95fr] lg:items-center lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>Teaching practice</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
+              <Reveal delay={stagger(1)}>
                 <h2 className="t-h2 mt-5 max-w-lg text-white">
                   The part that cannot be learned from a book.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-7 max-w-lg space-y-5 text-[1.0625rem] leading-relaxed text-white/70">
                   <p>
                     Both programmes place trainees in real classrooms carrying real teaching
@@ -167,7 +169,7 @@ export default function DEdBEd() {
               </Reveal>
             </div>
 
-            <Reveal delay={120} className="group">
+            <Reveal delay={stagger(2)} className="group">
               <Figure
                 src={campusImages.seminarHall}
                 alt="A large teaching session underway in the campus seminar hall"

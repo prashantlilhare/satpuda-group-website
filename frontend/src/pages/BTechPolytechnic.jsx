@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { Eyebrow, Fact, Figure, Reveal, SectionHeading } from "../components/ui/Primitives";
@@ -5,8 +6,24 @@ import { btechBranches, diplomaBranches, engineeringAdmission } from "../data/pr
 import { campusImages } from "../data/about";
 import { getInstitution } from "../data/institutions";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 const inst = getInstitution("btech-polytechnic");
+
+const btechBranchImages = {
+  CSE: campusImages.computerLab,
+  MIN: campusImages.campusAerial,
+  CIV: campusImages.campusFront,
+  MECH: campusImages.workshop,
+  EE: campusImages.electronicsBench,
+};
+
+const diplomaBranchImages = [
+  campusImages.campusFront,
+  campusImages.electronicsBench,
+  campusImages.workshop,
+  campusImages.campusAerial,
+];
 
 const facilities = [
   {
@@ -36,6 +53,13 @@ const facilities = [
 ];
 
 export default function BTechPolytechnic() {
+  const [hoveredDiploma, setHoveredDiploma] = useState(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    setCursorPos({ x: e.clientX, y: e.clientY });
+  };
+
   useSeo({
     title: "B.Tech & Polytechnic",
     description:
@@ -45,6 +69,35 @@ export default function BTechPolytechnic() {
 
   return (
     <>
+      {/* Floating Cursor-following Image Preview (Global outside div, Portrait format) */}
+      <div
+        className="pointer-events-none fixed z-[9999] transition-all duration-300 ease-out"
+        style={{
+          left: 0,
+          top: 0,
+          transform: `translate3d(${cursorPos.x + 32}px, ${cursorPos.y - 144}px, 0)`,
+          opacity: hoveredDiploma !== null ? 1 : 0,
+          pointerEvents: "none",
+        }}
+      >
+        <div className="w-56 h-72 overflow-hidden rounded-2xl border border-white/20 bg-royal-950 shadow-2xl relative">
+          <img
+            src={diplomaBranchImages[hoveredDiploma ?? 0] || campusImages.campusFront}
+            alt={diplomaBranches[hoveredDiploma ?? 0]?.name}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+          <div className="absolute bottom-4 left-5 right-5">
+            <span className="text-[10px] font-mono text-ember-400 font-bold tracking-widest block mb-1.5">
+              0{(hoveredDiploma ?? 0) + 1}
+            </span>
+            <span className="text-[0.9375rem] font-semibold text-white tracking-wide block leading-tight">
+              {diplomaBranches[hoveredDiploma ?? 0]?.name}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <PageHero
         eyebrow="Institute"
         title="B.Tech & Polytechnic"
@@ -54,11 +107,11 @@ export default function BTechPolytechnic() {
       />
 
       {/* ---------------- approvals ---------------- */}
-      <section className="border-b border-stone-line bg-paper py-12 sm:py-14">
+      <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
           <div className="grid gap-8 sm:grid-cols-3">
             {inst.credentials.map((c, i) => (
-              <Reveal key={c} delay={i * 90}>
+              <Reveal key={c} delay={stagger(i)}>
                 <div className="flex items-start gap-4 border-t-2 border-royal-600 pt-5">
                   <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                     {String(i + 1).padStart(2, "0")}
@@ -72,19 +125,19 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- overview ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>The college</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
-                <h2 className="t-h2 mt-6 max-w-xl text-ink">
+              <Reveal delay={stagger(1)}>
+                <h2 className="t-h2 mt-5 max-w-xl text-ink">
                   Engineering taught where the industry actually is.
                 </h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                   <p>
                     Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
@@ -104,13 +157,13 @@ export default function BTechPolytechnic() {
                 </div>
               </Reveal>
 
-              <div className="mt-12 grid grid-cols-2 gap-8 sm:max-w-md">
-                <Reveal delay={200}>
+              <div className="mt-10 grid grid-cols-2 gap-8 sm:max-w-md">
+                <Reveal delay={stagger(3)}>
                   <div className="border-t border-stone-line pt-5">
                     <Fact value="05" label="B.Tech branches" />
                   </div>
                 </Reveal>
-                <Reveal delay={270}>
+                <Reveal delay={stagger(4)}>
                   <div className="border-t border-stone-line pt-5">
                     <Fact value="04" label="Diploma branches" />
                   </div>
@@ -118,8 +171,9 @@ export default function BTechPolytechnic() {
               </div>
             </div>
 
-            <Reveal delay={120} className="group">
+            <Reveal delay={stagger(2)} className="group">
               <Figure
+                mask
                 src={campusImages.campusAerial}
                 alt="The Satpuda campus seen across its lawns"
                 ratio="4 / 5"
@@ -130,7 +184,7 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- B.TECH BRANCHES ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Degree programmes"
@@ -138,56 +192,93 @@ export default function BTechPolytechnic() {
             lead="Four years, eight semesters, affiliated to RGPV Bhopal."
           />
 
-          <div className="mt-14 grid gap-px bg-stone-line sm:grid-cols-2 lg:grid-cols-3">
-            {btechBranches.map((b, i) => (
-              <Reveal key={b.code} delay={(i % 3) * 90}>
-                <article className="group flex h-full flex-col bg-paper-dim p-7 transition-colors duration-400 hover:bg-paper sm:p-8">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="font-display text-xs font-semibold tracking-[0.08em] text-ember-600">
-                      {b.code}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="h-px w-8 origin-right bg-stone-line transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-14 group-hover:bg-ember-500"
+          <div className="section-body grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {btechBranches.map((b, i) => {
+              const bgImg = btechBranchImages[b.code] || campusImages.campusFront;
+              return (
+                <Reveal key={b.code} delay={stagger(i % 3)}>
+                  <article className="group relative flex h-full min-h-[350px] flex-col justify-end overflow-hidden rounded-2xl border border-stone-line/10 bg-royal-950 p-7 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-2xl hover:border-ember-500/50">
+                    {/* Background Image - ALWAYS VISIBLE */}
+                    <img
+                      src={bgImg}
+                      alt={b.name}
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover scale-100 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
                     />
-                  </div>
 
-                  <h3 className="mt-5 font-display text-[1.3125rem] font-semibold leading-tight tracking-[-0.02em] text-ink">
-                    {b.name}
-                  </h3>
-                  <p className="mt-4 flex-1 text-[0.9375rem] leading-[1.7] text-ink-soft">
-                    {b.body}
-                  </p>
+                    {/* Dark gradient overlay - always visible at bottom to make white text readable */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-colors duration-500 group-hover:from-black/95 group-hover:via-black/75 group-hover:to-black/40"
+                    />
 
-                  <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-stone-line pt-5">
-                    {b.topics.map((t) => (
-                      <li key={t} className="text-[0.8125rem] text-ink-mute">
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </Reveal>
-            ))}
+                    {/* Ambient subtle accent glow on hover */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-ember-600/20 via-transparent to-royal-600/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    />
 
-            {/* filler cell keeps the 3-col grid tidy without inventing content */}
-            <div className="hidden bg-paper-dim lg:block" aria-hidden="true" />
+                    {/* Content overlay */}
+                    <div className="relative z-10 flex flex-col justify-end">
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <span className="font-display text-xs font-bold tracking-[0.1em] px-2.5 py-1 rounded-md bg-white/10 text-white border border-white/20 backdrop-blur-sm transition-all duration-300 group-hover:bg-ember-500 group-hover:border-ember-400 group-hover:text-white">
+                          {b.code}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className="h-px w-8 origin-right bg-white/40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-14 group-hover:bg-ember-400"
+                        />
+                      </div>
+
+                      <h3 className="font-display text-[1.3125rem] font-semibold leading-tight tracking-[-0.02em] text-white">
+                        {b.name}
+                      </h3>
+
+                      {/* Expandable Description & Topics Container - hidden by default, expands on hover */}
+                      <div className="grid grid-rows-[0fr] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:grid-rows-[1fr]">
+                        <div className="overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
+                          <p className="mt-3 text-[0.9375rem] leading-[1.7] text-white/85">
+                            {b.body}
+                          </p>
+
+                          <ul className="mt-5 flex flex-wrap gap-1.5 pt-4 border-t border-white/15">
+                            {b.topics.map((t) => (
+                              <li
+                                key={t}
+                                className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-[0.75rem] font-medium text-white/90"
+                              >
+                                {t}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ---------------- DIPLOMA ---------------- */}
-      <section className="on-dark bg-royal-900 py-20 text-white sm:py-28">
+      <section
+        onMouseMove={handleMouseMove}
+        className="section on-dark bg-royal-900 text-white relative"
+      >
+
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
             <div>
               <Reveal>
                 <Eyebrow>Diploma programmes</Eyebrow>
               </Reveal>
-              <Reveal delay={70}>
+              <Reveal delay={stagger(1)}>
                 <h2 className="t-h2 mt-5 text-white">Polytechnic — a three-year route in.</h2>
               </Reveal>
-              <Reveal delay={140}>
+              <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
                   Open after Class 10 and approved by the Directorate of Technical Education,
                   Government of Madhya Pradesh. A diploma can stand on its own as a technical
@@ -196,18 +287,22 @@ export default function BTechPolytechnic() {
               </Reveal>
             </div>
 
-            <div>
+            <div className="flex flex-col">
               {diplomaBranches.map((d, i) => (
-                <Reveal key={d.name} delay={i * 90}>
-                  <article className="group grid grid-cols-[2.75rem_1fr] gap-4 border-t border-white/15 py-7 transition-colors duration-400 hover:border-ember-500 sm:grid-cols-[4rem_1fr] sm:gap-7">
-                    <span className="font-display text-xs font-semibold tabular-nums text-ember-400">
+                <Reveal key={d.name} delay={stagger(i)}>
+                  <article
+                    onMouseEnter={() => setHoveredDiploma(i)}
+                    onMouseLeave={() => setHoveredDiploma(null)}
+                    className="group grid grid-cols-[2.75rem_1fr] gap-4 border-t border-white/15 py-7 transition-all duration-300 hover:border-ember-500 hover:pl-2 sm:grid-cols-[4rem_1fr] sm:gap-7 cursor-pointer"
+                  >
+                    <span className="font-display text-xs font-semibold tabular-nums text-ember-400 transition-colors group-hover:text-ember-300">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div>
-                      <h3 className="font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-white">
+                      <h3 className="font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-white transition-colors duration-200 group-hover:text-ember-300">
                         {d.name}
                       </h3>
-                      <p className="mt-2.5 text-[0.9375rem] leading-[1.7] text-white/62">
+                      <p className="mt-2.5 text-[0.9375rem] leading-[1.7] text-white/62 transition-colors duration-200 group-hover:text-white/80">
                         {d.body}
                       </p>
                     </div>
@@ -220,7 +315,7 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- FACILITIES ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="Labs & infrastructure"
@@ -228,9 +323,9 @@ export default function BTechPolytechnic() {
             lead="Laboratory and workshop time is scheduled as core teaching, not as a demonstration attached to a lecture."
           />
 
-          <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:gap-x-12 lg:gap-y-14">
+          <div className="section-body grid gap-10 sm:grid-cols-2 lg:gap-x-12 lg:gap-y-14">
             {facilities.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 2) * 100} className="group">
+              <Reveal key={f.title} delay={stagger(i % 2)} className="group">
                 <article>
                   <Figure src={f.image} alt={f.alt} ratio="16 / 10" />
                   <h3 className="mt-6 font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-ink">
@@ -247,14 +342,14 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- ADMISSION ---------------- */}
-      <section className="bg-paper-dim py-20 sm:py-28">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Eligibility & admission"
             title="What you need, and how you apply."
           />
 
-          <div className="mt-14 grid gap-px bg-stone-line lg:grid-cols-2">
+          <div className="section-body grid gap-px bg-stone-line lg:grid-cols-2">
             {engineeringAdmission.map((a) => (
               <Reveal key={a.label}>
                 <div className="h-full bg-paper-dim p-8 sm:p-10">
@@ -288,7 +383,7 @@ export default function BTechPolytechnic() {
             ))}
           </div>
 
-          <Reveal delay={120}>
+          <Reveal delay={stagger(2)}>
             <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
               Intake, fee structure, scholarship eligibility and counselling dates change every
               session and are not published here. Contact the institution for current details.

@@ -10,7 +10,7 @@ import { Eyebrow } from "../ui/Primitives";
  */
 export function PageHero({ eyebrow, title, lead, crumbs = [], image, imageAlt = "", align = "left" }) {
   return (
-    <section className="on-dark relative isolate overflow-hidden bg-royal-900 pt-14 pb-16 sm:pt-20 sm:pb-24">
+    <section className="section-tight on-dark relative isolate overflow-hidden bg-royal-900">
       {image && (
         <>
           <img
@@ -19,7 +19,7 @@ export function PageHero({ eyebrow, title, lead, crumbs = [], image, imageAlt = 
             loading="eager"
             fetchPriority="high"
             decoding="async"
-            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.22]"
+            className="hero-backdrop absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.22]"
           />
           <div
             aria-hidden="true"

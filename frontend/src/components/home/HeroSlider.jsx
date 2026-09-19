@@ -124,7 +124,7 @@ export function HeroSlider() {
                     {line}
                     <span
                       aria-hidden="true"
-                      className="absolute -bottom-1 left-0 hidden h-[3px] w-full bg-ember-500 sm:block"
+                      className="hero-rule absolute -bottom-1 left-0 hidden h-[3px] w-full bg-ember-500 sm:block"
                     />
                   </span>
                 ) : (
@@ -149,7 +149,7 @@ export function HeroSlider() {
         </div>
 
         {/* ---------- controls ---------- */}
-        <div className="mt-11 flex items-end justify-between gap-6 border-t border-white/18 pt-6">
+        <div className="hero-controls mt-11 flex items-end justify-between gap-6 border-t border-white/18 pt-6">
           {/* pagination */}
           <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3.5">
             {heroSlides.map((s, i) => {

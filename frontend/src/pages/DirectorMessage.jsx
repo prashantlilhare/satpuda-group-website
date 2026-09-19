@@ -6,6 +6,7 @@ import { Eyebrow, Figure, Reveal } from "../components/ui/Primitives";
 import { director, principal } from "../data/leadership";
 import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
+import { stagger } from "../components/ui/stagger";
 
 export default function DirectorMessage() {
   useSeo({
@@ -26,13 +27,14 @@ export default function DirectorMessage() {
       />
 
       {/* ---------------- portrait + message ---------------- */}
-      <section className="bg-paper py-20 sm:py-28">
+      <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[0.62fr_1fr] lg:gap-20">
             {/* --- portrait column --- */}
-            <div className="lg:sticky lg:top-32 lg:self-start">
+            <div className="lg:sticky-aside">
               <Reveal className="group">
                 <Figure
+                  mask
                   src={director.portrait}
                   alt={director.portraitAlt}
                   ratio="4 / 5"
@@ -41,7 +43,7 @@ export default function DirectorMessage() {
                 />
               </Reveal>
 
-              <Reveal delay={110}>
+              <Reveal delay={stagger(2)}>
                 <div className="mt-7 border-t-2 border-ember-500 pt-6">
                   <h2 className="font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink">
                     {director.name}
@@ -72,13 +74,13 @@ export default function DirectorMessage() {
                 </blockquote>
               </Reveal>
 
-              <Reveal delay={110}>
+              <Reveal delay={stagger(2)}>
                 <hr className="rule my-10" />
               </Reveal>
 
               <div className="space-y-6 text-[1.0625rem] leading-[1.78] text-ink-soft">
                 {director.paragraphs.map((p, i) => (
-                  <Reveal key={i} delay={140 + i * 70}>
+                  <Reveal key={i} delay={stagger(2 + i)}>
                     <p className={i === 0 ? "first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-[3.75rem] first-letter:font-semibold first-letter:leading-[0.82] first-letter:text-royal-700" : ""}>
                       {p}
                     </p>
@@ -87,13 +89,13 @@ export default function DirectorMessage() {
               </div>
 
               {/* --- pillars --- */}
-              <div className="mt-14">
+              <div className="section-body">
                 <Reveal>
                   <Eyebrow>What that means in practice</Eyebrow>
                 </Reveal>
                 <ol className="mt-8">
                   {director.pillars.map((p, i) => (
-                    <Reveal key={p.title} delay={i * 100}>
+                    <Reveal key={p.title} delay={stagger(i)}>
                       <li className="grid grid-cols-[2.75rem_1fr] gap-4 border-t border-stone-line py-6 sm:grid-cols-[4rem_1fr] sm:gap-7">
                         <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                           {String(i + 1).padStart(2, "0")}
@@ -113,8 +115,8 @@ export default function DirectorMessage() {
               </div>
 
               {/* --- signature --- */}
-              <Reveal delay={120}>
-                <div className="mt-14 flex items-end justify-between gap-6 border-t border-stone-line pt-8">
+              <Reveal delay={stagger(2)}>
+                <div className="mt-12 flex items-end justify-between gap-6 border-t border-stone-line pt-8">
                   <div>
                     <p
                       className="font-display text-[1.625rem] italic tracking-[-0.02em] text-royal-700 sm:text-[1.875rem]"
@@ -140,7 +142,7 @@ export default function DirectorMessage() {
       </section>
 
       {/* ---------------- cross-link ---------------- */}
-      <section className="bg-paper-dim py-16 sm:py-20">
+      <section className="section-tight bg-paper-dim">
         <div className="shell">
           <Reveal>
             <Link
