@@ -525,410 +525,191 @@
 }
 
 /* ============================================================
-   WHY SATPUDA — rolling disc → card
+   WHY SATPUDA — campus gallery marquee
    ============================================================
 
-   Each card arrives as a disc carrying its number. It rolls in from
-   outside the screen — turning at the rate its own travel demands, so
-   it grips the page rather than sliding across it — and as it comes to
-   rest on the card's top-left corner it opens out: the disc's clip-path
-   expands into the card's own rectangle while its blue dissolves to
-   page colour, leaving the copy that was underneath it.
+   Three rows of photographs drifting past at walking pace: rows one
+   and three to the right, row two against them to the left.
 
-   Row one rolls in from the left, row two from the right. The six are
-   sequenced in JavaScript rather than by a fixed CSS stagger — see
-   `useSequencedReveal` — so 01 → 06 always play in order and only one
-   disc is ever crossing the page.
+   Each row carries its pictures twice over and slides the whole track
+   by half its own width. The second half being a copy of the first,
+   the frame at -50% is identical to the frame at 0% — so the loop
+   restarts on the picture it ended on and there is no seam to catch.
+   The durations differ between rows (see `galleryRows`), which is
+   what stops the three from beating in time with one another.
 
-   Nothing here touches the card's box. The plate is absolutely
-   positioned inside the article and the copy only ever moves by
-   transform and opacity, so the grid measures the same before, during
-   and after the reveal. The top rule is held back until the plate has
-   opened, so what rolls in reads as a disc rather than a disc towing a
-   stray hairline.
+   Hovering a photograph does two things at once: it holds all three
+   rows still, and it takes the light off every other tile so the one
+   under the pointer is the only thing lit. Both come from the
+   cascade — the pause from the band's own `:hover`, the dimming from
+   `:has()` — rather than from React state, which is why crossing
+   straight from one picture to the next never drops a frame or lets
+   the rows twitch back into motion between them.
 */
 
-/* The discs travel in from beyond the page edge, so the band clips
-   rather than the card: `clip` neither establishes a formatting context
-   nor makes anything scrollable, and the band is full-bleed, so its
-   edges *are* the viewport's — a disc becomes visible at the exact
-   moment it rolls onto the screen. */
+/* Each row already clips its own track; this is the backstop, so that a band
+   running the full width of the page can never be the thing that hands the
+   document a horizontal scrollbar. `clip` rather than `hidden`: it neither
+   establishes a formatting context nor makes the band scrollable. */
 .why-section {
   overflow-x: clip;
 }
 
-.why-card {
-  /* Filled in per card by `WhySection`, measured from where the card
-     actually sits: how far off-screen the disc starts, how far it has
-     to turn to cover that ground without slipping, and how long the
-     roll takes at a constant pace. The values here are the fallback
-     for the frame before that measurement lands, and for a browser
-     that never runs it. */
-  --why-x: -70vw;
-  --why-spin: -540deg;
-  --why-travel: 0.66s;
+.gallery-marquee {
+  /* One height per row; the tile's shape then decides its width. */
+  --tile-h: clamp(7rem, 4.75rem + 7.5vw, 13.5rem);
+  --tile-gap: clamp(0.5rem, 0.3rem + 0.7vw, 1rem);
+  /* Room above and below a row for a clicked tile to grow into. The rows
+     are spaced by this padding rather than by a `gap` here, so the headroom
+     costs the band almost nothing in height. Comfortably clears the 8% a
+     held tile takes at every size the tiles reach. */
+  --tile-lift: calc(var(--tile-gap) * 0.75);
 
-  --why-delay: 0ms;
-  --why-t: 1; /* duration scale — trimmed on phones */
+  display: flex;
+  flex-direction: column;
+}
 
-  /* The disc, anchored at the article's top-left so the rectangle it
-     opens into is the card itself. It needs `top + size` of vertical
-     room; the shortest card in the grid runs a little over 12rem even
-     at the widest column, so it never reaches the bottom edge and
-     never clips. */
-  --why-circle: 9.5rem;
-  --why-circle-top: 0.625rem;
-
-  /* Where the number's line box sits in normal flow, measured from the
-     article's top edge: the 2rem `py-8` padding plus half the 1.6rem
-     strut the number stands on. The disc's copy of the number is
-     parked at the disc's centre, scaled up to read at that size, and
-     walks back to exactly this line as the disc opens. */
-  --why-digit-cy: 2.8rem;
-  --why-digit-scale: 3.1;
-
-  /* The roll is over before the shape starts to change — a rectangle
-     caught mid-rotation reads as a mistake — but the disc is still
-     creeping the last few pixels of its travel when it does, so it
-     never opens from a dead stop. */
-  --why-travel-t: calc(var(--why-travel) * var(--why-t));
-  --why-roll: calc(var(--why-travel-t) * 0.74);
-  --why-open-at: calc(var(--why-delay) + var(--why-travel-t) * 0.78);
-
-  /* A wheel arrives at speed and settles; it does not start from rest,
-     because it was already moving before it came on screen. Slope out
-     of the gate is a little above its own average, then a long ease
-     into the corner it stops on. */
-  --why-ease-roll: cubic-bezier(0.28, 0.42, 0.24, 1);
-
-  /* Not the site-wide expo curve for the opening: expo covers
-     three-quarters of its distance in the first fifth of its time,
-     which on a shape this large reads as a snap — the circle is gone
-     before it has been seen. This keeps a short ramp in, is out-biased
-     from there, and still eases into its last frames rather than
-     stopping dead on them. */
-  --why-ease-morph: cubic-bezier(0.45, 0.02, 0.24, 1);
-
-  --why-clip-disc: inset(
-    var(--why-circle-top) calc(100% - var(--why-circle))
-      calc(100% - var(--why-circle-top) - var(--why-circle)) 0 round 999px
+/* Tiles are eased out at the two ends rather than cut off at them, so a
+   row reads as a current passing through the band rather than as a strip
+   with edges. */
+.gallery-row {
+  padding-block: var(--tile-lift);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 5%,
+    #000 95%,
+    transparent
   );
-  --why-clip-card: inset(0px 0px 0px 0px round 0px);
-
-  /* The 50% resolves against the digits' own box, so this stays centred
-     whatever the number renders at; the scale is about that same centre
-     and so does not disturb it. */
-  --why-digit-park: translate3d(
-      calc(var(--why-circle) / 2 - 50%),
-      calc(var(--why-circle-top) + var(--why-circle) / 2 - var(--why-digit-cy)),
-      0
-    )
-    scale(var(--why-digit-scale));
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
 }
 
-/* Both numbers — the disc's and the card's — share a box so the
-   hand-off between them is invisible. */
-.why-digit {
-  display: inline-block;
+.gallery-track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: gallery-drift var(--gallery-drift) linear infinite;
 }
 
-/* Four elements, not one.
-   `filter` is applied before `clip-path` on the same element, so a drop
-   shadow declared alongside the clip would be clipped away with it —
-   hence a plate carrying the travel and the shadow, a wheel inside it
-   carrying the rotation, and a disc inside that carrying the clip and
-   the fill.
-   The number is a sibling of the disc rather than a child, because its
-   destination is the card's top-left corner and the opening shape only
-   reaches that corner on its very last frame: clipped, the number would
-   be sliced away by the disc's own curve on the way there. It is
-   `relative` so it paints over the disc despite coming after it. */
-.why-plate {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  opacity: 0;
-  pointer-events: none;
+/* One keyframe pair for both directions — played backwards for the rows
+   that travel right. Two sets of keyframes would be two things to keep in
+   step; this way a change to the drift cannot apply to one direction and
+   not the other. */
+.gallery-track[data-direction="right"] {
+  animation-direction: reverse;
 }
 
-.why-wheel {
-  position: absolute;
-  inset: 0;
-  /* Matches the article's `py-8`, which is what puts the plate's number
-     on the same line as the real one. */
-  padding-block: 2rem;
-  /* The centre of the disc, so the wheel turns about its own axle. */
-  transform-origin: calc(var(--why-circle) / 2)
-    calc(var(--why-circle-top) + var(--why-circle) / 2);
+/* One pass, stated as a fraction of the track rather than a pixel distance
+   so nothing has to be measured in JavaScript. `PASSES` in `WhySection` is
+   the other half of this number and the two have to agree. */
+@keyframes gallery-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-100% / 3), 0, 0);
+  }
 }
 
-.why-disc {
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-royal-600);
-  clip-path: var(--why-clip-disc);
-}
-
-/* The rim: a hairline set in from the disc's edge, which is what gives a
-   flat circle the weight of a wheel. Set in rather than sitting on the
-   boundary, where the clip's own antialiasing would eat half of it. It
-   retires with the tint. (What reads as rotation is the number — a ring
-   is the same ring at every angle.) */
-.why-disc::after {
-  content: "";
-  position: absolute;
-  top: calc(var(--why-circle-top) + 0.5rem);
-  left: 0.5rem;
-  width: calc(var(--why-circle) - 1rem);
-  height: calc(var(--why-circle) - 1rem);
-  border: 1px solid rgb(255 255 255 / 0.3);
-  border-radius: 999px;
-}
-
-.why-plate .why-digit {
+/* The gap is the tile's own margin, not a `gap` on the track. A gap would
+   also fall between the two passes, leaving the track a half-gap wider than
+   twice its content — and half of *that* is no longer a whole pass, so every
+   loop would slip by half a gap. Carried as a margin, the tile's outer width
+   includes its spacing and the halves stay exactly equal. */
+.gallery-tile {
   position: relative;
-  color: #fff;
-  transform: var(--why-digit-park);
+  flex: none;
+  height: var(--tile-h);
+  margin-right: var(--tile-gap);
+  overflow: hidden;
+  /* Just enough to soften the corner; any more and a photograph starts to
+     read as a card. */
+  border-radius: 0.1875rem;
+  /* The holding tint the rest of the site's figures use, so a tile that is
+     still loading sits in the page rather than flashing white. */
+  background-color: rgb(20 34 68 / 0.05);
 }
 
-.why-card[data-visible="false"] .why-num,
-.why-card[data-visible="false"] .why-copy {
-  opacity: 0;
+.gallery-tile[data-shape="wide"] {
+  aspect-ratio: 3 / 2;
 }
 
-.why-card[data-visible="false"] .why-face {
-  border-top-color: transparent;
+.gallery-tile[data-shape="square"] {
+  aspect-ratio: 1 / 1;
 }
 
-@keyframes why-roll-in {
-  from {
-    transform: translate3d(var(--why-x), 0, 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+.gallery-tile[data-shape="upright"] {
+  aspect-ratio: 4 / 5;
 }
 
-@keyframes why-spin {
-  from {
-    transform: rotate(var(--why-spin));
-  }
-  to {
-    transform: rotate(0deg);
-  }
+/* The whole tile is the hit area. A button rather than a click handler on
+   the tile so the picture can be reached from the keyboard too; everything
+   that makes a button look like one is taken off. */
+.gallery-tile-hit {
+  display: block;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* Drawn inside the tile — the row clips at its own edge, so a ring on the
+     outside of a tile at either end would be cut in half. */
+  outline-offset: -3px;
 }
 
-@keyframes why-open {
-  from {
-    clip-path: var(--why-clip-disc);
-  }
-  to {
-    clip-path: var(--why-clip-card);
-  }
+.gallery-tile img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 }
 
-/* The tint has to outlive the first half of the opening, or there is no
-   morph to see: a disc that washes out while it is still round leaves a
-   rectangle to finish growing in the page's own colour, which is to say
-   invisibly. So it holds through the stretch where the shape is actually
-   changing and is gone by the time that shape is the whole card —
-   otherwise the morph would end on a blue panel blinking over the copy.
-   The target is the section ground rather than `--color-paper`, which is
-   a shade lighter than this band and showed as a pale panel. */
-@keyframes why-dissolve {
-  from {
-    background-color: var(--color-royal-600);
-  }
-  to {
-    background-color: var(--color-paper-dim);
-  }
+/* --- Clicked: the row holds, the picture comes forward ----------------
+   The hold belongs to the row, so it is the row's own track that stops and
+   the other two carry on; each runs its own animation and nothing above
+   them is listening. Nothing here answers to :hover — moving the pointer
+   across the band leaves all three rows exactly as they were. */
+.gallery-track[data-paused="true"] {
+  animation-play-state: paused;
 }
 
-/* The number is tied to the tint underneath it, not to its own journey
-   back to the corner: white while there is blue to sit on, the card's
-   accent red by the time there is not. */
-@keyframes why-ink {
-  from {
-    color: #fff;
-  }
-  to {
-    color: var(--color-ember-600);
-  }
+.gallery-tile {
+  transition: transform 420ms var(--ease-out-expo);
 }
 
-@keyframes why-rim-out {
-  to {
-    opacity: 0;
-  }
-}
-
-/* In early, out the moment the rectangle is complete — the disc ends the
-   morph painted in the section's own colour and covering the whole card,
-   so anything still underneath it stays hidden until the plate has gone.
-   The drop shadow is retired over the window the disc opens in. One
-   animation rather than two, so nothing else has to own `opacity` on the
-   plate.
-
-   The shadow is `filter` rather than `box-shadow` because a box shadow
-   follows the element's own square border box and the clip then cuts it
-   down to a stray tick where the two happen to meet. A drop shadow is
-   taken from the alpha of what the filter is given, which by then is
-   the clipped disc, so it traces whatever shape the morph is in. */
-@keyframes why-plate-life {
-  0% {
-    opacity: 0;
-    filter: drop-shadow(0 0.75rem 1.5rem rgb(20 34 68 / 0.3));
-  }
-  6% {
-    opacity: 1;
-  }
-  50% {
-    filter: drop-shadow(0 0.75rem 1.5rem rgb(20 34 68 / 0.3));
-  }
-  80% {
-    filter: drop-shadow(0 0 0 rgb(20 34 68 / 0));
-  }
-  94% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    filter: drop-shadow(0 0 0 rgb(20 34 68 / 0));
-  }
-}
-
-@keyframes why-settle {
-  from {
-    transform: var(--why-digit-park);
-  }
-  to {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-@keyframes why-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes why-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 0.5rem, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* No `to`, so the rule lands on whatever the cascade says it should be
-   — and `backwards` rather than `forwards` hands border-colour back to
-   the hover transition the moment the entrance is over. */
-@keyframes why-rule {
-  from {
-    border-top-color: transparent;
-  }
-}
-
-/* One timeline, stated once. Every duration and offset is scaled by
-   `--why-t`, so the whole card can be shortened on a phone without any
-   of its parts drifting out of step. At the 0.66s roll a mid-width
-   card measures for itself:
-
-     0.00s  disc rolls on from off-screen, turning as it goes
-     0.49s  wheel is upright and at rest
-     0.51s  disc begins opening out; number sets off for its line
-     0.57s  the blue starts washing out of the opening shape
-     0.66s  travel is done
-     0.85s  the shape is page-coloured; the number is on its accent red
-     0.95s  top rule fades in
-     0.97s  disc has become the card; the plate hands over and goes
-     0.99s  number and copy take over
-     1.65s  last line of copy has landed
-
-   The sequence step is 800ms (`WhySection`), so the next disc sets off
-   while this card's copy is still arriving but well after its shape has
-   settled — which is what keeps two cards from ever being seen changing
-   shape together. */
-.why-card[data-visible="true"] .why-plate {
-  animation:
-    why-roll-in var(--why-travel-t) var(--why-ease-roll) var(--why-delay) both,
-    why-plate-life calc(var(--why-travel-t) * 0.78 + 0.52s * var(--why-t)) linear
-      var(--why-delay) both;
-}
-
-.why-card[data-visible="true"] .why-wheel {
-  animation: why-spin var(--why-roll) var(--why-ease-roll) var(--why-delay) both;
-}
-
-.why-card[data-visible="true"] .why-disc {
-  animation:
-    why-open calc(0.46s * var(--why-t)) var(--why-ease-morph) var(--why-open-at) both,
-    why-dissolve calc(0.28s * var(--why-t)) linear
-      calc(var(--why-open-at) + 0.06s * var(--why-t)) both;
-}
-
-/* Out early: a ring that is still being drawn once the shape has left the
-   circle reads as a stray arc across the card. */
-.why-card[data-visible="true"] .why-disc::after {
-  animation: why-rim-out calc(0.18s * var(--why-t)) linear var(--why-open-at) both;
-}
-
-.why-card[data-visible="true"] .why-plate .why-digit {
-  animation:
-    why-settle calc(0.46s * var(--why-t)) var(--why-ease-morph) var(--why-open-at) both,
-    why-ink calc(0.28s * var(--why-t)) linear calc(var(--why-open-at) + 0.06s * var(--why-t)) both;
-}
-
-.why-card[data-visible="true"] .why-face {
-  animation: why-rule calc(0.5s * var(--why-t)) linear
-    calc(var(--why-open-at) + 0.44s * var(--why-t)) backwards;
-}
-
-.why-card[data-visible="true"] .why-num {
-  animation: why-fade-in calc(0.3s * var(--why-t)) var(--ease-out-expo)
-    calc(var(--why-open-at) + 0.44s * var(--why-t)) both;
-}
-
-.why-card[data-visible="true"] .why-copy {
-  animation: why-rise calc(0.6s * var(--why-t)) var(--ease-out-expo)
-    calc(var(--why-open-at) + var(--why-copy-delay, 0.48s) * var(--why-t)) both;
-}
-
-.why-card[data-visible="true"] .why-copy + .why-copy {
-  --why-copy-delay: 0.6s;
-}
-
-/* One column: the disc comes down to suit a narrower card, and the
-   whole timeline tightens. The travel is measured either way, and from
-   this close to the edge it is short, so the roll stays brisk. */
-@media (max-width: 639px) {
-  .why-card {
-    --why-t: 0.82;
-    --why-circle: 7.5rem;
-    --why-digit-scale: 2.4;
-  }
+.gallery-tile[data-held="true"] {
+  transform: scale(1.08);
+  /* Above its neighbours on both sides, which it now overlaps a little. */
+  z-index: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .why-plate {
+  .gallery-track {
+    animation: none;
+  }
+
+  /* Nothing is moving, so the second pass is eight repeats with no purpose
+     — and each row becomes something to push by hand instead of a fixed
+     crop of the few tiles that happen to fit. */
+  .gallery-tile[aria-hidden="true"] {
     display: none;
   }
 
-  .why-card .why-num,
-  .why-card .why-copy {
-    opacity: 1;
-    transform: none;
-    animation: none;
+  .gallery-row {
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
-  .why-card .why-face {
-    animation: none;
+  .gallery-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-tile {
+    transition: none;
   }
 }
 

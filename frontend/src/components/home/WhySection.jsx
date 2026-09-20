@@ -1,153 +1,141 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { SectionHeading } from "../ui/Primitives";
-import { differentiators } from "../../data/about";
-import { useSequencedReveal } from "../../hooks/useSequencedReveal";
+import { galleryRows } from "../../data/gallery";
+import { useReveal } from "../../hooks/useReveal";
 
-/* The card's number, and the copy of it that rides in inside the disc.
-   Identical boxes, so the hand-off between the two is invisible. */
-const DIGIT = "why-digit font-display text-xs font-semibold tabular-nums";
+/* Each row's pictures are laid down three times, back to back, and the track
+   slides by exactly one of those passes. The passes being identical, the
+   frame at the end of the cycle is pixel-for-pixel the frame at the start —
+   the loop restarts on the picture it ended on, so there is nothing to see
+   when it does.
 
-/* Gap between one card setting off and the next. Reduced so the next card
-   triggers while the previous is still animating its arrival, creating a
-   more overlapping cascade effect. */
-const STEP = 500;
-const STEP_COMPACT = 350;
+   Three rather than two because of what is left to the right of the pointer
+   at the end of a cycle: the track has travelled one pass, so the rows can
+   only stay filled while the remaining `PASSES - 1` cover the viewport. One
+   spare pass measures about 2,200px, which runs out on a wide desktop; two
+   carries past 4K, where the tiles have stopped growing.
 
-/* Rolling speed, px per second. The distance a disc has to cover depends on
-   where its card sits, so the duration is derived from it rather than fixed:
-   a disc in the left column and one in the right column then roll at the
-   same pace instead of the far one flying. Clamped at both ends so neither
-   is a blink nor a crawl. */
-const SPEED = 2000;
-const TRAVEL_MIN = 0.46;
-const TRAVEL_MAX = 0.82;
+   The space between tiles is carried by each tile's own margin rather than by
+   a `gap` on the track: a gap would also fall between passes, leaving the
+   track wider than three whole passes — and a third of that is no longer one
+   pass. That slip, once a minute, is exactly the sort of small recurring
+   nudge that reads as a stutter. The margin lives on `.gallery-tile` in the
+   stylesheet, and the matching fraction in `@keyframes gallery-drift`. */
+const PASSES = 3;
 
-/* Extra distance past the viewport edge, so the disc is fully outside the
-   screen — including its shadow — before it starts. */
-const OFFSCREEN_PAD = 40;
+/* A tile is never wider than roughly a quarter of the band on a desktop, or
+   just under half of it on a phone — stated here so the browser can pick the
+   460w file wherever the 880w one would be wasted. */
+const SIZES = "(max-width: 639px) 46vw, (max-width: 1023px) 30vw, 23vw";
 
-function sequenceStep() {
-  if (typeof window === "undefined") return STEP;
-  return window.matchMedia("(max-width: 639px)").matches ? STEP_COMPACT : STEP;
-}
-
-function prefersReducedMotion() {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-/** `--why-circle` as a number of pixels, whatever unit it is written in. */
-function circlePx(el) {
-  const raw = getComputedStyle(el).getPropertyValue("--why-circle").trim();
-  const n = parseFloat(raw);
-  if (!Number.isFinite(n)) return 0;
-  if (raw.endsWith("rem") || raw.endsWith("em")) {
-    return n * parseFloat(getComputedStyle(document.documentElement).fontSize);
-  }
-  return n;
-}
-
-/* Row one enters from the left, row two from the right. Indexes rather than
-   visual rows, which is the same thing at `lg` where the 2 × 3 grid actually
-   exists, and reads as an alternating cadence below it. */
-function WhyCard({ cardRef, index, delay, title, body }) {
-  const number = String(index + 1).padStart(2, "0");
-  const fromLeft = index < 3;
-  const node = useRef(null);
-
-  /* One ref, two owners: the sequencer needs the node to observe, and the
-     measurement below needs it to read its position. */
-  const attach = useCallback(
-    (el) => {
-      node.current = el;
-      cardRef(el);
-    },
-    [cardRef],
+function Tile({ frame, loaded, duplicate, held, onToggle }) {
+  return (
+    /* Passes two and three are the same photographs over again, so they are
+       hidden from assistive tech: the row should be announced once, and only
+       the first pass is reachable by tab. */
+    <li
+      className="gallery-tile"
+      data-shape={frame.shape}
+      data-held={held || undefined}
+      aria-hidden={duplicate || undefined}
+    >
+      {loaded && (
+        <button
+          type="button"
+          className="gallery-tile-hit"
+          onClick={onToggle}
+          aria-pressed={held}
+          tabIndex={duplicate ? -1 : undefined}
+        >
+          <img
+            src={frame.src}
+            srcSet={`${frame.small} 460w, ${frame.src} 880w`}
+            sizes={SIZES}
+            alt={duplicate ? "" : frame.alt}
+            decoding="async"
+            draggable="false"
+          />
+        </button>
+      )}
+    </li>
   );
+}
 
-  /* How far the disc has to travel to reach its slot from off-screen, how
-     long that takes at a constant roll, and how far it has to turn to cover
-     that ground without slipping — a real wheel, not a spinning sticker.
-     Measured from the card's own position, so it is right at every width
-     and never assumes a layout. */
-  useLayoutEffect(() => {
-    const el = node.current;
-    if (!el || prefersReducedMotion()) return;
-
-    const measure = () => {
-      /* Re-measuring a card that has already set off would tear its
-         animation mid-flight; it keeps the numbers it started with. */
-      if (el.dataset.visible === "true") return;
-
-      const diameter = circlePx(el);
-      const { left } = el.getBoundingClientRect();
-      const distance = Math.round(
-        fromLeft ? left + diameter + OFFSCREEN_PAD : window.innerWidth - left + OFFSCREEN_PAD,
-      );
-      const spin = diameter > 0 ? (distance / (diameter / 2)) * (180 / Math.PI) : 0;
-      const travel = Math.min(TRAVEL_MAX, Math.max(TRAVEL_MIN, distance / SPEED));
-
-      el.style.setProperty("--why-x", `${fromLeft ? -distance : distance}px`);
-      el.style.setProperty("--why-spin", `${fromLeft ? -spin : spin}deg`);
-      el.style.setProperty("--why-travel", `${travel.toFixed(3)}s`);
-    };
-
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [fromLeft]);
+/**
+ * One drifting row.
+ *
+ * Each row runs its own animation on its own track, at its own duration.
+ * `direction` picks which way a shared keyframe pair is played — "right"
+ * runs it in reverse — so the two directions cannot drift apart in speed or
+ * easing, but the three animations remain entirely separate: stopping one
+ * is invisible to the other two.
+ *
+ * Which is what the hold below relies on. A click parks this row on the
+ * picture that was clicked; the row keeps that picture forward and stays
+ * still until the same one is clicked again. Nothing outside this component
+ * knows about it, so the other two rows carry on regardless. Clicking a
+ * second picture in a row that is already held simply moves the hold.
+ */
+function GalleryRow({ row, loaded }) {
+  const [held, setHeld] = useState(null);
+  const toggle = (key) => () => setHeld((current) => (current === key ? null : key));
 
   return (
-    <div
-      ref={attach}
-      data-visible={delay !== null}
-      style={{ "--why-delay": `${delay ?? 0}ms` }}
-      className="why-card"
-    >
-      <article className="why-face group relative border-t border-stone-line py-8 transition-colors duration-400 hover:border-royal-600">
-        <span className="why-plate" aria-hidden="true">
-          <span className="why-wheel">
-            <span className="why-disc" />
-            <span className={DIGIT}>{number}</span>
-          </span>
-        </span>
-        <span className={`why-num ${DIGIT} text-ember-600`}>{number}</span>
-        <h3 className="why-copy mt-4 font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-ink">
-          {title}
-        </h3>
-        <p className="why-copy mt-3.5 text-[0.9375rem] leading-[1.7] text-ink-soft">{body}</p>
-      </article>
+    <div className="gallery-row">
+      <ul
+        className="gallery-track"
+        data-direction={row.direction}
+        data-paused={held !== null || undefined}
+        style={{ "--gallery-drift": row.drift }}
+      >
+        {Array.from({ length: PASSES }, (_, pass) =>
+          row.frames.map((frame, i) => {
+            const key = `${pass}-${i}`;
+            return (
+              <Tile
+                key={key}
+                frame={frame}
+                loaded={loaded}
+                duplicate={pass > 0}
+                held={held === key}
+                onToggle={toggle(key)}
+              />
+            );
+          }),
+        )}
+      </ul>
     </div>
   );
 }
 
+/* The photographs are held back until the band is close, then fetched at
+   normal priority rather than lazily. Lazy loading measures against the
+   viewport, and most of a row is parked outside it by design — the tiles
+   would then arrive one at a time as they drifted in, which is the one kind
+   of pop a marquee cannot hide. */
+const NEAR = { threshold: 0, rootMargin: "0px 0px 35% 0px" };
+
 export function WhySection() {
-  /* Read once at mount: a card part-way through its sequence should not have
-     the cadence changed underneath it by a resize. */
-  const [step] = useState(sequenceStep);
-  const [register, delays] = useSequencedReveal(differentiators.length, { step });
+  const [ref, near] = useReveal(NEAR);
 
   return (
-    <section className="section why-section bg-paper-dim">
+    <section ref={ref} className="section why-section bg-paper-dim">
       <div className="shell">
         <SectionHeading
           eyebrow="Why Satpuda Group"
-          title="Reasons that hold up when you visit."
-          lead="Not claims about rankings or placement percentages — the things you can verify from the campus, the approvals and the record."
+          title="A campus built around learning, practice and growth."
         />
+      </div>
 
-        <div className="section-body grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
-          {differentiators.map((d, i) => (
-            <WhyCard
-              key={d.title}
-              cardRef={register(i)}
-              index={i}
-              delay={delays[i]}
-              title={d.title}
-              body={d.body}
-            />
-          ))}
-        </div>
+      {/* Full-bleed: the rows run edge to edge, outside the shell's gutter. */}
+      <div
+        className="section-body gallery-marquee"
+        role="group"
+        aria-label="Photographs from across the Satpuda Group campus"
+      >
+        {galleryRows.map((row) => (
+          <GalleryRow key={row.id} row={row} loaded={near} />
+        ))}
       </div>
     </section>
   );
