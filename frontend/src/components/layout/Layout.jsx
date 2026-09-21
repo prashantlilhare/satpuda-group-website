@@ -2,6 +2,8 @@ import { Suspense, useEffect } from "react";
 import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { SocialRail } from "./SocialRail";
+import { SmoothScroll } from "./SmoothScroll";
 
 /** Route-level loading state — quiet, and sized so the footer never jumps up. */
 function RouteFallback() {
@@ -40,6 +42,8 @@ export function Layout() {
 
   return (
     <>
+      <SmoothScroll />
+
       <a
         href="#main"
         className="skip-link bg-royal-600 px-5 py-3 text-[0.875rem] font-semibold text-white"
@@ -67,6 +71,10 @@ export function Layout() {
       </main>
 
       <Footer />
+
+      {/* Site-wide contact rail — fixed to the right edge on every route. */}
+      <SocialRail />
+
       <ScrollRestoration />
     </>
   );

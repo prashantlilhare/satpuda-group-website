@@ -49,6 +49,10 @@ export const btechBranches = [
 /* ------------------------------------------------------------------ */
 
 export const diplomaBranches = [
+  {
+    name: "Computer Science Engineering",
+    body: "Programming fundamentals, databases, networking and computer hardware, with laboratory practice throughout.",
+  },
   { name: "Civil Engineering", body: "Construction practice, surveying, estimating and site supervision." },
   { name: "Electrical Engineering", body: "Installation, machines, power distribution and electrical maintenance." },
   { name: "Mechanical Engineering", body: "Workshop technology, machine drawing, manufacturing and maintenance." },

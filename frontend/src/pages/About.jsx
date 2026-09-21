@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Figure, Reveal, SectionHeading, TextLink } from "../components/ui/Primitives";
+import { Eyebrow, Figure, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
 import { campusImages, values } from "../data/about";
+import { photo } from "../data/photos";
 import { institutions, milestones } from "../data/institutions";
 import { site, sources } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
@@ -24,7 +25,7 @@ export default function About() {
         title="An educational group built in Balaghat, for Balaghat."
         lead="Four institutions under one trust, covering the distance from a Class 1 classroom to a degree in engineering."
         crumbs={[{ label: "About Us" }]}
-        image={campusImages.campusAerial}
+        image={photo("0041", "Students filling the campus hall for a group-wide session", "50% 40%")}
         imageAlt=""
       />
 
@@ -80,8 +81,11 @@ export default function About() {
               </Reveal>
             </div>
 
-            {/* Right Column: Narrative Phase Cards with Micro-animations */}
-            <div className="space-y-4">
+            {/* Right Column: Narrative Phase Cards with Micro-animations.
+                Desktop only — on a phone the three phase cards stacked below
+                the trust card turned the opening into a long scroll of body
+                copy before anything else on the page. */}
+            <div className="hidden space-y-4 lg:block">
               <Reveal delay={stagger(1)}>
                 <div className="group rounded-2xl border border-stone-line/70 bg-white p-6 shadow-xs transition-all duration-400 hover:-translate-y-1 hover:border-royal-400 hover:shadow-md">
                   <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -277,7 +281,7 @@ export default function About() {
                 <Eyebrow>What we hold to</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 text-white">Six values, used as tests.</h2>
+                <SplitText as="h2" className="t-h2 mt-5 block text-white">Six values, used as tests.</SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">

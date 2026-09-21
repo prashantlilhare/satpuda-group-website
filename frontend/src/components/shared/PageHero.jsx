@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { Eyebrow } from "../ui/Primitives";
+import { Eyebrow, ReadMore, SplitText } from "../ui/Primitives";
 
 /**
  * Interior page masthead. A dark royal band with an optional photographic
@@ -9,16 +9,23 @@ import { Eyebrow } from "../ui/Primitives";
  * content below it carries the weight.
  */
 export function PageHero({ eyebrow, title, lead, crumbs = [], image, imageAlt = "", align = "left" }) {
+  /* `image` is either a plain URL or one of the campus library's photo objects,
+     which carry a 960w/1600w pair and their own focal point. */
+  const backdrop = typeof image === "string" ? { src: image } : image;
+
   return (
     <section className="section-tight on-dark relative isolate overflow-hidden bg-royal-900">
-      {image && (
+      {backdrop && (
         <>
           <img
-            src={image}
+            src={backdrop.src}
+            srcSet={backdrop.srcSet}
+            sizes="100vw"
             alt={imageAlt}
             loading="eager"
             fetchPriority="high"
             decoding="async"
+            style={backdrop.focus ? { objectPosition: backdrop.focus } : undefined}
             className="hero-backdrop absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.22]"
           />
           <div
@@ -71,11 +78,23 @@ export function PageHero({ eyebrow, title, lead, crumbs = [], image, imageAlt = 
 
         <div className={`mt-9 ${align === "center" ? "mx-auto max-w-3xl" : "max-w-4xl"}`}>
           {eyebrow && <Eyebrow className={align === "center" ? "justify-center" : ""}>{eyebrow}</Eyebrow>}
-          <h1 className="t-h1 mt-5 text-white">{title}</h1>
+          <SplitText as="h1" className="t-h1 mt-5 block text-white">
+            {title}
+          </SplitText>
           {lead && (
-            <p className="mt-7 max-w-2xl text-[1.0625rem] leading-relaxed text-white/72 sm:text-lg">
-              {lead}
-            </p>
+            /* Clamped to six lines. Most leads sit well inside that on a
+               laptop and show no toggle at all; the long ones — and every
+               lead at phone width — collapse behind "Read more" so the page
+               content starts above the fold instead of below a wall of text. */
+            <ReadMore
+              lines={6}
+              dark
+              className={`mt-7 max-w-2xl ${align === "center" ? "mx-auto" : ""}`}
+            >
+              <p className="text-[1.0625rem] leading-relaxed text-white/72 sm:text-lg">
+                {lead}
+              </p>
+            </ReadMore>
           )}
         </div>
       </div>

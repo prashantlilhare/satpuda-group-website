@@ -6,6 +6,7 @@ import imgEngineeringSmall from "../assets/images/institutions/engineering-700w.
 import imgTeacherEdSmall from "../assets/images/institutions/teacher-education-700w.webp";
 import imgItiSmall from "../assets/images/institutions/iti-700w.webp";
 import imgSchoolSmall from "../assets/images/institutions/school-700w.webp";
+import { photo } from "./photos";
 
 /**
  * The four institutions of Satpuda Group.
@@ -30,7 +31,7 @@ export const institutions = [
       "Affiliated to RGPV, Bhopal",
       "Approved by DTE, Government of Madhya Pradesh",
     ],
-    highlights: ["5 B.Tech branches", "4 diploma branches", "10-acre campus"],
+    highlights: ["5 B.Tech branches", "5 diploma branches", "10-acre campus"],
     featured: true,
   },
   {
@@ -41,6 +42,8 @@ export const institutions = [
     kicker: "Teacher Education",
     image: imgTeacherEd,
     imageAlt: "Students seated in a Satpuda classroom during a teaching session",
+    /* Thumbnail for the homepage list — the group's own photograph. */
+    thumb: photo("0049", "A primary class presenting a science project", "50% 45%"),
     summary:
       "Preparation for a career in the classroom — pedagogy, child development, curriculum design and supervised teaching practice.",
     blurb: "Preparing teachers through pedagogy, child development and classroom practice.",
@@ -56,6 +59,7 @@ export const institutions = [
     kicker: "Vocational Training",
     image: imgIti,
     imageAlt: "Satpuda trainees on an industrial workshop floor during practical training",
+    thumb: photo("0027", "An ITI trainee explaining a wiring board", "50% 45%"),
     summary:
       "Craftsman Training Scheme trades affiliated to NCVT — hands-on, job-oriented technical training for students after Class 10.",
     blurb: "NCVT trade training that puts tools in students' hands from day one.",
@@ -75,6 +79,7 @@ export const institutions = [
     kicker: "CBSE · Co-educational",
     image: imgSchool,
     imageAlt: "Satpuda students playing basketball on the campus sports court",
+    thumb: photo("0052", "School students with a model of their campus", "50% 40%"),
     summary:
       "A CBSE-affiliated, co-educational school on the Satpuda campus, educating students in Balaghat since 2009.",
     blurb: "CBSE schooling with room for sport, culture and curiosity.",

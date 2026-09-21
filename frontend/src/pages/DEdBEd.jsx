@@ -1,10 +1,27 @@
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Figure, Reveal, SectionHeading } from "../components/ui/Primitives";
+import { PhotoGrid } from "../components/shared/PhotoGrid";
+import { photo } from "../data/photos";
+import { Eyebrow, Figure, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { teacherEducation } from "../data/programs";
-import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
+
+/* Teaching practice happens in real classrooms — including the group's own
+   school, on the same campus. */
+const classroomPhotos = [
+  { ...photo("0051", "Students explaining a working model of the human heart", "50% 42%"), caption: "Senior students presenting their own work" },
+  { ...photo("0049", "A primary class presenting a science project in a corridor", "50% 45%"), caption: "A primary class at the science exhibition" },
+  { ...photo("0030", "A student explaining a nutrition model to visitors", "50% 42%"), caption: "Explaining, not reciting" },
+  { ...photo("0052", "School students with a model of their campus", "50% 40%"), caption: "The STEM and robotics room on campus" },
+];
+
+/* One photograph per programme, beside its summary: the stage of schooling
+   each qualification actually prepares a teacher for. */
+const programmePhotos = {
+  ded: photo("0053", "Young students presenting a project in the school corridor", "50% 45%"),
+  bed: photo("0050", "Senior students presenting a township model they built", "50% 45%"),
+};
 
 export default function DEdBEd() {
   useSeo({
@@ -21,7 +38,7 @@ export default function DEdBEd() {
         title="D.Ed & B.Ed"
         lead="Teacher education — preparing people who will spend their working lives in a classroom, for the reality of one."
         crumbs={[{ label: "Institute" }, { label: "D.Ed & B.Ed" }]}
-        image={campusImages.classroom}
+        image={photo("0049", "A primary class presenting a science project", "50% 45%")}
       />
 
       {/* ---------------- scope notice ---------------- */}
@@ -48,38 +65,43 @@ export default function DEdBEd() {
                 <Eyebrow>The work</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 max-w-xl text-ink">
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
                   Knowing a subject and being able to teach it are two different skills.
-                </h2>
+                </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
-                <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
-                  <p>
-                    Teacher education exists because the second skill has to be taught. A graduate
-                    who understands their subject completely can still lose a room of thirty
-                    fourteen-year-olds in four minutes. Knowing why that happens, and what to do
-                    instead, is the content of a D.Ed or a B.Ed.
-                  </p>
-                  <p>
-                    Both qualifications combine theory — how children develop, how learning works,
-                    how a curriculum is built and assessed — with extended practice in real
-                    classrooms under supervision. The practice is the part that changes people.
-                  </p>
-                  <p>
-                    For a district like Balaghat, where the group already runs a school, an ITI and
-                    an engineering college, training teachers locally is a practical proposition:
-                    the classrooms that need them are here.
-                  </p>
-                </div>
+                <ReadMore lines={7} className="mt-8">
+                  <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
+                    <p>
+                      Teacher education exists because the second skill has to be taught. A graduate
+                      who understands their subject completely can still lose a room of thirty
+                      fourteen-year-olds in four minutes. Knowing why that happens, and what to do
+                      instead, is the content of a D.Ed or a B.Ed.
+                    </p>
+                    <p>
+                      Both qualifications combine theory — how children develop, how learning works,
+                      how a curriculum is built and assessed — with extended practice in real
+                      classrooms under supervision. The practice is the part that changes people.
+                    </p>
+                    <p>
+                      For a district like Balaghat, where the group already runs a school, an ITI and
+                      an engineering college, training teachers locally is a practical proposition:
+                      the classrooms that need them are here.
+                    </p>
+                  </div>
+                </ReadMore>
               </Reveal>
             </div>
 
             <Reveal delay={stagger(2)} className="group">
               <Figure
                 mask
-                src={campusImages.classroom}
-                alt="A teaching session in progress in a Satpuda classroom"
+                src={photo("0029").src}
+                srcSet={photo("0029").srcSet}
+                sizes="(min-width: 1024px) 42vw, 100vw"
+                alt="School children demonstrating a model they built to visiting guests"
                 ratio="4 / 5"
+                position="50% 42%"
               />
             </Reveal>
           </div>
@@ -114,11 +136,31 @@ export default function DEdBEd() {
                   </div>
                 </Reveal>
 
-                <Reveal delay={stagger(1)}>
-                  <p className="mt-7 max-w-2xl text-[1.0625rem] leading-[1.75] text-ink-soft">
-                    {prog.summary}
-                  </p>
-                </Reveal>
+                <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_0.62fr] lg:items-center lg:gap-14">
+                  <Reveal delay={stagger(1)}>
+                    <p className="max-w-2xl text-[1.0625rem] leading-[1.75] text-ink-soft">
+                      {prog.summary}
+                    </p>
+                  </Reveal>
+
+                  {programmePhotos[prog.id] && (
+                    <Reveal delay={stagger(2)} className="group">
+                      <Figure
+                        src={programmePhotos[prog.id].src}
+                        srcSet={programmePhotos[prog.id].srcSet}
+                        sizes="(min-width: 1024px) 38vw, 100vw"
+                        alt={programmePhotos[prog.id].alt}
+                        ratio="16 / 10"
+                        position={programmePhotos[prog.id].focus}
+                      />
+                      <p className="mt-3 text-[0.8125rem] leading-snug text-ink-mute">
+                        {prog.code === "D.Ed"
+                          ? "The foundational years — where a D.Ed graduate teaches."
+                          : "Secondary classrooms — where a B.Ed graduate teaches."}
+                      </p>
+                    </Reveal>
+                  )}
+                </div>
 
                 <div className="mt-10 grid gap-x-12 gap-y-1 sm:grid-cols-2">
                   {prog.modules.map((m, i) => (
@@ -149,9 +191,9 @@ export default function DEdBEd() {
                 <Eyebrow>Teaching practice</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 max-w-lg text-white">
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-lg text-white">
                   The part that cannot be learned from a book.
-                </h2>
+                </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
                 <div className="mt-7 max-w-lg space-y-5 text-[1.0625rem] leading-relaxed text-white/70">
@@ -171,12 +213,27 @@ export default function DEdBEd() {
 
             <Reveal delay={stagger(2)} className="group">
               <Figure
-                src={campusImages.seminarHall}
-                alt="A large teaching session underway in the campus seminar hall"
+                src={photo("0032").src}
+                srcSet={photo("0032").srcSet}
+                sizes="(min-width: 1024px) 45vw, 100vw"
+                alt="A teacher listening as students explain the model they have built"
                 ratio="4 / 3"
+                position="50% 42%"
               />
             </Reveal>
           </div>
+        </div>
+      </section>
+
+      {/* ---------------- practice school ---------------- */}
+      <section className="section bg-paper">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Teaching practice"
+            title="The classroom they train for."
+            lead="Supervised teaching practice is carried out in real classrooms, including Satpuda Valley Public School on the same campus."
+          />
+          <PhotoGrid items={classroomPhotos} className="section-body" />
         </div>
       </section>
 

@@ -1,4 +1,4 @@
-import { Eyebrow, Figure, Reveal, TextLink } from "../ui/Primitives";
+import { Eyebrow, Figure, ReadMore, Reveal, SplitText, TextLink } from "../ui/Primitives";
 import { campusImages } from "../../data/about";
 import { site } from "../../data/site";
 import { values } from "../../data/about";
@@ -16,14 +16,15 @@ export function IntroSection() {
             </Reveal>
 
             <Reveal delay={stagger(1)}>
-              <h2 className="t-h2 mt-5 text-ink">
+              <SplitText as="h2" className="t-h2 mt-5 block text-ink">
                 Four institutions, one campus, and a single idea about what
                 education is for.
-              </h2>
+              </SplitText>
             </Reveal>
 
             <Reveal delay={stagger(2)}>
-              <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
+              <ReadMore lines={7} className="mt-8">
+              <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                 <p>
                   Satpuda Group is a family of institutions in Balaghat, Madhya Pradesh, run by{" "}
                   <strong className="font-semibold text-ink">{site.trust}</strong>. It began in
@@ -38,6 +39,7 @@ export function IntroSection() {
                   a B.Tech — or arrive after Class 10 and leave with a trade certificate and a job.
                 </p>
               </div>
+              </ReadMore>
             </Reveal>
 
             <Reveal delay={stagger(3)}>

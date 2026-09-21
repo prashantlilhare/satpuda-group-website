@@ -106,6 +106,9 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    /* Lenis sets this to `auto` inline while it is mounted, so the two are
+       never animating the same scroll at once. This stays as the fallback for
+       reduced motion and for the moment before hydration. */
     scroll-behavior: smooth;
     /* Anchor jumps, :target and keyboard-focus scrolling all stop clear of
        the fixed header rather than landing underneath it. Uses the compact
@@ -238,11 +241,19 @@
   /* --- Editorial type scale ---------------------------------------- */
   .t-display {
     font-family: var(--font-display);
-    font-size: clamp(2.75rem, 7.4vw, 6rem);
+    /* The `svh` term is what keeps a three-line headline inside a short
+       laptop window: on a 1366x1500 screen this is the same ~6rem it always
+       was, but on a 1366x650 one it steps down instead of pushing the first
+       line up behind the header. */
+    font-size: clamp(2rem, min(7.4vw, 10svh), 6rem);
     font-weight: 600;
     font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
-    line-height: 0.98;
-    letter-spacing: -0.032em;
+    /* Format only, same typeface as before: 0.98 set two display lines close
+       enough that a descender on the first line nearly touched the cap of the
+       second, and the old tracking pinched the large sizes. */
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
   }
 
   .t-h1 {
@@ -250,8 +261,11 @@
     font-size: clamp(2.25rem, 5.4vw, 4rem);
     font-weight: 600;
     font-variation-settings: "opsz" 120;
-    line-height: 1.04;
-    letter-spacing: -0.028em;
+    line-height: 1.1;
+    letter-spacing: -0.024em;
+    /* Breaks a long page title into even lines rather than leaving one word
+       stranded on the last one. */
+    text-wrap: balance;
   }
 
   .t-h2 {
@@ -435,6 +449,45 @@
   .reveal {
     opacity: 1;
     transform: none;
+    transition: none;
+  }
+}
+
+/* --- Heading word reveal ------------------------------------------
+ * Each word rides up out of its own clipped box. The box takes a little
+ * bottom padding (pulled back with a matching negative margin) so the
+ * clip never shaves a descender, and the spaces between words live
+ * outside the boxes so a long heading still wraps.
+ */
+.split-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.split-word-inner {
+  display: inline-block;
+  transform: translate3d(0, 115%, 0);
+  opacity: 0;
+  transition:
+    transform 0.85s var(--ease-out-expo),
+    opacity 0.6s var(--ease-out-expo);
+  transition-delay: calc(var(--split-delay, 0ms) + var(--word-index, 0) * 55ms);
+  will-change: transform;
+}
+
+.split-text[data-visible="true"] .split-word-inner {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-word-inner {
+    transform: none;
+    opacity: 1;
     transition: none;
   }
 }
@@ -714,6 +767,30 @@
 }
 
 /* ============================================================
+   HERO SLIDER — band height
+   ============================================================
+
+   A `min-height`, never a fixed one: the copy can never be pushed up
+   behind the fixed header, whatever the headline or the text size the
+   visitor browses at. Each rule is stated twice — the `vh` line is the
+   fallback for browsers without `svh` (older Android WebViews), where a
+   fixed `svh` height collapsed to the floor and clipped the copy.
+
+   Phone: 70% of the screen, as asked. Tablet up: one viewport height,
+   capped so it does not become a wall on a very tall monitor. */
+.hero-band {
+  min-height: 70vh;
+  min-height: 70svh;
+}
+
+@media (min-width: 640px) {
+  .hero-band {
+    min-height: calc(100vh - var(--nav-h));
+    min-height: min(calc(100svh - var(--nav-h)), 50rem);
+  }
+}
+
+/* ============================================================
    HERO SLIDER — Ken Burns drift
    ============================================================ */
 
@@ -734,6 +811,29 @@
   .kenburns {
     animation: none;
     transform: scale(1.04);
+  }
+}
+
+/* Crossfade: the incoming photograph fades up over the outgoing one, which
+   stays mounted underneath for the length of the fade. An animation rather
+   than a transition, because the element is newly mounted each step and a
+   transition has nothing to transition from. */
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hero-fade {
+  animation: hero-fade-in 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade {
+    animation-duration: 1ms;
   }
 }
 
@@ -1148,6 +1248,81 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: tradeTextShimmer 2.2s infinite linear 0.1s, tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+}
+
+/* Mobile / touch: no hover, so the same reveal is driven by the card
+   entering the viewport instead. `.is-inview` is set by an
+   IntersectionObserver in TradeRow and cleared again on the way out, so the
+   sweep replays rather than firing once. Scoped to narrow viewports so the
+   desktop hover behaviour is unchanged. */
+@media (max-width: 1023px) {
+  .trade-card.is-inview {
+    background: linear-gradient(110deg, #ffffff 0%, #fffbf8 45%, #f4f7fd 100%);
+    border-color: rgba(41, 71, 145, 0.45);
+    box-shadow: 0 16px 36px -10px rgba(41, 71, 145, 0.14), 0 4px 18px rgba(217, 58, 38, 0.08);
+  }
+
+  .trade-card.is-inview .trade-shine-overlay {
+    animation: tradeShineBeam 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .trade-card.is-inview .trade-accent-line {
+    transform: scaleX(1);
+    animation: tradeTextShimmer 2s infinite linear;
+  }
+
+  .trade-card.is-inview .trade-load-0 {
+    animation: tradeTextLoadIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .trade-card.is-inview .trade-load-1 {
+    animation: tradeTextLoadIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s forwards;
+  }
+
+  .trade-card.is-inview .trade-load-2 {
+    animation: tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+  }
+
+  .trade-card.is-inview .trade-load-3 {
+    animation: tradeTextLoadIn 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.18s forwards;
+  }
+
+  .trade-card.is-inview .trade-load-4 {
+    animation: tradeTextLoadIn 0.58s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards;
+  }
+
+  .trade-card.is-inview .trade-title-shimmer {
+    background: linear-gradient(
+      90deg,
+      #191817 0%,
+      #294791 20%,
+      #d93a26 40%,
+      #f59e0b 50%,
+      #ffffff 55%,
+      #294791 75%,
+      #191817 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: tradeTextShimmer 1.8s infinite linear, tradeTextLoadIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s forwards;
+  }
+
+  .trade-card.is-inview .trade-body-shimmer {
+    background: linear-gradient(
+      90deg,
+      #55504a 0%,
+      #223a76 25%,
+      #d93a26 45%,
+      #ffffff 55%,
+      #223a76 75%,
+      #55504a 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: tradeTextShimmer 2.2s infinite linear 0.1s, tradeTextLoadIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+  }
 }
 
 /* ============================================================

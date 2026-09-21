@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Fact, Figure, Reveal, SectionHeading } from "../components/ui/Primitives";
+import { Eyebrow, Fact, Figure, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { btechBranches, diplomaBranches, engineeringAdmission } from "../data/programs";
+import { photo } from "../data/photos";
 import { campusImages } from "../data/about";
 import { getInstitution } from "../data/institutions";
 import { useSeo } from "../hooks/useSeo";
@@ -18,7 +19,10 @@ const btechBranchImages = {
   EE: campusImages.electronicsBench,
 };
 
+// Index-aligned with `diplomaBranches`: computing, civil, electrical,
+// mechanical, mining.
 const diplomaBranchImages = [
+  campusImages.computerLab,
   campusImages.campusFront,
   campusImages.electronicsBench,
   campusImages.workshop,
@@ -103,7 +107,7 @@ export default function BTechPolytechnic() {
         title="B.Tech & Polytechnic"
         lead={inst.summary}
         crumbs={[{ label: "Institute" }, { label: "B.Tech & Polytechnic" }]}
-        image={campusImages.campusFront}
+        image={photo("0037", "The electrical engineering laboratory in use", "50% 45%")}
       />
 
       {/* ---------------- approvals ---------------- */}
@@ -133,28 +137,30 @@ export default function BTechPolytechnic() {
                 <Eyebrow>The college</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 max-w-xl text-ink">
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
                   Engineering taught where the industry actually is.
-                </h2>
+                </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
-                <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
-                  <p>
-                    Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
-                    three-year diploma programmes on the group's campus at Manjhapur, Balaghat. The
-                    degree programmes are approved by the All India Council for Technical Education
-                    and affiliated to Rajiv Gandhi Proudyogiki Vishwavidyalaya, Bhopal; the diploma
-                    programmes are approved by the Directorate of Technical Education, Government of
-                    Madhya Pradesh.
-                  </p>
-                  <p>
-                    The branch mix is deliberate. Balaghat sits in a mineral belt, and mining
-                    engineering here is not a theoretical offering — it is taught in a district
-                    where mines operate. Civil, mechanical and electrical engineering serve the
-                    construction and infrastructure work around the region, and computer science
-                    opens routes that are not geographically limited at all.
-                  </p>
-                </div>
+                <ReadMore lines={7} className="mt-8">
+                  <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
+                    <p>
+                      Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
+                      three-year diploma programmes on the group's campus at Manjhapur, Balaghat. The
+                      degree programmes are approved by the All India Council for Technical Education
+                      and affiliated to Rajiv Gandhi Proudyogiki Vishwavidyalaya, Bhopal; the diploma
+                      programmes are approved by the Directorate of Technical Education, Government of
+                      Madhya Pradesh.
+                    </p>
+                    <p>
+                      The branch mix is deliberate. Balaghat sits in a mineral belt, and mining
+                      engineering here is not a theoretical offering — it is taught in a district
+                      where mines operate. Civil, mechanical and electrical engineering serve the
+                      construction and infrastructure work around the region, and computer science
+                      opens routes that are not geographically limited at all.
+                    </p>
+                  </div>
+                </ReadMore>
               </Reveal>
 
               <div className="mt-10 grid grid-cols-2 gap-8 sm:max-w-md">
@@ -165,7 +171,7 @@ export default function BTechPolytechnic() {
                 </Reveal>
                 <Reveal delay={stagger(4)}>
                   <div className="border-t border-stone-line pt-5">
-                    <Fact value="04" label="Diploma branches" />
+                    <Fact value="05" label="Diploma branches" />
                   </div>
                 </Reveal>
               </div>
@@ -276,7 +282,7 @@ export default function BTechPolytechnic() {
                 <Eyebrow>Diploma programmes</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 text-white">Polytechnic — a three-year route in.</h2>
+                <SplitText as="h2" className="t-h2 mt-5 block text-white">Polytechnic — a three-year route in.</SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">

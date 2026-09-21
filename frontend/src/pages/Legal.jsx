@@ -1,6 +1,7 @@
 import { PageHero } from "../components/shared/PageHero";
 import { Reveal, TextLink } from "../components/ui/Primitives";
 import { contact, site } from "../data/site";
+import { photo } from "../data/photos";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
@@ -88,7 +89,13 @@ export default function Legal({ kind = "privacy" }) {
 
   return (
     <>
-      <PageHero eyebrow="Legal" title={doc.title} lead={doc.lead} crumbs={[{ label: doc.title }]} />
+      <PageHero
+        eyebrow="Legal"
+        title={doc.title}
+        lead={doc.lead}
+        crumbs={[{ label: doc.title }]}
+        image={photo("0064", "The workshop hall on the Satpuda campus", "50% 42%")}
+      />
 
       <section className="section bg-paper">
         <div className="shell-narrow">

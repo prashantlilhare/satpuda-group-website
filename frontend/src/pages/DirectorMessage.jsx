@@ -4,7 +4,7 @@ import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { Eyebrow, Figure, Reveal } from "../components/ui/Primitives";
 import { director, principal } from "../data/leadership";
-import { campusImages } from "../data/about";
+import { photo } from "../data/photos";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
@@ -23,7 +23,7 @@ export default function DirectorMessage() {
         title="Director's Message"
         lead={director.standfirst}
         crumbs={[{ label: "About Us", to: "/about" }, { label: "Director's Message" }]}
-        image={campusImages.campusFront}
+        image={photo("0042", "Faculty and students seated together at a campus gathering", "50% 40%")}
       />
 
       {/* ---------------- portrait + message ---------------- */}

@@ -1,4 +1,4 @@
-import { Eyebrow, Fact, Reveal } from "../ui/Primitives";
+import { Eyebrow, Fact, Reveal, SplitText } from "../ui/Primitives";
 import { GrowthTimeline } from "./GrowthTimeline";
 import { stagger } from "../ui/stagger";
 
@@ -10,7 +10,7 @@ import { stagger } from "../ui/stagger";
 const facts = [
   { value: "1999", label: "Educating since", sub: "The group's first institution opened in Balaghat" },
   { value: "04", label: "Institutions", sub: "School, ITI, teacher education, engineering" },
-  { value: "09", label: "Engineering branches", sub: "5 degree, 4 diploma disciplines" },
+  { value: "10", label: "Engineering branches", sub: "5 degree, 5 diploma disciplines" },
   { value: "10", label: "Acre campus", sub: "Teaching blocks, labs, library and grounds" },
 ];
 
@@ -28,9 +28,9 @@ export function FactsSection() {
               <Eyebrow>The group at a glance</Eyebrow>
             </Reveal>
             <Reveal delay={stagger(1)}>
-              <h2 className="t-h2 mt-5 max-w-md text-white">
+              <SplitText as="h2" className="t-h2 mt-5 block max-w-md text-white">
                 Figures we can stand behind.
-              </h2>
+              </SplitText>
             </Reveal>
 
             <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-12">
