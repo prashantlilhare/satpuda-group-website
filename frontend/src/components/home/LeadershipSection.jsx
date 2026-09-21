@@ -73,6 +73,36 @@ export function LeadershipSection() {
     };
   }, [isDesktop]);
 
+  // Mobile autoplay: the cards step on their own every 1.5s, so the section
+  // reads as a moving carousel without a swipe. Any touch on the track parks
+  // it for a few seconds so a deliberate swipe is not fought by the timer,
+  // and reduced-motion users get a static track with the arrows only.
+  const [mobilePaused, setMobilePaused] = useState(false);
+  const resumeTimer = useRef(null);
+
+  const holdAutoplay = () => {
+    clearTimeout(resumeTimer.current);
+    setMobilePaused(true);
+    resumeTimer.current = setTimeout(() => setMobilePaused(false), 5000);
+  };
+
+  useEffect(() => () => clearTimeout(resumeTimer.current), []);
+
+  useEffect(() => {
+    if (isDesktop || mobilePaused) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = setTimeout(() => {
+      const el = mobileTrackRef.current;
+      if (!el) return;
+      const nextIdx = (activeIndex + 1) % leadershipCards.length;
+      const cardWidth = el.scrollWidth / leadershipCards.length;
+      el.scrollTo({ left: nextIdx * cardWidth, behavior: "smooth" });
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [isDesktop, mobilePaused, activeIndex]);
+
   // Mobile horizontal scroll tracking
   const handleMobileScroll = () => {
     const el = mobileTrackRef.current;
@@ -331,9 +361,11 @@ export function LeadershipSection() {
           <div
             ref={mobileTrackRef}
             onScroll={handleMobileScroll}
+            onTouchStart={holdAutoplay}
+            onTouchMove={holdAutoplay}
             className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-6 scrollbar-none"
           >
-            {leadershipCards.map((card, i) => (
+            {leadershipCards.map((card) => (
               <article
                 key={card.id}
                 className="relative snap-center shrink-0 w-[88vw] max-w-[380px] rounded-2xl border border-stone-line bg-white p-6 shadow-xs flex flex-col justify-between"
@@ -401,14 +433,44 @@ export function LeadershipSection() {
             ))}
           </div>
 
-          {/* Mobile bottom counter & dots */}
-          <div className="mt-4 flex items-center justify-between border-t border-stone-line pt-4">
+          {/* Mobile bottom controls: back / forward, dots, counter */}
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-stone-line pt-4">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  holdAutoplay();
+                  scrollToCard(
+                    (activeIndex - 1 + leadershipCards.length) % leadershipCards.length,
+                  );
+                }}
+                aria-label="Previous leadership card"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-stone-line bg-white text-royal-800 shadow-xs transition-all active:bg-royal-700 active:text-white"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  holdAutoplay();
+                  scrollToCard((activeIndex + 1) % leadershipCards.length);
+                }}
+                aria-label="Next leadership card"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-stone-line bg-white text-royal-800 shadow-xs transition-all active:bg-royal-700 active:text-white"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+
             <div className="flex items-center gap-1.5">
               {leadershipCards.map((_, i) => (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => scrollToCard(i)}
+                  onClick={() => {
+                    holdAutoplay();
+                    scrollToCard(i);
+                  }}
                   className={`h-2 rounded-full transition-all ${
                     i === activeIndex
                       ? "w-6 bg-ember-500"

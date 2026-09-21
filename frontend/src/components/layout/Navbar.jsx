@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { ChevronDown, Mail, Menu, Phone, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { nav, contact, site } from "../../data/site";
+import { startSmoothScroll, stopSmoothScroll } from "../../lib/smoothScroll";
 
 /* ================================================================== */
 /* DESKTOP DROPDOWN                                                    */
@@ -223,9 +225,13 @@ export function Navbar() {
     const gap = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = "hidden";
     if (gap > 0) document.body.style.paddingRight = `${gap}px`;
+    // `overflow: hidden` alone does not stop Lenis, which drives the scroll
+    // itself — the page would still glide underneath the open panel.
+    stopSmoothScroll();
     return () => {
       document.body.style.overflow = overflow;
       document.body.style.paddingRight = paddingRight;
+      startSmoothScroll();
     };
   }, [menuOpen]);
 
@@ -412,29 +418,40 @@ export function Navbar() {
       </div>
 
       {/* ---------- mobile panel ----------
-          Padding clears whatever the header currently is. The header sits above
-          this panel (z-50 vs z-40) so the close button stays reachable, which
-          means the first menu item must start below it — this previously cleared
-          only the main bar, leaving the utility bar covering "Home" at the top
-          of the page. Body scroll is locked while open, so `scrolled` cannot
-          change underneath it. */}
-      <div
-        id="mobile-menu"
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Site menu"
-        inert={!menuOpen}
-        className={`on-dark fixed inset-0 top-0 z-40 flex flex-col bg-royal-900 transition-[opacity,visibility] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden ${
-          menuOpen ? "visible opacity-100" : "invisible opacity-0"
-        }`}
-        style={{
-          paddingTop: `calc(${
-            scrolled ? "var(--nav-h-compact)" : "var(--nav-h)"
-          } + env(safe-area-inset-top, 0px))`,
-        }}
-      >
-        <div className="flex-1 overflow-y-auto overscroll-contain px-[var(--spacing-gutter)] pb-10">
+          Rendered into <body> rather than inside the header. Two reasons, both
+          of which broke it where it stood: the header takes `backdrop-blur`
+          once scrolled, and a backdrop-filter makes the header the containing
+          block for any `fixed` descendant — so below the hero the panel was
+          confined to the 4rem header strip instead of the viewport, its content
+          vanishing while body scroll stayed locked. And within the header's own
+          stacking context its z-40 painted *over* the toggle, hiding the X.
+          As a sibling of the header it is simply below it (z-40 vs z-50), so
+          the close button stays visible and reachable.
+
+          Padding clears whatever the header currently is, so the first menu
+          item starts below it. Body scroll is locked while open, so `scrolled`
+          cannot change underneath it. */}
+      {createPortal(
+        <div
+          id="mobile-menu"
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site menu"
+          inert={!menuOpen}
+          className={`on-dark fixed inset-0 top-0 z-40 flex flex-col bg-royal-900 transition-[opacity,visibility] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden ${
+            menuOpen ? "visible opacity-100" : "invisible opacity-0"
+          }`}
+          style={{
+            paddingTop: `calc(${
+              scrolled ? "var(--nav-h-compact)" : "var(--nav-h)"
+            } + env(safe-area-inset-top, 0px))`,
+          }}
+        >
+          <div
+            data-lenis-prevent
+            className="flex-1 overflow-y-auto overscroll-contain px-[var(--spacing-gutter)] pb-10"
+          >
           <nav aria-label="Mobile">
             <ul>
               {nav.map((item, i) =>
@@ -464,7 +481,7 @@ export function Navbar() {
               )}
             </ul>
           </nav>
-
+  
           <div className="mt-10 space-y-3">
             <Link
               to="/contact"
@@ -485,10 +502,12 @@ export function Navbar() {
                 {contact.email}
               </a>
             </div>
-            <p className="motto pt-5 text-center text-sm text-white/55">{site.motto}</p>
+              <p className="motto pt-5 text-center text-sm text-white/55">{site.motto}</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </div>,
+        document.body,
+      )}
     </header>
   );
 }

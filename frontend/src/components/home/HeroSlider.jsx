@@ -1,23 +1,87 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import { Button } from "../ui/Primitives";
-import { heroSlides } from "../../data/hero";
+import { heroGroups, heroGroupStarts, heroPlaylist } from "../../data/hero";
 
-const DURATION = 6500;
+/** How long a single photograph holds before the next one fades in. */
+const DURATION = 3000;
+
+/* One frame of the wall: the photograph plus its readability scrims. */
+function Slide({ slide, active }) {
+  return (
+    <div aria-hidden="true" className="absolute inset-0">
+      <img
+        src={slide.src}
+        srcSet={slide.srcSet}
+        sizes="100vw"
+        alt=""
+        loading="eager"
+        decoding="async"
+        style={{ objectPosition: slide.focus }}
+        className={`h-full w-full object-cover ${active ? "kenburns" : "scale-[1.06]"}`}
+      />
+      {/* readability scrim: stronger at the bottom-left where copy sits */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(12,21,41,0.92)_0%,rgba(12,21,41,0.72)_28%,rgba(12,21,41,0.36)_58%,rgba(12,21,41,0.22)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(20,34,68,0.74)_0%,rgba(20,34,68,0.44)_38%,rgba(20,34,68,0.1)_72%,transparent_92%)]" />
+      {/* Phone only. The copy fills most of a 70%-tall band there, so it can
+          land on a bright wall or a white shirt in one slide and on shadow in
+          the next; this holds the whole copy area dark enough for body text
+          to stay legible on every photograph in the wall. */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(9,16,32,0.93)_0%,rgba(9,16,32,0.8)_46%,rgba(9,16,32,0.55)_72%,rgba(9,16,32,0.22)_92%,transparent_100%)] sm:hidden" />
+    </div>
+  );
+}
 
 export function HeroSlider() {
-  const [index, setIndex] = useState(0);
+  // `previous` stays mounted underneath so the incoming photograph can fade in
+  // over it — the whole wall is never in the DOM at once, which is what keeps
+  // 46 photographs affordable on a phone.
+  const [frame, setFrame] = useState({ current: 0, previous: null });
   const [userPaused, setUserPaused] = useState(false);
-  const [autoPaused, setAutoPaused] = useState(false); // hover / focus / tab hidden
+  // Focus and tab-visibility only. Hovering used to pause it too, which meant
+  // that on a laptop — where the pointer almost always rests somewhere over a
+  // full-width hero — the slideshow simply never advanced.
+  const [autoPaused, setAutoPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const regionRef = useRef(null);
 
-  const count = heroSlides.length;
+  const count = heroPlaylist.length;
+  const index = frame.current;
+  const slide = heroPlaylist[index];
+  const group = heroGroups[slide.groupIndex];
   const paused = userPaused || autoPaused || reduced;
 
-  const goTo = useCallback((i) => setIndex(((i % count) + count) % count), [count]);
+  const goTo = useCallback((i) => {
+    const next = ((i % count) + count) % count;
+    setFrame((f) => (f.current === next ? f : { current: next, previous: f.current }));
+  }, [count]);
+
   const next = useCallback(() => goTo(index + 1), [goTo, index]);
-  const prev = useCallback(() => goTo(index - 1), [goTo, index]);
+
+  /* --- step a whole headline at a time with the arrows -------------
+   * Stepping one photograph would leave the copy unchanged on most presses,
+   * which reads as a dead button. The arrows move to the next/previous
+   * headline instead, and land on the first photograph of that run.
+   */
+  const goToGroup = useCallback(
+    (direction) => {
+      const here = heroPlaylist[index].groupIndex;
+      let i = index;
+
+      for (let step = 0; step < count; step++) {
+        i = (i + direction + count) % count;
+        if (heroPlaylist[i].groupIndex !== here) break;
+      }
+      // Walk back to the first photograph of the run we landed in.
+      const landed = heroPlaylist[i].groupIndex;
+      for (let step = 0; step < count; step++) {
+        const before = (i - 1 + count) % count;
+        if (heroPlaylist[before].groupIndex !== landed) break;
+        i = before;
+      }
+      goTo(i);
+    },
+    [count, index, goTo],
+  );
 
   /* --- honour reduced motion: no autoplay at all ------------------ */
   useEffect(() => {
@@ -35,6 +99,15 @@ export function HeroSlider() {
     return () => clearTimeout(t);
   }, [index, paused, next]);
 
+  /* --- warm the next photograph so the fade never lands on nothing - */
+  useEffect(() => {
+    const upcoming = heroPlaylist[(index + 1) % count];
+    const img = new Image();
+    img.sizes = "100vw";
+    img.srcset = upcoming.srcSet;
+    img.src = upcoming.src;
+  }, [index, count]);
+
   /* --- pause while the tab is in the background ------------------- */
   useEffect(() => {
     const onVisibility = () => setAutoPaused(document.hidden);
@@ -46,80 +119,51 @@ export function HeroSlider() {
   const onKeyDown = (e) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      prev();
+      goToGroup(-1);
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      next();
+      goToGroup(1);
     }
   };
-
-  const slide = heroSlides[index];
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Satpuda Group highlights"
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setAutoPaused(true)}
-      onMouseLeave={() => setAutoPaused(false)}
       onFocusCapture={() => setAutoPaused(true)}
       onBlurCapture={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setAutoPaused(false);
       }}
-      className="on-dark relative isolate flex min-h-[max(32rem,calc(min(100svh,54rem)-var(--nav-h)))] w-full overflow-hidden bg-royal-950"
+      /* `.hero-band` owns the height (see index.css): 70% of the screen on a
+         phone, one capped viewport height from `sm` up, always as a minimum
+         so the copy can never end up behind the header. The copy block below
+         reserves the same room on every slide — three heading lines, a fixed
+         body box — so the banner is the same height whatever the headline. */
+      className="hero-band on-dark relative isolate flex w-full overflow-hidden bg-royal-950"
     >
-      {/* ---------- slides ---------- */}
-      {heroSlides.map((s, i) => {
-        const active = i === index;
-        return (
-          <div
-            key={s.id}
-            aria-hidden={!active}
-            inert={!active}
-            className={`absolute inset-0 transition-opacity duration-[1100ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
-              active ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <img
-              src={s.src}
-              srcSet={s.srcSet}
-              sizes="100vw"
-              alt={s.alt}
-              width="1920"
-              height="1280"
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : "low"}
-              decoding={i === 0 ? "sync" : "async"}
-              style={{ objectPosition: s.focus }}
-              className={`h-full w-full object-cover ${active ? "kenburns" : "scale-[1.06]"}`}
-            />
-            {/* readability scrim: stronger at the bottom-left where copy sits */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(to_top,rgba(12,21,41,0.92)_0%,rgba(12,21,41,0.72)_28%,rgba(12,21,41,0.36)_58%,rgba(12,21,41,0.22)_100%)]"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(to_right,rgba(20,34,68,0.74)_0%,rgba(20,34,68,0.44)_38%,rgba(20,34,68,0.1)_72%,transparent_92%)]"
-            />
-          </div>
-        );
-      })}
+      {/* ---------- photo wall ---------- */}
+      {frame.previous !== null && (
+        <Slide key="under" slide={heroPlaylist[frame.previous]} />
+      )}
+      <div key={`over-${index}`} className="hero-fade absolute inset-0">
+        <Slide slide={slide} active />
+      </div>
 
       {/* ---------- copy ----------
-          Top padding matters even though the copy is bottom-aligned: slides
-          carry different amounts of text, and on a short viewport the tallest
-          one would otherwise run right up to (and past) the top edge. Paired
-          with the section's min-h, a tall slide now grows the hero instead of
-          having its eyebrow and first heading line clipped away. */}
-      <div className="shell relative z-10 flex w-full flex-col justify-end pt-12 pb-12 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20">
-        <div key={index} className="slide-copy max-w-3xl">
-          <p className="eyebrow !text-ember-300">{slide.eyebrow}</p>
+          Keyed by headline, not by photograph: the copy animates in when the
+          headline changes and then holds still while the pictures behind it
+          change, instead of re-running its entrance every few seconds. */}
+      <div className="shell relative z-10 flex w-full flex-col justify-end pt-6 pb-6 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20">
+        <div key={group.id} className="slide-copy max-w-3xl">
+          <p className="eyebrow !text-ember-300 [text-shadow:0_1px_3px_rgba(6,12,25,0.6)] sm:[text-shadow:none]">
+            {group.eyebrow}
+          </p>
 
-          <h1 className="t-display mt-6 text-white">
-            {slide.title.map((line, i) => (
+          <h1 className="t-display mt-3 min-h-[3.12em] text-white [text-shadow:0_2px_10px_rgba(6,12,25,0.45)] sm:mt-6 sm:[text-shadow:none]">
+            {group.title.map((line, i) => (
               <span key={line} className="block">
-                {i === slide.title.length - 1 ? (
+                {i === group.title.length - 1 ? (
                   <span className="relative">
                     {line}
                     <span
@@ -134,34 +178,34 @@ export function HeroSlider() {
             ))}
           </h1>
 
-          <p className="mt-7 max-w-xl text-[1.0625rem] leading-relaxed text-white/80 sm:text-lg">
-            {slide.body}
+          <p className="mt-3 line-clamp-2 min-h-[3.25em] max-w-xl text-[0.875rem] leading-relaxed text-white/95 [text-shadow:0_1px_3px_rgba(6,12,25,0.6)] sm:mt-7 sm:line-clamp-3 sm:min-h-[4.9em] sm:text-lg sm:text-white/80 sm:[text-shadow:none]">
+            {group.body}
           </p>
 
-          <div className="mt-9 flex flex-wrap gap-3.5">
-            <Button to="/institutes/btech-polytechnic" variant="ember">
+          <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-9 sm:gap-3.5">
+            <Button to="/institutes/btech-polytechnic" variant="ember" size="compact">
               Explore institutions
             </Button>
-            <Button to="/contact" variant="ghostLight">
+            <Button to="/contact" variant="ghostLight" size="compact">
               Contact us
             </Button>
           </div>
         </div>
 
         {/* ---------- controls ---------- */}
-        <div className="hero-controls mt-11 flex items-end justify-between gap-6 border-t border-white/18 pt-6">
-          {/* pagination */}
+        <div className="hero-controls mt-6 flex items-end justify-between gap-4 border-t border-white/18 pt-4 sm:mt-11 sm:gap-6 sm:pt-6">
+          {/* pagination — one bar per headline */}
           <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3.5">
-            {heroSlides.map((s, i) => {
-              const active = i === index;
+            {heroGroups.map((g, i) => {
+              const active = i === slide.groupIndex;
               return (
                 <button
-                  key={s.id}
+                  key={g.id}
                   type="button"
-                  onClick={() => goTo(i)}
-                  aria-label={`Go to slide ${i + 1}: ${s.eyebrow}`}
+                  onClick={() => goTo(heroGroupStarts[i])}
+                  aria-label={`Go to ${g.eyebrow}`}
                   aria-current={active ? "true" : undefined}
-                  className="group/dot relative h-8 min-w-0 flex-1 cursor-pointer sm:max-w-[7rem]"
+                  className="group/dot relative h-6 min-w-0 flex-1 cursor-pointer sm:h-8 sm:max-w-[7rem]"
                 >
                   <span className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-white/22 transition-colors duration-300 group-hover/dot:bg-white/40" />
                   {active && (
@@ -181,10 +225,10 @@ export function HeroSlider() {
           <div className="flex shrink-0 items-center gap-4 sm:gap-6">
             <p className="hidden font-display text-sm tabular-nums text-white/55 sm:block">
               <span className="text-lg text-white">
-                {String(index + 1).padStart(2, "0")}
+                {String(slide.groupIndex + 1).padStart(2, "0")}
               </span>
               <span className="mx-1.5">/</span>
-              {String(count).padStart(2, "0")}
+              {String(heroGroups.length).padStart(2, "0")}
             </p>
 
             <div className="flex items-center gap-2">
@@ -192,7 +236,7 @@ export function HeroSlider() {
                 type="button"
                 onClick={() => setUserPaused((v) => !v)}
                 aria-label={userPaused ? "Resume slideshow" : "Pause slideshow"}
-                className="flex h-11 w-11 items-center justify-center border border-white/28 text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-royal-800"
+                className="flex h-10 w-10 items-center justify-center border border-white/28 text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-royal-800 sm:h-11 sm:w-11"
               >
                 {userPaused ? (
                   <Play aria-hidden="true" className="h-4 w-4" />
@@ -202,17 +246,17 @@ export function HeroSlider() {
               </button>
               <button
                 type="button"
-                onClick={prev}
-                aria-label="Previous slide"
-                className="flex h-11 w-11 items-center justify-center border border-white/28 text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-royal-800"
+                onClick={() => goToGroup(-1)}
+                aria-label="Previous headline"
+                className="flex h-10 w-10 items-center justify-center border border-white/28 text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-royal-800 sm:h-11 sm:w-11"
               >
                 <ArrowLeft aria-hidden="true" className="h-4 w-4" />
               </button>
               <button
                 type="button"
-                onClick={next}
-                aria-label="Next slide"
-                className="flex h-11 w-11 items-center justify-center border border-white/28 text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-royal-800"
+                onClick={() => goToGroup(1)}
+                aria-label="Next headline"
+                className="flex h-10 w-10 items-center justify-center border border-white/28 text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-royal-800 sm:h-11 sm:w-11"
               >
                 <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </button>
@@ -222,8 +266,8 @@ export function HeroSlider() {
       </div>
 
       {/* screen-reader announcement of the current slide */}
-      <p ref={regionRef} aria-live="polite" aria-atomic="true" className="sr-only">
-        {`Slide ${index + 1} of ${count}: ${slide.title.join(" ")}`}
+      <p aria-live="polite" aria-atomic="true" className="sr-only">
+        {`${group.title.join(" ")} — ${slide.alt}`}
       </p>
     </section>
   );

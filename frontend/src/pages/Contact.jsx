@@ -2,8 +2,9 @@ import { useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Mail, MapPin, Phone, Clock, ExternalLink } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
-import { Button, Eyebrow, Reveal, SectionHeading, TextLink } from "../components/ui/Primitives";
+import { Button, Eyebrow, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
 import { contact, instituteLinks } from "../data/site";
+import { photo } from "../data/photos";
 import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
@@ -285,7 +286,7 @@ export default function Contact() {
         title="Contact Satpuda Group"
         lead="One campus, four institutions. Tell us who the student is and what stage they're at, and we'll point you to the right person."
         crumbs={[{ label: "Contact" }]}
-        image={campusImages.campusFront}
+        image={photo("0043", "Students at a session on the Satpuda campus", "50% 38%")}
       />
 
       {/* ---------------- details + form ---------------- */}
@@ -385,7 +386,7 @@ export default function Contact() {
             {/* --- form --- */}
             <div>
               <Reveal>
-                <h2 className="t-h2 text-ink">Send us an enquiry.</h2>
+                <SplitText as="h2" className="t-h2 block text-ink">Send us an enquiry.</SplitText>
                 <p className="t-lead mt-5 max-w-xl">
                   Fill this in and we will get back to you, or call the numbers alongside if it is
                   urgent.

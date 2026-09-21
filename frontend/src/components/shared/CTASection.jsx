@@ -1,5 +1,5 @@
 import { Mail, MapPin, Phone } from "lucide-react";
-import { Button, Eyebrow, Reveal } from "../ui/Primitives";
+import { Button, Eyebrow, Reveal, SplitText } from "../ui/Primitives";
 import { contact } from "../../data/site";
 import { stagger } from "../ui/stagger";
 
@@ -33,7 +33,7 @@ export function CTASection({
               <Eyebrow>{eyebrow}</Eyebrow>
             </Reveal>
             <Reveal delay={stagger(1)}>
-              <h2 className="t-h2 mt-5 max-w-xl text-white">{title}</h2>
+              <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-white">{title}</SplitText>
             </Reveal>
             <Reveal delay={stagger(2)}>
               <p className="mt-6 max-w-lg text-[1.0625rem] leading-relaxed text-white/75">

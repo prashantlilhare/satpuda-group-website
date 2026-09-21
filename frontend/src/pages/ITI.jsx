@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from "react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Fact, Figure, Reveal, SectionHeading } from "../components/ui/Primitives";
+import { PhotoGrid } from "../components/shared/PhotoGrid";
+import { photo } from "../data/photos";
+import { Eyebrow, Fact, Figure, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { itiTrades } from "../data/programs";
 import { campusImages } from "../data/about";
 import { getInstitution } from "../data/institutions";
@@ -8,6 +11,14 @@ import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
 const inst = getInstitution("iti");
+
+/* The institute's own workshop floor and annual project exhibition. */
+const tradeFloor = [
+  { ...photo("0027", "An ITI trainee explaining a domestic wiring board", "50% 45%"), caption: "Wiring practice, explained by the trainee who built it" },
+  { ...photo("0055", "Trade projects lined up along the workshop hall", "50% 45%"), caption: "The annual project exhibition" },
+  { ...photo("0054", "A working road-and-turbine model built by trainees", "50% 50%"), caption: "A working model from the electrical trade" },
+  { ...photo("0064", "Trainees gathered in the workshop hall at Manjhapur", "50% 42%"), caption: "Trainees in the Manjhapur workshop" },
+];
 
 const careerSteps = [
   {
@@ -28,9 +39,43 @@ const careerSteps = [
   },
 ];
 
+/**
+ * There is no hover on a phone, so the card plays its own reveal — the accent
+ * sweep, shine beam and text shimmer — as it reaches the middle of the screen,
+ * and resets when it leaves so it plays again on the way back. Desktop is
+ * untouched: the same styling stays on `:hover` there (see `.trade-card` in
+ * index.css, where the `.is-inview` rules are scoped to narrow viewports).
+ */
+function useInViewOnMobile() {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.45, rootMargin: "-10% 0px -10% 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, inView];
+}
+
 function TradeRow({ trade, index }) {
+  const [cardRef, inView] = useInViewOnMobile();
+
   return (
-    <article className="trade-card group relative grid gap-5 border-t border-stone-line py-8 transition-all duration-400 md:grid-cols-[3.5rem_1.1fr_1.4fr] md:items-start md:gap-8 lg:grid-cols-[3.5rem_1fr_1.5fr_auto] lg:gap-10 rounded-2xl px-5 sm:px-8 cursor-pointer">
+    <article
+      ref={cardRef}
+      className={`trade-card group relative grid gap-5 border-t border-stone-line py-8 transition-all duration-400 md:grid-cols-[3.5rem_1.1fr_1.4fr] md:items-start md:gap-8 lg:grid-cols-[3.5rem_1fr_1.5fr_auto] lg:gap-10 rounded-2xl px-5 sm:px-8 cursor-pointer ${
+        inView ? "is-inview" : ""
+      }`}
+    >
       {/* Top radiant color bar that shoots left-to-right on hover */}
       <div className="trade-accent-line" />
 
@@ -99,7 +144,7 @@ export default function ITI() {
         title="Satpuda ITI, Garra"
         lead={inst.summary}
         crumbs={[{ label: "Institute" }, { label: "ITI" }]}
-        image={campusImages.workshop}
+        image={photo("0055", "Trade projects along the ITI workshop hall", "50% 45%")}
       />
 
       {/* ---------------- key facts strip ---------------- */}
@@ -131,32 +176,34 @@ export default function ITI() {
                 <Eyebrow>About the institute</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 max-w-xl text-ink">
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
                   The group's first institution — and still its most direct route to work.
-                </h2>
+                </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
-                <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
-                  <p>
-                    Satpuda ITI opened at Garra in 1999 under{" "}
-                    <strong className="font-semibold text-ink">
-                      Maharana Pratap Shikshan Samiti
-                    </strong>
-                    , and it remains the foundation the rest of the group was built on. It runs
-                    trades under the Craftsman Training Scheme, affiliated to the National Council
-                    for Vocational Training and accredited by the Quality Council of India.
-                  </p>
-                  <p>
-                    Vocational training answers a specific question: what can a student do the day
-                    after they finish? A National Trade Certificate is recognised nationally, it is
-                    understood by employers without explanation, and it takes one to two years
-                    rather than four.
-                  </p>
-                  <p>
-                    For a student leaving Class 10 who wants technical work rather than more
-                    classroom time, this is the shortest credible path to it.
-                  </p>
-                </div>
+                <ReadMore lines={7} className="mt-8">
+                  <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
+                    <p>
+                      Satpuda ITI opened at Garra in 1999 under{" "}
+                      <strong className="font-semibold text-ink">
+                        Maharana Pratap Shikshan Samiti
+                      </strong>
+                      , and it remains the foundation the rest of the group was built on. It runs
+                      trades under the Craftsman Training Scheme, affiliated to the National Council
+                      for Vocational Training and accredited by the Quality Council of India.
+                    </p>
+                    <p>
+                      Vocational training answers a specific question: what can a student do the day
+                      after they finish? A National Trade Certificate is recognised nationally, it is
+                      understood by employers without explanation, and it takes one to two years
+                      rather than four.
+                    </p>
+                    <p>
+                      For a student leaving Class 10 who wants technical work rather than more
+                      classroom time, this is the shortest credible path to it.
+                    </p>
+                  </div>
+                </ReadMore>
               </Reveal>
             </div>
 
@@ -211,9 +258,9 @@ export default function ITI() {
                 <Eyebrow>Practical learning</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 max-w-md text-white">
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-md text-white">
                   Most of the week is spent on the floor.
-                </h2>
+                </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
@@ -257,6 +304,18 @@ export default function ITI() {
               </ol>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ---------------- on the trade floor ---------------- */}
+      <section className="section bg-paper">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="On the trade floor"
+            title="What the training actually looks like."
+            lead="Photographs from the workshop floor at Manjhapur and the institute's annual project exhibition."
+          />
+          <PhotoGrid items={tradeFloor} className="section-body" />
         </div>
       </section>
 

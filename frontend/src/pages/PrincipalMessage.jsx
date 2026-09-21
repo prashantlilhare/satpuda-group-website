@@ -4,6 +4,7 @@ import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { Figure, Reveal } from "../components/ui/Primitives";
 import { director, principal } from "../data/leadership";
+import { photo } from "../data/photos";
 import { campusImages } from "../data/about";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
@@ -29,7 +30,7 @@ export default function PrincipalMessage() {
         title="Principal's Message"
         lead={principal.standfirst}
         crumbs={[{ label: "About Us", to: "/about" }, { label: "Principal's Message" }]}
-        image={campusImages.seminarHall}
+        image={photo("0044", "Students at a college assembly", "50% 35%")}
       />
 
       {/* ---------------- letter ---------------- */}

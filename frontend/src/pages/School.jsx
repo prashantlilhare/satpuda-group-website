@@ -1,17 +1,19 @@
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Fact, Figure, Reveal, SectionHeading, TextLink } from "../components/ui/Primitives";
+import { Eyebrow, Fact, Figure, ReadMore, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
 import { schoolPillars } from "../data/programs";
 import { campusImages } from "../data/about";
+import { photo } from "../data/photos";
 import { socials } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
+/* The school's own photographs, from its science exhibition and STEM room. */
 const gallery = [
-  { src: campusImages.sports, alt: "Students playing basketball on the campus court", span: "lg:col-span-7" },
-  { src: campusImages.classroom, alt: "A classroom session in progress", span: "lg:col-span-5" },
-  { src: campusImages.culture, alt: "Students and staff at an annual cultural programme", span: "lg:col-span-5" },
-  { src: campusImages.libraryStacks, alt: "Open reference shelving in the library", span: "lg:col-span-7" },
+  { ...photo("0050", "Students presenting a township model in the school corridor", "50% 45%"), span: "lg:col-span-7" },
+  { ...photo("0052", "School students with a model of their campus at the STEM room", "50% 40%"), span: "lg:col-span-5" },
+  { ...photo("0031", "Junior students explaining their school model to visitors", "50% 40%"), span: "lg:col-span-5" },
+  { ...photo("0051", "Senior students explaining a working model of the human heart", "50% 42%"), span: "lg:col-span-7" },
 ];
 
 export default function School() {
@@ -31,7 +33,7 @@ export default function School() {
         title="Satpuda Valley Public School"
         lead="A CBSE-affiliated, co-educational school on the Satpuda campus at Manjhapur (Garra), Balaghat — educating students here since 2009."
         crumbs={[{ label: "Institute" }, { label: "School" }]}
-        image={campusImages.sports}
+        image={photo("0050", "School students presenting their projects in the corridor", "50% 45%")}
       />
 
       {/* ---------------- key facts ---------------- */}
@@ -63,29 +65,31 @@ export default function School() {
                 <Eyebrow>About the school</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <h2 className="t-h2 mt-5 max-w-xl text-ink">
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
                   Where a Satpuda education usually starts.
-                </h2>
+                </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
-                <div className="mt-8 space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
-                  <p>
-                    Satpuda Valley Public School was opened in 2009 by Maharana Pratap Shikshan
-                    Samiti, a decade after the trust's first institution. It follows the Central
-                    Board of Secondary Education curriculum and is co-educational.
-                  </p>
-                  <p>
-                    Sitting on the same campus as the group's technical institutions has a practical
-                    effect: school students grow up within sight of laboratories, workshops and a
-                    library that belong to an engineering college. The idea that they might study
-                    those subjects is not abstract.
-                  </p>
-                  <p>
-                    The school's approach is to build understanding rather than recall — supported
-                    by subject laboratories, a library, sports grounds and a full calendar of
-                    cultural activity.
-                  </p>
-                </div>
+                <ReadMore lines={7} className="mt-8">
+                  <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
+                    <p>
+                      Satpuda Valley Public School was opened in 2009 by Maharana Pratap Shikshan
+                      Samiti, a decade after the trust's first institution. It follows the Central
+                      Board of Secondary Education curriculum and is co-educational.
+                    </p>
+                    <p>
+                      Sitting on the same campus as the group's technical institutions has a practical
+                      effect: school students grow up within sight of laboratories, workshops and a
+                      library that belong to an engineering college. The idea that they might study
+                      those subjects is not abstract.
+                    </p>
+                    <p>
+                      The school's approach is to build understanding rather than recall — supported
+                      by subject laboratories, a library, sports grounds and a full calendar of
+                      cultural activity.
+                    </p>
+                  </div>
+                </ReadMore>
               </Reveal>
 
               <Reveal delay={stagger(3)}>
@@ -150,8 +154,15 @@ export default function School() {
 
           <div className="section-body grid gap-5 lg:grid-cols-12">
             {gallery.map((img, i) => (
-              <Reveal key={img.src} delay={stagger(i % 2)} className={`group ${img.span}`}>
-                <Figure src={img.src} alt={img.alt} ratio="16 / 10" />
+              <Reveal key={img.id} delay={stagger(i % 2)} className={`group ${img.span}`}>
+                <Figure
+                  src={img.src}
+                  srcSet={img.srcSet}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  alt={img.alt}
+                  ratio="16 / 10"
+                  position={img.focus}
+                />
               </Reveal>
             ))}
           </div>

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
 import { stagger } from "./stagger";
 
@@ -24,6 +24,52 @@ export function Reveal({ as: Tag = "div", delay = 0, className = "", children, .
 }
 
 /* ------------------------------------------------------------------ */
+/* SplitText — word-by-word entrance for headings                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Rises a heading into place one word at a time as it scrolls into view.
+ *
+ * Each word sits in its own clipped box, so the words come up from behind
+ * their own baseline rather than simply fading — the small difference between
+ * "animated" and "typeset". The spaces are left outside the boxes so the line
+ * still wraps normally, and the boxes carry a little bottom padding so
+ * descenders are not shaved off.
+ *
+ * Plain text only; anything else is rendered untouched. Reduced motion shows
+ * the finished heading with no movement at all.
+ */
+export function SplitText({ as: Tag = "span", children, className = "", delay = 0 }) {
+  const [ref, visible] = useReveal({ threshold: 0.2 });
+
+  if (typeof children !== "string") {
+    return <Tag className={className}>{children}</Tag>;
+  }
+
+  const words = children.split(" ");
+
+  return (
+    <Tag
+      ref={ref}
+      data-visible={visible}
+      className={`split-text ${className}`}
+      style={{ "--split-delay": `${delay}ms` }}
+    >
+      {words.map((word, i) => (
+        <Fragment key={`${word}-${i}`}>
+          <span className="split-word">
+            <span className="split-word-inner" style={{ "--word-index": i }}>
+              {word}
+            </span>
+          </span>
+          {i < words.length - 1 ? " " : ""}
+        </Fragment>
+      ))}
+    </Tag>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Eyebrow                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -40,10 +86,19 @@ export function Eyebrow({ children, className = "" }) {
    up rather than as a card popping. `active:` returns it to the surface so
    a press still feels like a press. */
 const BASE =
-  "group/btn inline-flex items-center justify-center gap-2.5 font-sans text-[0.9375rem] font-semibold " +
-  "tracking-[-0.01em] px-6 py-3.5 transition-[background-color,color,border-color,transform,box-shadow] " +
+  "group/btn inline-flex items-center justify-center gap-2.5 font-sans font-semibold " +
+  "tracking-[-0.01em] transition-[background-color,color,border-color,transform,box-shadow] " +
   "duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 active:translate-y-0 " +
   "disabled:opacity-55 disabled:pointer-events-none disabled:hover:translate-y-0";
+
+/* `compact` is the phone-first size: a smaller tap target that grows to the
+   standard one from `sm` up. Used where several buttons share a tight band,
+   such as the hero, where the default size was overpowering on a phone. */
+const SIZES = {
+  md: "px-6 py-3.5 text-[0.9375rem]",
+  compact:
+    "px-3.5 py-2 text-[0.8125rem] gap-1.5 sm:gap-2.5 sm:px-5 sm:py-3 sm:text-[0.9375rem]",
+};
 
 const VARIANTS = {
   primary:
@@ -67,12 +122,13 @@ export function Button({
   to,
   href,
   variant = "primary",
+  size = "md",
   arrow = true,
   className = "",
   children,
   ...rest
 }) {
-  const cls = `${BASE} ${VARIANTS[variant] ?? VARIANTS.primary} ${className}`;
+  const cls = `${BASE} ${SIZES[size] ?? SIZES.md} ${VARIANTS[variant] ?? VARIANTS.primary} ${className}`;
   const inner = (
     <>
       {children}
@@ -157,9 +213,9 @@ export function SectionHeading({
           <Eyebrow className={centred ? "justify-center" : ""}>{eyebrow}</Eyebrow>
         </Reveal>
       )}
-      <Reveal delay={stagger(1)}>
-        <Tag className="t-h2 mt-5 text-ink">{title}</Tag>
-      </Reveal>
+      <SplitText as={Tag} delay={90} className="t-h2 mt-5 block text-ink">
+        {title}
+      </SplitText>
       {lead && (
         <Reveal delay={stagger(2)}>
           <p className="t-lead mt-5">{lead}</p>
@@ -176,6 +232,10 @@ export function SectionHeading({
 
 export function Figure({
   src,
+  /* Optional responsive pair for the campus library, whose photographs ship
+     at 1600w and 960w — a phone has no use for the larger file. */
+  srcSet,
+  sizes = "(min-width: 1024px) 33vw, 100vw",
   alt,
   ratio = "4 / 3",
   className = "",
@@ -197,6 +257,8 @@ export function Figure({
     >
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={srcSet ? sizes : undefined}
         alt={alt}
         loading={loading}
         decoding="async"
@@ -283,6 +345,91 @@ export function Fact({ value, label, sub, dark = false }) {
       </p>
       {sub && (
         <p className={`mt-2 text-sm ${dark ? "text-white/60" : "text-ink-mute"}`}>{sub}</p>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* ReadMore — clamp long body copy behind a toggle                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Clamps its children to `lines` and reveals the rest on request.
+ *
+ * The toggle only appears when the text actually overflows, so a short lead
+ * on a wide screen renders exactly as it did before — no stray button under
+ * two lines of copy. Overflow is measured only while collapsed (expanded,
+ * scrollHeight always equals clientHeight) and re-measured on resize, which
+ * is what makes the same block clamp on a phone and run free on a laptop.
+ */
+export function ReadMore({
+  children,
+  lines = 6,
+  dark = false,
+  className = "",
+  moreLabel = "Read more",
+  lessLabel = "Show less",
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [clipped, setClipped] = useState(false);
+  const bodyRef = useRef(null);
+
+  useEffect(() => {
+    if (expanded) return; // nothing to measure: the clamp is off
+    const node = bodyRef.current;
+    if (!node) return;
+
+    const measure = () => setClipped(node.scrollHeight - node.clientHeight > 4);
+    measure();
+
+    const observer =
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    observer?.observe(node);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [expanded, children, lines]);
+
+  return (
+    <div className={className}>
+      <div
+        ref={bodyRef}
+        style={
+          expanded
+            ? undefined
+            : {
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: lines,
+                overflow: "hidden",
+              }
+        }
+      >
+        {children}
+      </div>
+
+      {clipped && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className={`mt-3 inline-flex items-center gap-1.5 text-[0.875rem] font-semibold tracking-[-0.01em] transition-colors duration-300 ${
+            dark
+              ? "text-ember-300 hover:text-white"
+              : "text-royal-700 hover:text-ember-600"
+          }`}
+        >
+          {expanded ? lessLabel : moreLabel}
+          <ChevronDown
+            aria-hidden="true"
+            className={`h-3.5 w-3.5 transition-transform duration-300 ${
+              expanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       )}
     </div>
   );

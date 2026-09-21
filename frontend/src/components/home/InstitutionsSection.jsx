@@ -114,8 +114,19 @@ function InstitutionRow({ item, index }) {
         </ul>
       </div>
 
-      <div className="hidden w-28 shrink-0 self-center overflow-hidden sm:block">
-        <Figure src={item.image} alt="" ratio="4 / 3" zoom />
+      {/* Small on a phone — enough to give the row a face without turning the
+          list into a gallery — and a step larger from `sm` up. Decorative:
+          the row's own heading already names the institution. */}
+      <div className="w-20 shrink-0 self-center overflow-hidden sm:w-28">
+        <Figure
+          src={item.thumb?.src ?? item.image}
+          srcSet={item.thumb?.srcSet}
+          sizes="(min-width: 640px) 7rem, 5rem"
+          alt=""
+          ratio="4 / 3"
+          position={item.thumb?.focus}
+          zoom
+        />
       </div>
     </Link>
   );
