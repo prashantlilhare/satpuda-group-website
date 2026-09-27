@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useInView } from "motion/react";
 import { ChevronLeft, ChevronRight, Compass } from "lucide-react";
 import { Eyebrow } from "../ui/Primitives";
 import { leadershipCards } from "../../data/leadership";
@@ -9,9 +10,10 @@ export function LeadershipSection() {
   const trackRef = useRef(null);
   const mobileTrackRef = useRef(null);
 
-  const [progress, setProgress] = useState(0);
-  const [translateX, setTranslateX] = useState(0);
+  const barRef = useRef(null);
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const onScreen = useInView(containerRef);
   const [isDesktop, setIsDesktop] = useState(
     typeof window !== "undefined" ? window.innerWidth >= 1024 : true
   );
@@ -25,37 +27,58 @@ export function LeadershipSection() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Desktop vertical-to-horizontal pinned scroll logic
+  // Desktop vertical-to-horizontal pinned scroll logic.
+  //
+  // The track does not jump to where the scroll says it should be; it chases
+  // that point, closing FOLLOW of the gap every frame. A wheel notch moves the
+  // page in one step, and this is what turns that step into a glide. The
+  // transform and the progress bar are written straight to the DOM rather
+  // than through state, so the glide never waits on a React render — only the
+  // active card, which changes a handful of times, goes through state.
   useEffect(() => {
     if (!isDesktop) return;
+    const FOLLOW = 0.16;
     let frame = 0;
+    let target = 0;
+    let shown = null;
 
-    const onScroll = () => {
-      frame = 0;
+    const measure = () => {
       const container = containerRef.current;
       const sticky = stickyRef.current;
-      const track = trackRef.current;
-      if (!container || !sticky || !track) return;
+      if (!container || !sticky) return;
 
       const totalTravel = container.offsetHeight - sticky.offsetHeight;
       if (totalTravel <= 0) return;
 
-      const rect = container.getBoundingClientRect();
-      const scrolled = -rect.top;
-      const rawProgress = Math.max(0, Math.min(1, scrolled / totalTravel));
-      setProgress(rawProgress);
+      const scrolled = -container.getBoundingClientRect().top;
+      target = Math.max(0, Math.min(1, scrolled / totalTravel));
+    };
 
-      const maxTranslate = Math.max(
-        0,
-        track.scrollWidth - window.innerWidth + 96
+    const paint = (p) => {
+      const track = trackRef.current;
+      if (track) {
+        const maxTranslate = Math.max(0, track.scrollWidth - window.innerWidth + 96);
+        track.style.transform = `translate3d(${-p * maxTranslate}px, 0, 0)`;
+      }
+      if (barRef.current) {
+        barRef.current.style.transform = `scaleX(${Math.max(0.08, p)})`;
+      }
+      setActiveIndex(
+        Math.min(
+          leadershipCards.length - 1,
+          Math.floor(p * leadershipCards.length + 0.15)
+        )
       );
-      setTranslateX(rawProgress * maxTranslate);
+    };
 
-      const currentCard = Math.min(
-        leadershipCards.length - 1,
-        Math.floor(rawProgress * leadershipCards.length + 0.15)
-      );
-      setActiveIndex(currentCard);
+    const onScroll = () => {
+      frame = 0;
+      measure();
+      if (shown === null) shown = target;
+      const gap = target - shown;
+      shown = Math.abs(gap) < 0.0005 ? target : shown + gap * FOLLOW;
+      paint(shown);
+      if (shown !== target) frame = requestAnimationFrame(onScroll);
     };
 
     const schedule = () => {
@@ -89,7 +112,9 @@ export function LeadershipSection() {
   useEffect(() => () => clearTimeout(resumeTimer.current), []);
 
   useEffect(() => {
-    if (isDesktop || mobilePaused) return;
+    // Only while the section is on screen — off it, each step would still
+    // fire a smooth scroll and a re-render for nobody to see.
+    if (isDesktop || mobilePaused || !onScreen) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const timer = setTimeout(() => {
@@ -101,7 +126,7 @@ export function LeadershipSection() {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [isDesktop, mobilePaused, activeIndex]);
+  }, [isDesktop, mobilePaused, activeIndex, onScreen]);
 
   // Mobile horizontal scroll tracking
   const handleMobileScroll = () => {
@@ -110,7 +135,6 @@ export function LeadershipSection() {
     const max = el.scrollWidth - el.clientWidth;
     if (max <= 0) return;
     const ratio = Math.max(0, Math.min(1, el.scrollLeft / max));
-    setProgress(ratio);
     const idx = Math.min(
       leadershipCards.length - 1,
       Math.round(ratio * (leadershipCards.length - 1))
@@ -173,7 +197,7 @@ export function LeadershipSection() {
                   The people accountable for it.
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm lg:text-base text-ink-mute">
-                  Six leaders, in their own words — on what the group is trying to build, and what students can expect when they arrive.
+                  The governing board of Satpuda Group — the members who set its direction, and what each of them is answerable for.
                 </p>
               </div>
 
@@ -190,10 +214,6 @@ export function LeadershipSection() {
             <div
               ref={trackRef}
               className="flex gap-8 pl-8 sm:pl-16 lg:pl-24 pr-24 will-change-transform"
-              style={{
-                transform: `translate3d(-${translateX}px, 0, 0)`,
-                transition: "transform 0.12s cubic-bezier(0.16, 1, 0.3, 1)",
-              }}
             >
               {leadershipCards.map((card, i) => (
                 <article
@@ -216,7 +236,7 @@ export function LeadershipSection() {
                       {card.category}
                     </span>
                     <span className="font-display text-xs font-semibold tracking-wider text-ink-mute">
-                      LEADER #{card.num}
+                      MEMBER #{card.num}
                     </span>
                   </div>
 
@@ -268,9 +288,6 @@ export function LeadershipSection() {
                             {card.institution}
                           </span>
                         </p>
-                        <p className="mt-1 text-[0.8125rem] leading-relaxed text-ink-mute line-clamp-1">
-                          {card.qualifications}
-                        </p>
                         <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink-mute">
                           {card.description}
                         </p>
@@ -303,7 +320,7 @@ export function LeadershipSection() {
                   {leadershipCards[activeIndex]?.num || "01"}
                 </span>
                 <span className="text-sm font-semibold text-ink-mute">
-                  / 0{leadershipCards.length}
+                  / {String(leadershipCards.length).padStart(2, "0")}
                 </span>
                 <span className="hidden sm:inline-block ml-3 text-xs uppercase tracking-widest text-ink-mute">
                   {leadershipCards[activeIndex]?.name}
@@ -313,10 +330,7 @@ export function LeadershipSection() {
               {/* Progress Line */}
               <div className="flex items-center gap-4">
                 <div className="relative h-1.5 w-36 sm:w-64 overflow-hidden rounded-full bg-stone-200">
-                  <div
-                    className="h-full bg-ember-500 transition-all duration-150 ease-out"
-                    style={{ width: `${Math.max(8, progress * 100)}%` }}
-                  />
+                  <div ref={barRef} className="h-full origin-left bg-ember-500" style={{ transform: "scaleX(0.08)" }} />
                 </div>
               </div>
 
@@ -346,14 +360,14 @@ export function LeadershipSection() {
         </div>
       ) : (
         /* ================= MOBILE / TABLET SWIPE VIEW ================= */
-        <div className="py-16 px-4 sm:px-6">
-          <div className="mb-8">
+        <div className="section shell">
+          <div className="mb-[var(--space-heading)]">
             <Eyebrow>Leadership</Eyebrow>
             <h2 className="mt-2 font-display text-2xl font-semibold tracking-[-0.015em] text-ink sm:text-3xl">
               The people accountable for it.
             </h2>
             <p className="mt-2 text-sm text-ink-mute">
-              Swipe horizontally to meet the leadership team across school, vocational, teacher training and engineering colleges.
+              Swipe horizontally to meet the governing board behind Satpuda's school, vocational, teacher training and engineering institutions.
             </p>
           </div>
 
@@ -482,7 +496,8 @@ export function LeadershipSection() {
             </div>
 
             <span className="font-display text-xs font-semibold text-ink">
-              0{activeIndex + 1} / 0{leadershipCards.length}
+              {String(activeIndex + 1).padStart(2, "0")} /{" "}
+              {String(leadershipCards.length).padStart(2, "0")}
             </span>
           </div>
         </div>

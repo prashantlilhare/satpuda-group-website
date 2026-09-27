@@ -1,54 +1,87 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import { Figure, Reveal, SectionHeading } from "../ui/Primitives";
+import { SectionHeading } from "../ui/Primitives";
+import { useReveal } from "../../hooks/useReveal";
 import { institutions } from "../../data/institutions";
-import { stagger } from "../ui/stagger";
+
+const number = (i) => String(i + 1).padStart(2, "0");
 
 /* ------------------------------------------------------------------ */
-/* Featured — the large block                                          */
+/* Desktop — four strips, one open at a time                           */
 /* ------------------------------------------------------------------ */
 
-function FeaturedInstitution({ item }) {
+/**
+ * One strip of the desktop band.
+ *
+ * Closed, it is a dark column carrying the institution's number and name
+ * set on its side; open, it takes most of the band and shows the photograph
+ * and the full copy. Pointing at a strip — or tabbing to it — opens it, so
+ * the band always has exactly one institution speaking. The whole strip is
+ * the link.
+ *
+ * The widening itself is a `flex-grow` transition in the stylesheet
+ * (`.inst-strip`), and each strip rises into the band from behind its own
+ * bottom edge, one after another, as the band arrives.
+ */
+function Strip({ item, index, open, onOpen }) {
   return (
-    // Flex column anchored to the bottom: the card grows to fit its copy rather
-    // than letting an absolutely-positioned block overflow and clip on narrow
-    // screens. The photograph is a background layer behind it.
     <Link
       to={item.to}
-      className="card-lift group on-dark relative isolate flex h-full min-h-[31rem] flex-col justify-end overflow-hidden bg-royal-950 focus-visible:outline-offset-4 sm:min-h-[33rem] lg:min-h-[34rem]"
+      data-open={open}
+      onMouseEnter={onOpen}
+      onFocus={onOpen}
+      style={{ "--strip-index": index }}
+      className="inst-strip group on-dark relative isolate flex min-w-0 overflow-hidden bg-royal-950 focus-visible:outline-offset-4"
     >
       <img
         src={item.image}
-        alt={item.imageAlt}
+        alt=""
         loading="lazy"
         decoding="async"
         style={{ objectPosition: "50% 55%" }}
-        className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
+        className="inst-strip-img absolute inset-0 -z-10 h-full w-full object-cover"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(12,21,41,0.95)_6%,rgba(12,21,41,0.7)_46%,rgba(12,21,41,0.2)_82%)] transition-opacity duration-500 group-hover:opacity-[0.94]"
+        className="inst-strip-scrim absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(12,21,41,0.96)_4%,rgba(12,21,41,0.66)_44%,rgba(12,21,41,0.15)_85%)]"
       />
 
-      <div className="relative p-7 sm:p-10">
-        <span className="inline-flex items-center gap-2.5 bg-ember-500 px-3.5 py-1.5 text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-white">
-          {item.kicker}
+      {/* closed: number and name on the strip's side */}
+      <div aria-hidden="true" className="inst-strip-label absolute inset-0 flex flex-col items-center justify-between py-8">
+        <span className="font-display text-sm font-semibold tabular-nums text-ember-300">
+          {number(index)}
         </span>
+        <span className="font-display text-[1.375rem] font-semibold tracking-[-0.015em] text-white [writing-mode:vertical-rl] rotate-180 whitespace-nowrap">
+          {item.shortName}
+        </span>
+        <ArrowUpRight className="h-5 w-5 text-white/55" />
+      </div>
 
-        <h3 className="t-h3 mt-5 max-w-lg text-white sm:!text-[2rem]">{item.name}</h3>
+      {/* open: the full copy, which arrives once the strip has widened */}
+      <div className="inst-strip-body relative mt-auto w-full min-w-[26rem] p-9 xl:p-11">
+        <div className="flex items-center gap-4">
+          <span className="font-display text-sm font-semibold tabular-nums text-ember-300">
+            {number(index)}
+          </span>
+          <span className="inline-flex bg-ember-500 px-3 py-1.5 text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-white">
+            {item.kicker}
+          </span>
+        </div>
 
-        <p className="mt-4 max-w-md text-[0.9375rem] leading-relaxed text-white/72">
+        <h3 className="t-h3 mt-5 max-w-lg text-white xl:!text-[2rem]">{item.name}</h3>
+
+        <p className="mt-4 max-w-md text-[0.9375rem] leading-relaxed text-white/75">
           {item.summary}
         </p>
 
-        <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
-          {item.credentials.map((c) => (
+        <ul className="mt-6 flex flex-wrap gap-2">
+          {item.highlights.map((h) => (
             <li
-              key={c}
-              className="flex items-center gap-2 text-[0.8125rem] font-medium text-white/65"
+              key={h}
+              className="border border-white/22 px-3 py-1.5 text-[0.8125rem] text-white/80"
             >
-              <span aria-hidden="true" className="h-1 w-1 shrink-0 bg-ember-400" />
-              {c}
+              {h}
             </li>
           ))}
         </ul>
@@ -69,99 +102,105 @@ function FeaturedInstitution({ item }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Supporting — the stacked blocks                                     */
-/* ------------------------------------------------------------------ */
+function StripBand() {
+  const [open, setOpen] = useState(0);
+  const [ref, visible] = useReveal({ threshold: 0.2 });
 
-function InstitutionRow({ item, index }) {
   return (
-    <Link
-      to={item.to}
-      className="group relative flex items-stretch gap-5 border-t border-stone-line py-6 transition-colors duration-400 hover:border-royal-600 sm:gap-7 sm:py-7"
+    <div
+      ref={ref}
+      data-visible={visible}
+      className="inst-band section-body hidden h-[34rem] gap-2 lg:flex xl:h-[36rem]"
     >
-      <span className="w-8 shrink-0 pt-1 font-display text-sm font-semibold tabular-nums text-ink-mute transition-colors duration-300 group-hover:text-ember-600">
-        {String(index).padStart(2, "0")}
-      </span>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-600">
-              {item.kicker}
-            </p>
-            <h3 className="mt-2 font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-ink transition-colors duration-300 group-hover:text-royal-700 sm:text-[1.375rem]">
-              {item.shortName}
-            </h3>
-          </div>
-
-          <ArrowUpRight
-            aria-hidden="true"
-            className="mt-1 h-5 w-5 shrink-0 text-ink-mute transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-ember-600"
-          />
-        </div>
-
-        <p className="mt-3 max-w-md text-[0.9375rem] leading-relaxed text-ink-soft">
-          {item.blurb}
-        </p>
-
-        {/* revealed on hover, desktop only — avoids hiding content on touch */}
-        <ul className="mt-3.5 hidden flex-wrap gap-x-4 gap-y-1.5 opacity-0 transition-opacity duration-400 group-hover:opacity-100 lg:flex">
-          {item.highlights.map((h) => (
-            <li key={h} className="text-[0.8125rem] text-ink-mute">
-              {h}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Small on a phone — enough to give the row a face without turning the
-          list into a gallery — and a step larger from `sm` up. Decorative:
-          the row's own heading already names the institution. */}
-      <div className="w-20 shrink-0 self-center overflow-hidden sm:w-28">
-        <Figure
-          src={item.thumb?.src ?? item.image}
-          srcSet={item.thumb?.srcSet}
-          sizes="(min-width: 640px) 7rem, 5rem"
-          alt=""
-          ratio="4 / 3"
-          position={item.thumb?.focus}
-          zoom
+      {institutions.map((item, i) => (
+        <Strip
+          key={item.id}
+          item={item}
+          index={i}
+          open={i === open}
+          onOpen={() => setOpen(i)}
         />
-      </div>
-    </Link>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Phone & tablet — cards that stack as they are scrolled past         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Below `lg` there is no pointer to open a strip with, so the four become
+ * full cards that pin under the header one after another: each new card
+ * slides up over the last and leaves a sliver of it showing, so by the end
+ * the four sit stacked like a hand of cards. Pure `position: sticky` — no
+ * scroll listener — with the offsets stepped by index.
+ */
+function StackCard({ item, index }) {
+  return (
+    <li
+      className="inst-stack-card sticky"
+      style={{ top: `calc(var(--nav-h-compact) + 1rem + ${index * 0.85}rem)` }}
+    >
+      <Link
+        to={item.to}
+        className="group on-dark relative isolate flex min-h-[27rem] flex-col justify-end overflow-hidden bg-royal-950 shadow-[0_-18px_40px_-24px_rgba(12,21,41,0.55)] sm:min-h-[30rem]"
+      >
+        <img
+          src={item.image}
+          alt={item.imageAlt}
+          loading="lazy"
+          decoding="async"
+          style={{ objectPosition: "50% 55%" }}
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(12,21,41,0.96)_8%,rgba(12,21,41,0.7)_50%,rgba(12,21,41,0.2)_88%)]"
+        />
+
+        <div className="p-6 sm:p-9">
+          <div className="flex items-center gap-3.5">
+            <span className="font-display text-sm font-semibold tabular-nums text-ember-300">
+              {number(index)}
+            </span>
+            <span className="inline-flex bg-ember-500 px-3 py-1.5 text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-white">
+              {item.kicker}
+            </span>
+          </div>
+          <h3 className="t-h3 mt-4 text-white">{item.name}</h3>
+          <p className="mt-3 max-w-md text-[0.9375rem] leading-relaxed text-white/75">
+            {item.blurb}
+          </p>
+          <span className="mt-6 inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-white">
+            Explore
+            <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+          </span>
+        </div>
+      </Link>
+    </li>
   );
 }
 
 /* ------------------------------------------------------------------ */
 
 export function InstitutionsSection() {
-  const featured = institutions.find((i) => i.featured);
-  const rest = institutions.filter((i) => !i.featured);
-
   return (
     <section className="section bg-paper-dim">
       <div className="shell">
-        <div className="flex flex-wrap items-end justify-between gap-8">
-          <SectionHeading
-            eyebrow="Our institutions"
-            title="One group. Four distinct routes through education."
-            lead="Each institution is built for a different stage and a different kind of learner — but they share a campus, a trust and a standard."
-          />
-        </div>
+        <SectionHeading
+          eyebrow="Our institutions"
+          title="One group. Four distinct routes through education."
+          lead="Each institution is built for a different stage and a different kind of learner — but they share a campus, a trust and a standard."
+        />
 
-        <div className="section-body grid gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-14 xl:gap-20">
-          <Reveal className="h-full">
-            <FeaturedInstitution item={featured} />
-          </Reveal>
+        <StripBand />
 
-          <Reveal delay={stagger(2)}>
-            <div className="border-b border-stone-line">
-              {rest.map((item, i) => (
-                <InstitutionRow key={item.id} item={item} index={i + 2} />
-              ))}
-            </div>
-          </Reveal>
-        </div>
+        <ul className="section-body flex flex-col gap-5 lg:hidden">
+          {institutions.map((item, i) => (
+            <StackCard key={item.id} item={item} index={i} />
+          ))}
+        </ul>
       </div>
     </section>
   );

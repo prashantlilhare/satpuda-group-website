@@ -55,6 +55,10 @@ import tradeAssembly from "../assets/images/gallery/trade-assembly.webp";
 import tradeAssemblySm from "../assets/images/gallery/trade-assembly-460w.webp";
 import rangoli from "../assets/images/gallery/rangoli.webp";
 import rangoliSm from "../assets/images/gallery/rangoli-460w.webp";
+import { shots, schoolShots, dedShots } from "./shots";
+
+/* A photograph from `shots.js`, framed for the marquee. */
+const pick = (s, shape) => frame(s.src, s.small, s.alt, shape);
 
 /**
  * One frame in the marquee.
@@ -79,6 +83,10 @@ const rowOne = [
   frame(corridorExhibits, corridorExhibitsSm, "Student project tables lining a teaching block corridor", "square"),
   frame(danceSolo, danceSoloSm, "A student performing a solo dance on the college stage", "upright"),
   frame(cncMachine, cncMachineSm, "A CNC machine being demonstrated to visitors in the workshop"),
+  pick(shots.civilLevel, "square"),
+  pick(shots.miningBriefing),
+  pick(schoolShots.choir, "square"),
+  pick(shots.cultural),
 ];
 
 /* Row two — people at work. */
@@ -91,6 +99,11 @@ const rowTwo = [
   frame(projectDemo, projectDemoSm, "A student explaining a working project model to visitors", "square"),
   frame(inauguration, inaugurationSm, "Staff at the ribbon-cutting of a new teaching space"),
   frame(electricalRig, electricalRigSm, "An electrical training rig standing ready in the laboratory", "square"),
+  pick(shots.mechGoKart),
+  pick(schoolShots.flagHoisting, "upright"),
+  pick(shots.elecTower),
+  pick(shots.mechEngineLab, "square"),
+  pick(dedShots.teaching),
 ];
 
 /* Row three — the wider campus. */
@@ -103,6 +116,11 @@ const rowThree = [
   frame(chartTalk, chartTalkSm, "A chart being presented to visitors on the exhibition floor", "square"),
   frame(studentAudience, studentAudienceSm, "Students in college blazers seated in the audience"),
   frame(juniorExhibit, juniorExhibitSm, "Junior students demonstrating their model to visiting guests", "square"),
+  pick(shots.civilTotalStation),
+  pick(shots.kabaddi, "square"),
+  pick(schoolShots.prizeGiving),
+  pick(shots.miningVisit, "square"),
+  pick(dedShots.faculty),
 ];
 
 /**

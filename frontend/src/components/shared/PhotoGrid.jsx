@@ -24,7 +24,13 @@ export function PhotoGrid({ items, ratio = "4 / 3", className = "" }) {
             position={item.focus}
           />
           {item.caption && (
-            <p className="mt-3 text-[0.8125rem] leading-snug text-ink-mute">{item.caption}</p>
+            <p className="mt-3 flex items-center text-[0.8125rem] leading-snug text-ink-mute transition-colors duration-500 group-hover:text-ink">
+              <span
+                aria-hidden="true"
+                className="h-px w-0 shrink-0 bg-ember-500 transition-[width,margin] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:mr-2 group-hover:w-5"
+              />
+              {item.caption}
+            </p>
           )}
         </Reveal>
       ))}

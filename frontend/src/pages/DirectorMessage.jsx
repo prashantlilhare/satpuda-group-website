@@ -1,14 +1,43 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Figure, Reveal } from "../components/ui/Primitives";
+import { Eyebrow, Figure, ReadMore, Reveal } from "../components/ui/Primitives";
 import { director, principal } from "../data/leadership";
 import { photo } from "../data/photos";
 import { useSeo } from "../hooks/useSeo";
+import { ScrollWords } from "../components/ui/ScrollWords";
 import { stagger } from "../components/ui/stagger";
 
+/**
+ * A thin ink rail down the left of the message that fills as it is read,
+ * with a nib riding its tip — a reading position for a long letter,
+ * rather than one more thing fading in. Desktop only; a phone already
+ * shows how far down the page is with its own scrollbar.
+ */
+function ReadingRail({ target }) {
+  const { scrollYProgress } = useScroll({ target, offset: ["start 55%", "end 70%"] });
+  const read = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 });
+  /* Transforms only — a scaled fill, and the nib riding a full-height
+     carrier moved by its own height — so following the reader never
+     costs a layout. */
+  const nib = useTransform(read, (v) => `${v * 100}%`);
+
+  return (
+    <div aria-hidden="true" className="absolute -left-10 bottom-0 top-2 hidden w-px bg-stone-line lg:block xl:-left-12">
+      <motion.span className="absolute inset-x-[-1px] inset-y-0 origin-top bg-ember-500" style={{ scaleY: read }} />
+      <motion.span className="absolute inset-x-0 inset-y-0" style={{ y: nib }}>
+        <span className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 border-2 border-ember-500 bg-paper" />
+      </motion.span>
+    </div>
+  );
+}
+
 export default function DirectorMessage() {
+  const messageRef = useRef(null);
+
   useSeo({
     title: "Director's Message",
     description:
@@ -19,6 +48,7 @@ export default function DirectorMessage() {
   return (
     <>
       <PageHero
+        motif="none"
         eyebrow="Leadership"
         title="Director's Message"
         lead={director.standfirst}
@@ -59,14 +89,15 @@ export default function DirectorMessage() {
             </div>
 
             {/* --- message column --- */}
-            <div>
+            <div ref={messageRef} className="relative">
+              <ReadingRail target={messageRef} />
               <Reveal>
                 <blockquote>
                   <p className="font-display text-[1.75rem] leading-[1.22] tracking-[-0.026em] text-ink sm:text-[2.25rem]">
                     <span aria-hidden="true" className="text-ember-500">
                       “
                     </span>
-                    {director.pullQuote}
+                    <ScrollWords as="span">{director.pullQuote}</ScrollWords>
                     <span aria-hidden="true" className="text-ember-500">
                       ”
                     </span>
@@ -78,6 +109,7 @@ export default function DirectorMessage() {
                 <hr className="rule my-10" />
               </Reveal>
 
+              <ReadMore mobileOnly>
               <div className="space-y-6 text-[1.0625rem] leading-[1.78] text-ink-soft">
                 {director.paragraphs.map((p, i) => (
                   <Reveal key={i} delay={stagger(2 + i)}>
@@ -87,6 +119,7 @@ export default function DirectorMessage() {
                   </Reveal>
                 ))}
               </div>
+              </ReadMore>
 
               {/* --- pillars --- */}
               <div className="section-body">
@@ -151,7 +184,7 @@ export default function DirectorMessage() {
             >
               <div className="flex items-center gap-6">
                 <div className="w-20 shrink-0 sm:w-24">
-                  <Figure src={principal.portrait} alt="" ratio="1 / 1" position="50% 18%" />
+                  <Figure src={principal.portrait} alt="" ratio="1 / 1" position="50% 18%" parallax={false} />
                 </div>
                 <div>
                   <p className="text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-600">

@@ -1,28 +1,42 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import { Button } from "../ui/Primitives";
+import { HeroRidge } from "../ui/Ridgeline";
 import { heroGroups, heroGroupStarts, heroPlaylist } from "../../data/hero";
 
 /** How long a single photograph holds before the next one fades in. */
 const DURATION = 3000;
 
-/* One frame of the wall: the photograph plus its readability scrims. */
-function Slide({ slide, active }) {
+/* One photograph of the wall. It starts its slow Ken Burns drift when it
+   mounts and keeps drifting after the next photograph has faded in over
+   it, so nothing ever snaps back to its starting scale. */
+function Slide({ slide }) {
   return (
-    <div aria-hidden="true" className="absolute inset-0">
-      <img
-        src={slide.src}
-        srcSet={slide.srcSet}
-        sizes="100vw"
-        alt=""
-        loading="eager"
-        decoding="async"
-        style={{ objectPosition: slide.focus }}
-        className={`h-full w-full object-cover ${active ? "kenburns" : "scale-[1.06]"}`}
-      />
-      {/* readability scrim: stronger at the bottom-left where copy sits */}
+    <img
+      src={slide.src}
+      srcSet={slide.srcSet}
+      sizes="100vw"
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      decoding="async"
+      style={{ objectPosition: slide.focus }}
+      className="kenburns absolute inset-0 h-full w-full object-cover"
+    />
+  );
+}
+
+/* The readability scrims, drawn once over the whole wall rather than once
+   per photograph — two stacked copies mid-fade would darken the picture
+   and then lift it again on every change. */
+function Scrims() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      {/* stronger at the bottom-left where copy sits */}
       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(12,21,41,0.92)_0%,rgba(12,21,41,0.72)_28%,rgba(12,21,41,0.36)_58%,rgba(12,21,41,0.22)_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(20,34,68,0.74)_0%,rgba(20,34,68,0.44)_38%,rgba(20,34,68,0.1)_72%,transparent_92%)]" />
+      {/* The copy column sits on near-solid navy, as on the institute
+          heroes; the wall only opens up past the middle of the band. */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(20,34,68,0.94)_0%,rgba(20,34,68,0.88)_34%,rgba(20,34,68,0.55)_58%,rgba(20,34,68,0.16)_82%,transparent_100%)]" />
       {/* Phone only. The copy fills most of a 70%-tall band there, so it can
           land on a bright wall or a white shirt in one slide and on shadow in
           the next; this holds the whole copy area dark enough for body text
@@ -30,6 +44,20 @@ function Slide({ slide, active }) {
       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(9,16,32,0.93)_0%,rgba(9,16,32,0.8)_46%,rgba(9,16,32,0.55)_72%,rgba(9,16,32,0.22)_92%,transparent_100%)] sm:hidden" />
     </div>
   );
+}
+
+/* Loads and decodes a photograph off-screen, once, so that when it is shown
+   the fade starts on a finished picture instead of a half-painted one. */
+const decoded = new Map();
+function preload(slide) {
+  if (!decoded.has(slide.src)) {
+    const img = new Image();
+    img.sizes = "100vw";
+    if (slide.srcSet) img.srcset = slide.srcSet;
+    img.src = slide.src;
+    decoded.set(slide.src, img.decode ? img.decode().catch(() => {}) : Promise.resolve());
+  }
+  return decoded.get(slide.src);
 }
 
 export function HeroSlider() {
@@ -43,6 +71,7 @@ export function HeroSlider() {
   // full-width hero — the slideshow simply never advanced.
   const [autoPaused, setAutoPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const sectionRef = useRef(null);
 
   const count = heroPlaylist.length;
   const index = frame.current;
@@ -92,21 +121,22 @@ export function HeroSlider() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  /* --- autoplay --------------------------------------------------- */
+  /* --- autoplay: wait out the hold, and for the next photograph to be
+     decoded, whichever is later ------------------------------------- */
   useEffect(() => {
     if (paused) return;
-    const t = setTimeout(next, DURATION);
-    return () => clearTimeout(t);
-  }, [index, paused, next]);
-
-  /* --- warm the next photograph so the fade never lands on nothing - */
-  useEffect(() => {
-    const upcoming = heroPlaylist[(index + 1) % count];
-    const img = new Image();
-    img.sizes = "100vw";
-    img.srcset = upcoming.srcSet;
-    img.src = upcoming.src;
-  }, [index, count]);
+    let cancelled = false;
+    const ready = preload(heroPlaylist[(index + 1) % count]);
+    const t = setTimeout(() => {
+      ready.then(() => {
+        if (!cancelled) next();
+      });
+    }, DURATION);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [index, paused, next, count]);
 
   /* --- pause while the tab is in the background ------------------- */
   useEffect(() => {
@@ -128,6 +158,7 @@ export function HeroSlider() {
 
   return (
     <section
+      ref={sectionRef}
       aria-roledescription="carousel"
       aria-label="Satpuda Group highlights"
       onKeyDown={onKeyDown}
@@ -142,13 +173,18 @@ export function HeroSlider() {
          body box — so the banner is the same height whatever the headline. */
       className="hero-band on-dark relative isolate flex w-full overflow-hidden bg-royal-950"
     >
-      {/* ---------- photo wall ---------- */}
-      {frame.previous !== null && (
-        <Slide key="under" slide={heroPlaylist[frame.previous]} />
-      )}
-      <div key={`over-${index}`} className="hero-fade absolute inset-0">
-        <Slide slide={slide} active />
-      </div>
+      {/* ---------- photo wall ----------
+          Keyed by photograph, so the one being faded over is the same
+          element that was on screen a moment ago — still mid-drift —
+          rather than a fresh copy restarting underneath. */}
+      {[frame.previous, index]
+        .filter((i) => i !== null && i !== undefined)
+        .map((i) => (
+          <div key={`slide-${i}`} className={`absolute inset-0 overflow-hidden ${i === index ? "hero-fade" : ""}`}>
+            <Slide slide={heroPlaylist[i]} />
+          </div>
+        ))}
+      <Scrims />
 
       {/* ---------- copy ----------
           Keyed by headline, not by photograph: the copy animates in when the
@@ -264,6 +300,9 @@ export function HeroSlider() {
           </div>
         </div>
       </div>
+
+      {/* the lower edge, cut as the Satpuda hills */}
+      <HeroRidge target={sectionRef} />
 
       {/* screen-reader announcement of the current slide */}
       <p aria-live="polite" aria-atomic="true" className="sr-only">

@@ -1,9 +1,12 @@
 import { Suspense, useEffect } from "react";
 import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
+import { MotionConfig } from "motion/react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { SocialRail } from "./SocialRail";
 import { SmoothScroll } from "./SmoothScroll";
+import { BackToTop, ScrollProgress } from "../ui/Motion";
+import { useCardPointer } from "../../hooks/useCardPointer";
 
 /** Route-level loading state — quiet, and sized so the footer never jumps up. */
 function RouteFallback() {
@@ -38,11 +41,13 @@ function useFocusMainOnNavigate() {
 
 export function Layout() {
   useFocusMainOnNavigate();
+  useCardPointer();
   const { pathname } = useLocation();
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <SmoothScroll />
+      <ScrollProgress />
 
       <a
         href="#main"
@@ -74,8 +79,9 @@ export function Layout() {
 
       {/* Site-wide contact rail — fixed to the right edge on every route. */}
       <SocialRail />
+      <BackToTop />
 
       <ScrollRestoration />
-    </>
+    </MotionConfig>
   );
 }

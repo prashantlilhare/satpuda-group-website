@@ -1,271 +1,13 @@
-import { useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Mail, MapPin, Phone, Clock, ExternalLink } from "lucide-react";
+import { Mail, MapPin, Phone, Clock, ExternalLink } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
-import { Button, Eyebrow, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
+import { Eyebrow, Reveal, SectionHeading, TextLink } from "../components/ui/Primitives";
+import { AdmissionGlance, AdmissionSteps } from "../components/shared/AdmissionDesk";
 import { contact, instituteLinks } from "../data/site";
-import { photo } from "../data/photos";
 import { campusImages } from "../data/about";
+import { photo } from "../data/photos";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
-
-/* ------------------------------------------------------------------ */
-/* FORM                                                                */
-/* ------------------------------------------------------------------ */
-
-const SUBJECTS = [
-  "B.Tech admission",
-  "Diploma / Polytechnic admission",
-  "ITI trade admission",
-  "School admission",
-  "D.Ed / B.Ed enquiry",
-  "Something else",
-];
-
-const EMPTY = { name: "", email: "", phone: "", subject: SUBJECTS[0], message: "" };
-
-function validate(values) {
-  const errors = {};
-  if (!values.name.trim()) errors.name = "Please enter your name.";
-  if (!values.email.trim()) {
-    errors.email = "Please enter an email address.";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email.trim())) {
-    errors.email = "That email address doesn't look right.";
-  }
-  const digits = values.phone.replace(/\D/g, "");
-  if (!values.phone.trim()) {
-    errors.phone = "Please enter a phone number.";
-  } else if (digits.length < 10) {
-    errors.phone = "Please enter a phone number with at least 10 digits.";
-  }
-  if (!values.message.trim()) {
-    errors.message = "Please tell us how we can help.";
-  } else if (values.message.trim().length < 10) {
-    errors.message = "A little more detail would help us answer properly.";
-  }
-  return errors;
-}
-
-function Field({ label, name, error, children, hint }) {
-  return (
-    /* `group` + `focus-within` so the label follows its own control into
-       focus — the field being filled in is then legible from the label
-       down, not just from the border. */
-    <div className="group">
-      <label
-        htmlFor={name}
-        className="block text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute transition-colors duration-300 group-focus-within:text-royal-700"
-      >
-        {label}
-      </label>
-      <div className="mt-2.5">{children}</div>
-      {hint && !error && <p className="mt-2 text-[0.8125rem] text-ink-mute">{hint}</p>}
-      {error && (
-        <p id={`${name}-error`} role="alert" className="mt-2 text-[0.8125rem] font-medium text-ember-600">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-/* The focus state is a tinted halo rather than the platform ring: the field
-   is already bordered, so a second hard outline around it reads as an error.
-   `box-shadow` rather than `ring`, so nothing is added to the layout. */
-const inputCls =
-  "w-full border border-stone-line bg-white px-4 py-3.5 text-[0.9375rem] text-ink " +
-  "transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] " +
-  "placeholder:text-ink-mute/70 hover:border-royal-300 " +
-  "focus:border-royal-600 focus:shadow-[0_0_0_3px_rgba(41,71,145,0.12)] " +
-  "focus:outline-none focus-visible:outline-none";
-
-function ContactForm() {
-  const [values, setValues] = useState(EMPTY);
-  const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
-  const formId = useId();
-  const successRef = useRef(null);
-
-  const update = (e) => {
-    const { name, value } = e.target;
-    setValues((v) => ({ ...v, [name]: value }));
-    if (errors[name]) setErrors((err) => ({ ...err, [name]: undefined }));
-  };
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-    const found = validate(values);
-    setErrors(found);
-    if (Object.keys(found).length > 0) {
-      const first = document.getElementById(Object.keys(found)[0]);
-      first?.focus();
-      return;
-    }
-    setSubmitted(true);
-    requestAnimationFrame(() => successRef.current?.focus());
-  };
-
-  if (submitted) {
-    return (
-      <div
-        ref={successRef}
-        tabIndex={-1}
-        className="border border-royal-200 bg-royal-50 p-8 focus-visible:outline-none sm:p-10"
-      >
-        <CheckCircle2 aria-hidden="true" className="h-9 w-9 text-royal-600" />
-        <h3 className="mt-5 font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink">
-          Your details are ready to send, {values.name.split(" ")[0]}.
-        </h3>
-        <p className="mt-4 text-[0.9375rem] leading-[1.7] text-ink-soft">
-          This form is the front end of a site whose server is still being built, so nothing has
-          been transmitted yet. Until it is connected, the fastest way to reach us is directly:
-        </p>
-
-        <div className="mt-7 flex flex-wrap gap-3">
-          <Button href={contact.phones[0].href} variant="primary" arrow={false}>
-            <Phone aria-hidden="true" className="h-4 w-4" />
-            {contact.phones[0].label}
-          </Button>
-          <Button
-            href={`mailto:${contact.email}?subject=${encodeURIComponent(
-              `${values.subject} — enquiry from ${values.name}`,
-            )}&body=${encodeURIComponent(
-              `${values.message}\n\n—\n${values.name}\n${values.phone}\n${values.email}`,
-            )}`}
-            variant="outline"
-            arrow={false}
-          >
-            <Mail aria-hidden="true" className="h-4 w-4" />
-            Send this as an email
-          </Button>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            setValues(EMPTY);
-            setSubmitted(false);
-          }}
-          className="link-underline mt-8 text-[0.875rem] font-semibold text-royal-700"
-        >
-          Write another enquiry
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={onSubmit} noValidate aria-labelledby={`${formId}-title`}>
-      <h3 id={`${formId}-title`} className="sr-only">
-        Enquiry form
-      </h3>
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Field label="Full name" name="name" error={errors.name}>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            autoComplete="name"
-            value={values.name}
-            onChange={update}
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? "name-error" : undefined}
-            placeholder="Your name"
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Phone" name="phone" error={errors.phone}>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            value={values.phone}
-            onChange={update}
-            aria-invalid={!!errors.phone}
-            aria-describedby={errors.phone ? "phone-error" : undefined}
-            placeholder="+91"
-            className={inputCls}
-          />
-        </Field>
-
-        <div className="sm:col-span-2">
-          <Field label="Email" name="email" error={errors.email}>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={values.email}
-              onChange={update}
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              placeholder="you@example.com"
-              className={inputCls}
-            />
-          </Field>
-        </div>
-
-        <div className="sm:col-span-2">
-          <Field label="I'm enquiring about" name="subject">
-            <select
-              id="subject"
-              name="subject"
-              value={values.subject}
-              onChange={update}
-              className={`${inputCls} appearance-none bg-[length:1.1rem] bg-[right_1rem_center] bg-no-repeat pr-11`}
-              style={{
-                backgroundImage:
-                  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d766d' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>\")",
-              }}
-            >
-              {SUBJECTS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-
-        <div className="sm:col-span-2">
-          <Field
-            label="Message"
-            name="message"
-            error={errors.message}
-            hint="Tell us the student's current class or qualification — it helps us answer precisely."
-          >
-            <textarea
-              id="message"
-              name="message"
-              rows={5}
-              value={values.message}
-              onChange={update}
-              aria-invalid={!!errors.message}
-              aria-describedby={errors.message ? "message-error" : undefined}
-              placeholder="How can we help?"
-              className={`${inputCls} resize-y`}
-            />
-          </Field>
-        </div>
-      </div>
-
-      <div className="mt-8 flex flex-wrap items-center gap-5">
-        <Button type="submit">Send enquiry</Button>
-        <p className="text-[0.8125rem] text-ink-mute">
-          We usually reply within one working day.
-        </p>
-      </div>
-    </form>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* PAGE                                                                */
-/* ------------------------------------------------------------------ */
 
 export default function Contact() {
   useSeo({
@@ -282,14 +24,15 @@ export default function Contact() {
   return (
     <>
       <PageHero
+        motif="none"
         eyebrow="Get in touch"
         title="Contact Satpuda Group"
-        lead="One campus, four institutions. Tell us who the student is and what stage they're at, and we'll point you to the right person."
+        lead="One campus, four institutions, one admission office. Everything you need before you call or visit is on this page."
         crumbs={[{ label: "Contact" }]}
         image={photo("0043", "Students at a session on the Satpuda campus", "50% 38%")}
       />
 
-      {/* ---------------- details + form ---------------- */}
+      {/* ---------------- details + admissions ---------------- */}
       <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
@@ -383,22 +126,14 @@ export default function Contact() {
               </Reveal>
             </div>
 
-            {/* --- form --- */}
-            <div>
-              <Reveal>
-                <SplitText as="h2" className="t-h2 block text-ink">Send us an enquiry.</SplitText>
-                <p className="t-lead mt-5 max-w-xl">
-                  Fill this in and we will get back to you, or call the numbers alongside if it is
-                  urgent.
-                </p>
-              </Reveal>
-              <Reveal delay={stagger(2)} className="mt-10">
-                <ContactForm />
-              </Reveal>
-            </div>
+            {/* --- admissions --- */}
+            <AdmissionGlance />
           </div>
         </div>
       </section>
+
+      {/* ---------------- before you visit ---------------- */}
+      <AdmissionSteps />
 
       {/* ---------------- institution routing ---------------- */}
       <section className="section bg-paper-dim">

@@ -143,10 +143,11 @@ export function ProgramsSection() {
                   </div>
 
                   <ul className="mt-6 flex flex-wrap gap-2">
-                    {family.items.map((item) => (
+                    {family.items.map((item, j) => (
                       <li
                         key={item}
-                        className="border border-stone-line px-3 py-1.5 text-[0.8125rem] text-ink-soft transition-colors duration-300 group-hover:border-royal-200 group-hover:bg-royal-50"
+                        style={{ "--chip-index": j }}
+                        className="prog-chip border border-stone-line px-3 py-1.5 text-[0.8125rem] text-ink-soft group-hover:border-royal-200 group-hover:bg-royal-50 group-data-[active=true]:border-royal-200 group-data-[active=true]:bg-royal-50"
                       >
                         {item}
                       </li>

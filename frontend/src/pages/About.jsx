@@ -1,14 +1,20 @@
+import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Eyebrow, Figure, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
-import { campusImages, values } from "../data/about";
+import { StoryJourney } from "../components/shared/StoryJourney";
+import { Eyebrow, Fact, Figure, ReadMore, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
+import { values } from "../data/about";
 import { photo } from "../data/photos";
-import { institutions, milestones } from "../data/institutions";
+import { institutions } from "../data/institutions";
+import { prologuePhotos, storyChapters, thenNow } from "../data/story";
 import { site, sources } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
+
+/** Whole years since the first institute opened. */
+const YEARS = new Date().getFullYear() - 1999;
 
 export default function About() {
   useSeo({
@@ -21,9 +27,10 @@ export default function About() {
   return (
     <>
       <PageHero
+        motif="ridge"
         eyebrow="About us"
-        title="An educational group built in Balaghat, for Balaghat."
-        lead="Four institutions under one trust, covering the distance from a Class 1 classroom to a degree in engineering."
+        title="From one workshop floor to a campus that runs Class 1 to B.Tech."
+        lead="The story of how a single industrial training institute in Balaghat grew, one step at a time, into four institutions under one trust."
         crumbs={[{ label: "About Us" }]}
         image={photo("0041", "Students filling the campus hall for a group-wide session", "50% 40%")}
         imageAlt=""
@@ -32,9 +39,11 @@ export default function About() {
       {/* ---------------- editorial opening ---------------- */}
       <section className="section bg-paper">
         <div className="shell">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16 items-start">
-            {/* Left Column: Bold Headline & Trust Highlight Card */}
-            <div className="space-y-6">
+          <div className="grid gap-10 sm:gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+            {/* Left Column: Bold Headline & Trust Highlight Card — heading
+                sits at the top, card at the bottom, so both edges line up
+                with the photo grid beside it. */}
+            <div className="flex flex-col gap-8 lg:justify-between">
               <Reveal>
                 <Eyebrow>The Story · Since 1999</Eyebrow>
                 <h2 className="mt-4 font-display text-2xl sm:text-3xl lg:text-[2.25rem] font-bold leading-[1.24] tracking-tight text-ink">
@@ -69,7 +78,7 @@ export default function About() {
                       <span className="text-[10px] font-semibold text-ink-mute uppercase tracking-wider">Founded</span>
                     </div>
                     <div className="rounded-lg bg-white/70 py-2 border border-stone-line/50">
-                      <span className="block font-display text-lg font-bold text-ember-600">04</span>
+                      <span className="block font-display text-lg font-bold text-ember-600">4</span>
                       <span className="text-[10px] font-semibold text-ink-mute uppercase tracking-wider">Institutes</span>
                     </div>
                     <div className="rounded-lg bg-white/70 py-2 border border-stone-line/50">
@@ -81,104 +90,144 @@ export default function About() {
               </Reveal>
             </div>
 
-            {/* Right Column: Narrative Phase Cards with Micro-animations.
-                Desktop only — on a phone the three phase cards stacked below
-                the trust card turned the opening into a long scroll of body
-                copy before anything else on the page. */}
-            <div className="hidden space-y-4 lg:block">
-              <Reveal delay={stagger(1)}>
-                <div className="group rounded-2xl border border-stone-line/70 bg-white p-6 shadow-xs transition-all duration-400 hover:-translate-y-1 hover:border-royal-400 hover:shadow-md">
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ember-600">
-                      <span className="h-1.5 w-1.5 rounded-full bg-ember-500 animate-pulse" />
-                      The Industrial Roots · 1999
-                    </span>
-                    <span className="text-xs font-mono font-semibold text-ink-mute">Phase 01</span>
-                  </div>
-                  <p className="text-[0.9375rem] leading-[1.7] text-ink-soft transition-colors duration-300 group-hover:text-ink">
-                    {site.trust} opened Satpuda ITI at Garra in 1999. Balaghat sits in a mineral belt
-                    with real industrial demand, and the trades it certified — electrician, fitter,
-                    diesel mechanic — were the ones that local employers were actually hiring for.
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delay={stagger(2)}>
-                <div className="group rounded-2xl border border-stone-line/70 bg-white p-6 shadow-xs transition-all duration-400 hover:-translate-y-1 hover:border-royal-400 hover:shadow-md">
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-royal-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-royal-600" />
-                      Schooling & Engineering Expansion · 2009 Onward
-                    </span>
-                    <span className="text-xs font-mono font-semibold text-ink-mute">Phase 02</span>
-                  </div>
-                  <p className="text-[0.9375rem] leading-[1.7] text-ink-soft transition-colors duration-300 group-hover:text-ink">
-                    A CBSE-affiliated school, Satpuda Valley Public School, followed in 2009, taking
-                    the trust's work back to the start of a student's education. The Satpuda campus
-                    at Manjhapur now also carries degree and diploma engineering approved by AICTE
-                    and affiliated to Rajiv Gandhi Proudyogiki Vishwavidyalaya, Bhopal, along with
-                    teacher education programmes.
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delay={stagger(3)}>
-                <div className="group rounded-2xl border border-stone-line/70 bg-white p-6 shadow-xs transition-all duration-400 hover:-translate-y-1 hover:border-royal-400 hover:shadow-md">
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-royal-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-royal-600" />
-                      The Unified Regional Campus
-                    </span>
-                    <span className="text-xs font-mono font-semibold text-ink-mute">Today</span>
-                  </div>
-                  <p className="text-[0.9375rem] leading-[1.7] text-ink-soft transition-colors duration-300 group-hover:text-ink">
-                    The result is unusual for a district of this size: a single group that can take a
-                    student from primary school to an engineering degree, or give a Class 10 leaver a
-                    trade certificate and a route into employment — on one campus, under one trust.
-                  </p>
-                </div>
-              </Reveal>
+            {/* Right Column: the campus as it is used today, in three frames —
+                the place the story below arrives at. */}
+            <div className="grid grid-cols-2 grid-rows-2 gap-4 sm:gap-5">
+              {prologuePhotos.map((img, i) => (
+                <Reveal
+                  key={img.id}
+                  delay={stagger(i)}
+                  className={`group h-full ${i === 0 ? "row-span-2" : ""}`}
+                >
+                  <Figure
+                    mask
+                    src={img.src}
+                    srcSet={img.srcSet}
+                    sizes="(min-width: 1024px) 23vw, 50vw"
+                    alt={img.alt}
+                    position={img.focus}
+                    ratio={i === 0 ? "3 / 4" : "4 / 3"}
+                    className="h-full rounded-xl"
+                  />
+                </Reveal>
+              ))}
             </div>
-          </div>
-
-          {/* --- image band --- */}
-          <div className="section-body grid gap-5 sm:grid-cols-3">
-            {[
-              { src: campusImages.campusFront, alt: "The Satpuda college building from its front approach" },
-              { src: campusImages.seminarHall, alt: "A seminar session in the campus hall" },
-              { src: campusImages.librarySmart, alt: "The campus smart library" },
-            ].map((img, i) => (
-              <Reveal key={img.src} delay={stagger(i)} className="group">
-                <Figure src={img.src} alt={img.alt} ratio="4 / 3" />
-              </Reveal>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ---------------- milestones ---------------- */}
+      {/* ---------------- the journey, chapter by chapter ---------------- */}
       <section className="section bg-paper-dim">
         <div className="shell">
-          <SectionHeading eyebrow="Milestones" title="How the group grew." />
+          <SectionHeading
+            eyebrow="The journey · 1999 – today"
+            title="Five chapters, one range of hills."
+            lead="Every new institution raised another peak. Scroll through the years and watch a single hill become the Satpuda range."
+          />
 
-          <ol className="section-body grid gap-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
-            {milestones.map((m, i) => (
-              <Reveal key={m.year} delay={stagger(i)}>
-                <li className="border-t-2 border-royal-600 pt-7">
-                  <p
-                    className="font-display text-[2.25rem] font-semibold leading-none tracking-[-0.03em] text-royal-700"
-                    style={{ fontVariationSettings: '"opsz" 72' }}
-                  >
-                    {m.year}
-                  </p>
-                  <h3 className="mt-5 font-display text-[1.1875rem] font-semibold tracking-[-0.018em] text-ink">
-                    {m.title}
-                  </h3>
-                  <p className="mt-3.5 text-[0.9375rem] leading-[1.7] text-ink-soft">{m.body}</p>
-                </li>
-              </Reveal>
-            ))}
-          </ol>
+          <div className="section-body">
+            <StoryJourney chapters={storyChapters} />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- then and now ---------------- */}
+      <section className="section on-dark bg-royal-900 text-white">
+        <div className="shell">
+          <div className="max-w-2xl">
+            <Reveal>
+              <Eyebrow>Then, and now</Eyebrow>
+            </Reveal>
+            <SplitText as="h2" delay={90} className="t-h2 mt-5 block text-white">
+              {`What ${YEARS} years changed.`}
+            </SplitText>
+            <Reveal delay={stagger(2)}>
+              <p className="mt-5 max-w-xl text-white/65">
+                Read each row from left to right — where we started in 1999, and where we stand today.
+              </p>
+            </Reveal>
+          </div>
+
+          <div className="section-body">
+            {/* column key — tells the reader how to read every row */}
+            <div
+              aria-hidden="true"
+              className="hidden grid-cols-[14rem_9rem_1fr_9rem] gap-8 pb-4 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] sm:grid"
+            >
+              <span className="text-white/40">What we count</span>
+              <span className="text-white/50">In 1999</span>
+              <span />
+              <span className="text-right text-ember-300">Today</span>
+            </div>
+
+            <div className="divide-y divide-white/12 border-y border-white/12">
+              {thenNow.map((row, i) => {
+                const thenIsNumber = /^\d+$/.test(row.then);
+                return (
+                  <Reveal key={row.label} delay={stagger(i)}>
+                    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-5 py-7 sm:grid-cols-[14rem_9rem_1fr_9rem] sm:gap-8">
+                      <div className="col-span-3 sm:col-span-1">
+                        <p className="text-[0.8125rem] font-semibold uppercase tracking-[0.15em] text-white/80">
+                          {row.label}
+                        </p>
+                        {row.sub && (
+                          <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-white/50">{row.sub}</p>
+                        )}
+                      </div>
+
+                      {/* then */}
+                      <div>
+                        <span className="mb-1 block text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-white/40 sm:hidden">
+                          In 1999
+                        </span>
+                        <p
+                          className={`font-display font-semibold leading-none tracking-[-0.03em] text-white/45 tabular-nums ${
+                            thenIsNumber ? "text-[clamp(2rem,3.8vw,2.75rem)]" : "text-[clamp(1.25rem,2.2vw,1.625rem)]"
+                          }`}
+                        >
+                          {row.then}
+                        </p>
+                        <p className="mt-2 text-[0.8125rem] text-white/45">{row.thenUnit}</p>
+                      </div>
+
+                      {/* the distance travelled, drawn across as it arrives */}
+                      <div className="relative flex flex-col items-center justify-center">
+                        {row.change && (
+                          <motion.span
+                            className="mb-2 rounded-full border border-ember-400/40 bg-ember-500/10 px-2.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-ember-300"
+                            initial={{ opacity: 0, y: 6 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "0px 0px -15% 0px" }}
+                            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.9 + i * 0.12 }}
+                          >
+                            {row.change}
+                          </motion.span>
+                        )}
+                        <motion.span
+                          aria-hidden="true"
+                          className="relative block h-px w-full origin-left bg-gradient-to-r from-white/15 to-ember-400"
+                          initial={{ scaleX: 0 }}
+                          whileInView={{ scaleX: 1 }}
+                          viewport={{ once: true, margin: "0px 0px -15% 0px" }}
+                          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.25 + i * 0.12 }}
+                        >
+                          <span className="absolute -right-1 -top-[3px] h-[7px] w-[7px] rotate-45 border-r border-t border-ember-400" />
+                        </motion.span>
+                      </div>
+
+                      {/* now */}
+                      <div className="text-right">
+                        <span className="mb-1 block text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ember-300 sm:hidden">
+                          Today
+                        </span>
+                        <Fact value={row.now} label={row.nowUnit} dark />
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -186,9 +235,9 @@ export default function About() {
       <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
-            eyebrow="The institutions"
+            eyebrow="Where the story stands today"
             title="Four institutions, one trust."
-            lead="Each has its own affiliation, its own intake and its own teaching staff."
+            lead="Every chapter left something standing. Each has its own affiliation, its own intake and its own teaching staff."
           />
 
           <div className="section-body grid gap-6 sm:grid-cols-2 lg:gap-8">
@@ -196,6 +245,7 @@ export default function About() {
               <Reveal key={inst.id} delay={stagger(i % 2)}>
                 <Link
                   to={inst.to}
+                  data-tilt
                   className="group relative flex h-full min-h-[340px] flex-col justify-between overflow-hidden rounded-2xl border border-stone-line/60 bg-royal-950 p-6 sm:min-h-[380px] sm:p-8 shadow-md transition-all duration-500 hover:shadow-2xl hover:border-ember-500/50"
                 >
                   {/* Background Image */}
@@ -281,16 +331,42 @@ export default function About() {
                 <Eyebrow>What we hold to</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
-                <SplitText as="h2" className="t-h2 mt-5 block text-white">Six values, used as tests.</SplitText>
+                <SplitText as="h2" className="t-h2 mt-5 block text-white">Everything changed, except these six.</SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
                 <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
-                  They are the questions we ask when a decision about teaching, discipline or
-                  admissions is genuinely difficult.
+                  New programmes, new buildings, a new campus — and through all of it, the same
+                  questions we ask when a decision about teaching, discipline or admissions is
+                  genuinely difficult.
                 </p>
               </Reveal>
               <Reveal delay={stagger(3)}>
-                <p className="motto mt-10 text-2xl text-ember-300">{site.motto}</p>
+                {/* The motto is written on as if with a brush, left to
+                    right, and underlined with one stroke. */}
+                <div className="relative mt-10 inline-block">
+                  <motion.p
+                    className="motto pb-2 text-2xl text-ember-300"
+                    initial={{ clipPath: "inset(0 100% 0 0)" }}
+                    whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+                    viewport={{ once: true, margin: "0px 0px -15% 0px" }}
+                    transition={{ duration: 1.6, ease: [0.65, 0, 0.35, 1], delay: 0.2 }}
+                  >
+                    {site.motto}
+                  </motion.p>
+                  <svg aria-hidden="true" viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-3 w-full">
+                    <motion.path
+                      d="M2 8 C50 3 120 11 198 4"
+                      fill="none"
+                      stroke="var(--color-ember-400)"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true, margin: "0px 0px -15% 0px" }}
+                      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 1.7 }}
+                    />
+                  </svg>
+                </div>
                 <p className="mt-2 text-sm italic text-white/60">“{site.mottoMeaning}”</p>
               </Reveal>
             </div>
@@ -321,11 +397,13 @@ export default function About() {
               <h2 className="text-[0.6875rem] font-semibold uppercase tracking-[0.17em] text-ink-mute">
                 Official sources
               </h2>
-              <p className="mt-4 max-w-2xl text-[0.9375rem] leading-relaxed text-ink-soft">
-                Institutional facts on this site are drawn from the group's own published material.
-                Figures that change every session — fees, intake and admission dates — are not
-                published here; please contact the institution for those.
-              </p>
+              <ReadMore mobileOnly className="mt-4 max-w-2xl">
+                <p className="text-[0.9375rem] leading-relaxed text-ink-soft">
+                  Institutional facts on this site are drawn from the group's own published material.
+                  Figures that change every session — fees, intake and admission dates — are not
+                  published here; please contact the institution for those.
+                </p>
+              </ReadMore>
               <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
                 {sources.map((s) => (
                   <li key={s.href}>

@@ -1,32 +1,47 @@
 import { useState } from "react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
+import { InstituteGallery } from "../components/shared/InstituteGallery";
+import { PrincipalDesk } from "../components/shared/PrincipalDesk";
+import { AboutCollage } from "../components/shared/AboutCollage";
+import { RouteMap } from "../components/shared/RouteMap";
 import { Eyebrow, Fact, Figure, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { btechBranches, diplomaBranches, engineeringAdmission } from "../data/programs";
-import { photo } from "../data/photos";
 import { campusImages } from "../data/about";
+import { photo } from "../data/photos";
+import { shots } from "../data/shots";
 import { getInstitution } from "../data/institutions";
 import { useSeo } from "../hooks/useSeo";
+import { Stamp } from "../components/ui/Stamp";
 import { stagger } from "../components/ui/stagger";
 
 const inst = getInstitution("btech-polytechnic");
 
+/* The seal pressed beside each credential, index-aligned with
+   `inst.credentials`: AICTE, RGPV, DTE. */
+const seals = [
+  { ring: "APPROVED", label: "AICTE" },
+  { ring: "AFFILIATED", label: "RGPV" },
+  { ring: "APPROVED", label: "DTE MP" },
+];
+
+/* Each branch card shows that department at work. */
 const btechBranchImages = {
-  CSE: campusImages.computerLab,
-  MIN: campusImages.campusAerial,
-  CIV: campusImages.campusFront,
-  MECH: campusImages.workshop,
-  EE: campusImages.electronicsBench,
+  CSE: { src: campusImages.computerLab, focus: "50% 50%" },
+  MIN: shots.miningBriefing,
+  CIV: shots.civilLevel,
+  MECH: shots.mechGoKart,
+  EE: shots.elecBench,
 };
 
 // Index-aligned with `diplomaBranches`: computing, civil, electrical,
 // mechanical, mining.
 const diplomaBranchImages = [
-  campusImages.computerLab,
-  campusImages.campusFront,
-  campusImages.electronicsBench,
-  campusImages.workshop,
-  campusImages.campusAerial,
+  { src: campusImages.computerLab, focus: "50% 50%" },
+  shots.civilTotalStation,
+  shots.elecTower,
+  shots.mechEngineLab,
+  shots.miningPlant,
 ];
 
 const facilities = [
@@ -39,14 +54,14 @@ const facilities = [
   {
     title: "Electrical & electronics labs",
     body: "Machines, measurement and circuits benches where students run the experiments themselves rather than watch them.",
-    image: campusImages.electronicsBench,
-    alt: "Students at an electrical measurement bench",
+    image: shots.elecBench.src,
+    alt: shots.elecBench.alt,
   },
   {
     title: "Library & reading rooms",
-    body: "A smart library with catalogue terminals and quiet study desks, alongside open reference stacks.",
-    image: campusImages.librarySmart,
-    alt: "The campus smart library",
+    body: "A library with open reference stacks, departmental collections and quiet study desks.",
+    image: shots.library.src,
+    alt: shots.library.alt,
   },
   {
     title: "Seminar hall",
@@ -54,6 +69,35 @@ const facilities = [
     image: campusImages.seminarHall,
     alt: "A full seminar hall during a technical session",
   },
+];
+
+/* Beside the short "about" copy: the institution at a glance. */
+const aboutPhotos = [
+  { src: campusImages.campusFront, alt: "The Satpuda College of Engineering & Polytechnic building" },
+  { src: campusImages.computerLab, alt: "A Satpuda computing laboratory in use" },
+  { src: campusImages.campusAerial, alt: "The Satpuda campus seen across its lawns" },
+];
+
+/* The gallery ring near the foot of the page. */
+const ringPhotos = [
+  { ...shots.civilTotalStation, caption: "Surveying with the total station" },
+  { ...shots.civilExpo, caption: "Civil models at the project expo" },
+  { ...shots.mechGoKart, caption: "The go-kart our mechanical students built" },
+  { ...shots.elecTower, caption: "Stringing a model transmission line" },
+  { ...shots.miningVisit, caption: "Off on an industrial visit" },
+  { ...shots.civilSiteVisit, caption: "On a bridge construction site" },
+  { ...photo("0037", "The electrical engineering laboratory in use", "50% 45%"), caption: "The electrical engineering laboratory" },
+  { ...photo("0046", "A collaborative robot being demonstrated in the laboratory", "50% 45%"), caption: "The collaborative robot" },
+  { ...photo("0022", "The cobot training cell in the robotics laboratory", "50% 45%"), caption: "The cobot training cell" },
+  { ...photo("0039", "The PCB design and electronics manufacturing laboratory", "50% 45%"), caption: "PCB design and manufacturing lab" },
+  { ...photo("0047", "Visitors at the CNC simulator in the mechanical engineering laboratory", "50% 45%"), caption: "The CNC simulator" },
+  { ...photo("0026", "Students presenting working models at the project exhibition", "50% 45%"), caption: "The project exhibition" },
+  { src: campusImages.computerLab, alt: "A Satpuda computing laboratory in use", caption: "Computing laboratory" },
+  { ...shots.library, caption: "The library" },
+  { src: campusImages.seminarHall, alt: "A full seminar hall during a technical session", caption: "A technical session" },
+  { ...photo("0044", "Students in college blazers seated at a campus assembly", "50% 35%"), caption: "College assembly" },
+  { ...shots.kabaddi, caption: "The kabaddi team" },
+  { ...shots.cultural, caption: "The cultural evening" },
 ];
 
 export default function BTechPolytechnic() {
@@ -86,9 +130,10 @@ export default function BTechPolytechnic() {
       >
         <div className="w-56 h-72 overflow-hidden rounded-2xl border border-white/20 bg-royal-950 shadow-2xl relative">
           <img
-            src={diplomaBranchImages[hoveredDiploma ?? 0] || campusImages.campusFront}
+            src={diplomaBranchImages[hoveredDiploma ?? 0]?.src || campusImages.campusFront}
             alt={diplomaBranches[hoveredDiploma ?? 0]?.name}
             className="h-full w-full object-cover"
+            style={{ objectPosition: diplomaBranchImages[hoveredDiploma ?? 0]?.focus }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
           <div className="absolute bottom-4 left-5 right-5">
@@ -103,6 +148,7 @@ export default function BTechPolytechnic() {
       </div>
 
       <PageHero
+        motif="blueprint"
         eyebrow="Institute"
         title="B.Tech & Polytechnic"
         lead={inst.summary}
@@ -115,18 +161,22 @@ export default function BTechPolytechnic() {
         <div className="shell">
           <div className="grid gap-8 sm:grid-cols-3">
             {inst.credentials.map((c, i) => (
-              <Reveal key={c} delay={stagger(i)}>
-                <div className="flex items-start gap-4 border-t-2 border-royal-600 pt-5">
+              <div key={c} className="flex items-center gap-5 border-t-2 border-royal-600 pt-5">
+                {seals[i] && <Stamp {...seals[i]} index={i} className="h-[4.75rem] w-[4.75rem]" />}
+                <div>
                   <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <p className="text-[0.9375rem] font-medium leading-snug text-ink">{c}</p>
+                  <p className="mt-1 text-[0.9375rem] font-medium leading-snug text-ink">{c}</p>
                 </div>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* ---------------- principal ---------------- */}
+      <PrincipalDesk institution="btech-polytechnic" />
 
       {/* ---------------- overview ---------------- */}
       <section className="section bg-paper">
@@ -142,7 +192,7 @@ export default function BTechPolytechnic() {
                 </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
-                <ReadMore lines={7} className="mt-8">
+                <ReadMore lines={4} className="mt-6">
                   <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                     <p>
                       Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
@@ -177,20 +227,67 @@ export default function BTechPolytechnic() {
               </div>
             </div>
 
-            <Reveal delay={stagger(2)} className="group">
-              <Figure
-                mask
-                src={campusImages.campusAerial}
-                alt="The Satpuda campus seen across its lawns"
-                ratio="4 / 5"
-              />
-            </Reveal>
+            <AboutCollage items={aboutPhotos} />
           </div>
         </div>
       </section>
 
-      {/* ---------------- B.TECH BRANCHES ---------------- */}
+      {/* ---------------- ADMISSION ---------------- */}
       <section className="section bg-paper-dim">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Ways in"
+            title="Two routes into engineering — and what each needs."
+            lead="Join the degree after Class 12, or the diploma after Class 10 and step into the degree's second year later."
+          />
+
+          <RouteMap className="section-body" />
+
+          <div className="mt-12 grid gap-px bg-stone-line lg:mt-16 lg:grid-cols-2">
+            {engineeringAdmission.map((a) => (
+              <Reveal key={a.label}>
+                <div className="card-raise h-full bg-paper-dim p-8 sm:p-10">
+                  <h3 className="font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink">
+                    {a.label}
+                  </h3>
+                  <p className="mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ember-600">
+                    {a.duration}
+                  </p>
+
+                  <dl className="mt-8 space-y-6">
+                    <div>
+                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute">
+                        Eligibility
+                      </dt>
+                      <dd className="mt-2.5 text-[0.9375rem] leading-[1.7] text-ink-soft">
+                        {a.eligibility}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute">
+                        Admission
+                      </dt>
+                      <dd className="mt-2.5 text-[0.9375rem] leading-[1.7] text-ink-soft">
+                        {a.note}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={stagger(2)}>
+            <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
+              Intake, fee structure, scholarship eligibility and counselling dates change every
+              session and are not published here. Contact the institution for current details.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ---------------- B.TECH BRANCHES ---------------- */}
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="Degree programmes"
@@ -200,14 +297,17 @@ export default function BTechPolytechnic() {
 
           <div className="section-body grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {btechBranches.map((b, i) => {
-              const bgImg = btechBranchImages[b.code] || campusImages.campusFront;
+              const bgImg = btechBranchImages[b.code] || { src: campusImages.campusFront };
               return (
                 <Reveal key={b.code} delay={stagger(i % 3)}>
-                  <article className="group relative flex h-full min-h-[350px] flex-col justify-end overflow-hidden rounded-2xl border border-stone-line/10 bg-royal-950 p-7 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-2xl hover:border-ember-500/50">
+                  <article data-tilt className="group relative flex h-full min-h-[350px] flex-col justify-end overflow-hidden rounded-2xl border border-stone-line/10 bg-royal-950 p-7 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-2xl hover:border-ember-500/50">
                     {/* Background Image - ALWAYS VISIBLE */}
                     <img
-                      src={bgImg}
+                      src={bgImg.src}
+                      srcSet={bgImg.srcSet}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       alt={b.name}
+                      style={{ objectPosition: bgImg.focus }}
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover scale-100 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
@@ -285,11 +385,13 @@ export default function BTechPolytechnic() {
                 <SplitText as="h2" className="t-h2 mt-5 block text-white">Polytechnic — a three-year route in.</SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
-                <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/70">
-                  Open after Class 10 and approved by the Directorate of Technical Education,
-                  Government of Madhya Pradesh. A diploma can stand on its own as a technical
-                  qualification, or serve as lateral entry into the second year of a degree.
-                </p>
+                <ReadMore mobileOnly dark className="mt-6 max-w-md">
+                  <p className="text-[1.0625rem] leading-relaxed text-white/70">
+                    Open after Class 10 and approved by the Directorate of Technical Education,
+                    Government of Madhya Pradesh. A diploma can stand on its own as a technical
+                    qualification, or serve as lateral entry into the second year of a degree.
+                  </p>
+                </ReadMore>
               </Reveal>
             </div>
 
@@ -347,56 +449,12 @@ export default function BTechPolytechnic() {
         </div>
       </section>
 
-      {/* ---------------- ADMISSION ---------------- */}
-      <section className="section bg-paper-dim">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Eligibility & admission"
-            title="What you need, and how you apply."
-          />
-
-          <div className="section-body grid gap-px bg-stone-line lg:grid-cols-2">
-            {engineeringAdmission.map((a) => (
-              <Reveal key={a.label}>
-                <div className="h-full bg-paper-dim p-8 sm:p-10">
-                  <h3 className="font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink">
-                    {a.label}
-                  </h3>
-                  <p className="mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ember-600">
-                    {a.duration}
-                  </p>
-
-                  <dl className="mt-8 space-y-6">
-                    <div>
-                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute">
-                        Eligibility
-                      </dt>
-                      <dd className="mt-2.5 text-[0.9375rem] leading-[1.7] text-ink-soft">
-                        {a.eligibility}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute">
-                        Admission
-                      </dt>
-                      <dd className="mt-2.5 text-[0.9375rem] leading-[1.7] text-ink-soft">
-                        {a.note}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={stagger(2)}>
-            <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
-              Intake, fee structure, scholarship eligibility and counselling dates change every
-              session and are not published here. Contact the institution for current details.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      {/* ---------------- gallery ---------------- */}
+      <InstituteGallery
+        items={ringPhotos}
+        title="Inside the college."
+        lead="Laboratories, the robotics cell, the library and the hall — drag the ring or use the arrows."
+      />
 
       <CTASection
         eyebrow="Engineering admissions"
