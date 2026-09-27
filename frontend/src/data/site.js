@@ -46,12 +46,15 @@ export const socials = [
     icon: "instagram",
   },
   {
-    label: "Facebook — Satpuda Valley Public School",
+    label: "Facebook — Satpuda College of Engineering & Polytechnic",
     short: "Facebook",
-    href: "https://www.facebook.com/SatpudaValleyPublicSchoolBalaghat/",
+    href: "https://www.facebook.com/SatpudaEnggPoly",
     icon: "facebook",
   },
 ];
+
+/** The school keeps its own page; linked from the School page only. */
+export const schoolFacebook = "https://www.facebook.com/SatpudaValleyPublicSchoolBalaghat/";
 
 /** Public, citable sources used to build this site. */
 export const sources = [

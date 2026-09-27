@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { useInView } from "motion/react";
 import { Eyebrow, Figure, ReadMore, Reveal, SplitText, TextLink } from "../ui/Primitives";
 import { campusImages } from "../../data/about";
 import { site } from "../../data/site";
@@ -5,6 +7,9 @@ import { values } from "../../data/about";
 import { stagger } from "../ui/stagger";
 
 export function IntroSection() {
+  const tickerRef = useRef(null);
+  const tickerOnScreen = useInView(tickerRef);
+
   return (
     <section className="section bg-paper">
       <div className="shell">
@@ -23,7 +28,7 @@ export function IntroSection() {
             </Reveal>
 
             <Reveal delay={stagger(2)}>
-              <ReadMore lines={7} className="mt-8">
+              <ReadMore lines={7} className="mt-6">
               <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                 <p>
                   Satpuda Group is a family of institutions in Balaghat, Madhya Pradesh, run by{" "}
@@ -95,12 +100,14 @@ export function IntroSection() {
               delay={stagger(4)}
               className="absolute -right-2 top-8 bg-royal-600 px-5 py-4 text-white sm:-right-6 sm:px-6 sm:py-5"
             >
-              <p className="font-display text-[1.75rem] leading-none font-semibold sm:text-[2rem]">
-                1999
-              </p>
-              <p className="mt-2 text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-300">
-                Educating in Balaghat
-              </p>
+              <div className="float-soft">
+                <p className="font-display text-[1.75rem] leading-none font-semibold sm:text-[2rem]">
+                  1999
+                </p>
+                <p className="mt-2 text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-300">
+                  Educating in Balaghat
+                </p>
+              </div>
             </Reveal>
           </div>
         </div>
@@ -111,7 +118,11 @@ export function IntroSection() {
           top of the section's own bottom padding, so on a wide screen roughly
           14rem of empty paper separated the ticker from the section below it —
           the single largest dead space on the homepage. */}
-      <div className="section-body overflow-hidden border-y border-stone-line py-5">
+      <div
+        ref={tickerRef}
+        data-paused={!tickerOnScreen || undefined}
+        className="section-body overflow-hidden border-y border-stone-line py-5"
+      >
         <div className="marquee-track flex w-max items-center gap-10 sm:gap-14">
           {[...values, ...values].map((v, i) => (
             <span key={`${v.title}-${i}`} className="flex shrink-0 items-center gap-10 sm:gap-14">

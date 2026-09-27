@@ -295,7 +295,7 @@ export function Navbar() {
       ref={headerRef}
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow] duration-400 ${
         scrolled
-          ? "bg-white/95 shadow-[0_1px_0_0_var(--color-sand),0_12px_34px_-26px_rgba(20,34,68,0.55)] backdrop-blur-md"
+          ? "bg-white shadow-[0_1px_0_0_var(--color-sand),0_12px_34px_-26px_rgba(20,34,68,0.55)]"
           : "bg-white"
       }`}
     >
@@ -321,7 +321,7 @@ export function Navbar() {
               className="flex shrink-0 items-center gap-2 whitespace-nowrap text-white/80 transition-colors hover:text-white"
               tabIndex={scrolled ? -1 : 0}
             >
-              <Phone aria-hidden="true" className="h-3.5 w-3.5" />
+              <Phone aria-hidden="true" className="phone-ring h-3.5 w-3.5" />
               <span className="hidden sm:inline">{contact.phones[0].label}</span>
               <span className="sm:hidden">Call</span>
             </a>
@@ -419,7 +419,7 @@ export function Navbar() {
 
       {/* ---------- mobile panel ----------
           Rendered into <body> rather than inside the header. Two reasons, both
-          of which broke it where it stood: the header takes `backdrop-blur`
+          of which broke it where it stood: the header used to take `backdrop-blur`
           once scrolled, and a backdrop-filter makes the header the containing
           block for any `fixed` descendant — so below the hero the panel was
           confined to the 4rem header strip instead of the viewport, its content

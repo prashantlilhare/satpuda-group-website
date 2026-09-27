@@ -1,138 +1,31 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Eyebrow, Reveal } from "../ui/Primitives";
+import { useLayoutEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+} from "motion/react";
+import { Eyebrow } from "../ui/Primitives";
 import { milestones } from "../../data/institutions";
-import { stagger } from "../ui/stagger";
 
-/* ------------------------------------------------------------------ */
-/* Tuning                                                              */
-/* ------------------------------------------------------------------ */
+/** Marker diameter in px; the rail runs through its centre. */
+const MARKER = 44;
 
-/** Token diameter in px; the rail sits on its centre line. */
-const TOKEN = 64;
+const EASE = [0.16, 1, 0.3, 1];
 
-/* The pinned panel holds still for a beat at each end of its travel, so the
-   sequence neither starts the instant the section catches on the header nor
-   finishes exactly as it lets go. Fractions of the pinned distance. */
-const LEAD_IN = 0.1;
-const TAIL = 0.08;
-
-/* How far into a leg the token has to be before the milestone it is heading
-   for takes over the copy and the token's picture. Late enough to read as
-   "it arrived", early enough that the change is not still running as the
-   panel unpins. */
-const ARRIVAL = 0.72;
-
-const LAST = milestones.length - 1;
-
-const clamp01 = (n) => (n < 0 ? 0 : n > 1 ? 1 : n);
-
-/** Ease between two milestones, so the token settles onto each one. */
-const smooth = (t) => t * t * (3 - 2 * t);
-
-/* ------------------------------------------------------------------ */
-/* Is the scroll-driven version on?                                    */
-/* ------------------------------------------------------------------ */
-
-const DRIVEN_QUERY = "(min-width: 1024px)";
-
-function drivenNow() {
-  if (typeof window === "undefined" || !window.matchMedia) return false;
-  return (
-    window.matchMedia(DRIVEN_QUERY).matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
-/**
- * True only where the pinned, scroll-scrubbed timeline is wanted.
- *
- * Below `lg` the right column is too narrow to hold a 64px rail, a token and
- * readable copy without the copy wrapping to four lines, and pinning a panel
- * on a phone costs more scroll than the content is worth — so the same
- * milestones render as a plain, fully-legible list instead. Reduced motion
- * gets that list too.
- *
- * Read synchronously on the first render rather than in an effect, so a
- * desktop visitor never sees the static list swap to the pinned one.
- */
-function useDriven() {
-  const [driven, setDriven] = useState(drivenNow);
-
-  useEffect(() => {
-    const width = window.matchMedia(DRIVEN_QUERY);
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setDriven(drivenNow());
-    width.addEventListener("change", sync);
-    motion.addEventListener("change", sync);
-    return () => {
-      width.removeEventListener("change", sync);
-      motion.removeEventListener("change", sync);
-    };
-  }, []);
-
-  return driven;
-}
-
-/* ------------------------------------------------------------------ */
-/* Scroll position of the pinned panel                                 */
-/* ------------------------------------------------------------------ */
-
-/**
- * Progress 0 → 1 across the pinned stretch of `trackRef`.
- *
- * The track is taller than the panel pinned inside it; the difference is
- * exactly how far the page scrolls while the panel is held still, so
- * `(stickyTop - trackTop) / travel` is 0 the frame it catches and 1 the
- * frame it lets go. Reading it off the track's own geometry every frame —
- * rather than integrating scroll deltas — is what makes scrolling back up
- * run the sequence backwards for free.
- */
-function usePinProgress(trackRef, panelRef) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let frame = 0;
-
-    const read = () => {
-      frame = 0;
-      const track = trackRef.current;
-      const panel = panelRef.current;
-      if (!track || !panel) return;
-
-      const travel = track.offsetHeight - panel.offsetHeight;
-      if (travel <= 0) return;
-
-      const stickyTop = parseFloat(getComputedStyle(panel).top) || 0;
-      const pinned = (stickyTop - track.getBoundingClientRect().top) / travel;
-      setProgress(clamp01((pinned - LEAD_IN) / (1 - LEAD_IN - TAIL)));
-    };
-
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(read);
-    };
-
-    read();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [trackRef, panelRef]);
-
-  return progress;
-}
+/* A milestone appears once its marker crosses this line, as a fraction of
+   the viewport height from the top — same on every screen size. */
+const TRIGGER = 0.75;
 
 /**
  * Centre of each milestone's marker, in px down from the top of the list.
- *
- * Measured rather than assumed: the rows are sized by their copy, which
- * reflows with the column, so the token has to be told where the milestones
- * actually landed.
+ * Measured, because the rows are sized by copy
+ * that reflows with the column.
  */
 function useMarkerOffsets(listRef, markerRefs) {
-  const [offsets, setOffsets] = useState([]);
+  const [geo, setGeo] = useState({ offsets: [] });
 
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -140,11 +33,11 @@ function useMarkerOffsets(listRef, markerRefs) {
 
     const measure = () => {
       const top = list.getBoundingClientRect().top;
-      setOffsets(
-        markerRefs.current.map((node) =>
+      setGeo({
+        offsets: markerRefs.current.map((node) =>
           node ? node.getBoundingClientRect().top - top + node.offsetHeight / 2 : 0,
         ),
-      );
+      });
     };
 
     measure();
@@ -153,165 +46,184 @@ function useMarkerOffsets(listRef, markerRefs) {
     return () => observer.disconnect();
   }, [listRef, markerRefs]);
 
-  return offsets;
+  return geo;
 }
 
-/* ------------------------------------------------------------------ */
-/* Pinned, scroll-scrubbed timeline                                    */
-/* ------------------------------------------------------------------ */
+/** Two-digit counter whose digits slide over when the value changes. */
+function StepCounter({ value, total }) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    <span
+      className="inline-flex items-baseline font-display text-xs font-semibold tabular-nums text-white/60"
+      aria-hidden="true"
+    >
+      <span className="relative inline-flex h-[1.1em] overflow-hidden text-ember-300">
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={value}
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "-100%", opacity: 0 }}
+            transition={{ duration: 0.35, ease: EASE }}
+          >
+            {pad(value)}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+      <span className="ml-1">/ {pad(total)}</span>
+    </span>
+  );
+}
 
-function PinnedTimeline() {
-  const trackRef = useRef(null);
-  const panelRef = useRef(null);
+function Milestone({ m, reached, current, markerRef }) {
+  return (
+    <li className="group relative flex gap-5 pb-9 last:pb-0">
+      {/* marker: the milestone photo, hidden until the trigger line reaches it */}
+      <span
+        ref={markerRef}
+        className="relative z-[1] shrink-0"
+        style={{ width: MARKER, height: MARKER }}
+        aria-hidden="true"
+      >
+        <motion.span
+          className="absolute inset-0 rounded-full"
+          initial={false}
+          animate={reached ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
+          transition={{ type: "spring", stiffness: 320, damping: 24 }}
+        >
+          <motion.span
+            className="absolute inset-0 rounded-full"
+            animate={{
+              boxShadow: current
+                ? "0 0 0 4px var(--color-royal-900), 0 0 0 5.5px var(--color-ember-500)"
+                : "0 0 0 4px var(--color-royal-900), 0 0 0 5px rgb(255 255 255 / 0.22)",
+            }}
+            transition={{ duration: 0.4 }}
+          />
+          <span className="absolute inset-0 overflow-hidden rounded-full bg-royal-800">
+            <img
+              src={m.image}
+              srcSet={m.imageSrcSet}
+              sizes={m.imageSrcSet ? "44px" : undefined}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-110"
+            />
+          </span>
+          {/* one ripple the moment the rail arrives */}
+          <AnimatePresence>
+            {current && (
+              <motion.span
+                key="ripple"
+                className="absolute inset-0 rounded-full border-2 border-ember-500"
+                initial={{ scale: 1, opacity: 0.8 }}
+                animate={{ scale: 1.7, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.9, ease: EASE }}
+              />
+            )}
+          </AnimatePresence>
+        </motion.span>
+      </span>
+
+      {/* copy */}
+      <motion.div
+        className="min-w-0 pt-0.5"
+        initial={false}
+        animate={
+          reached
+            ? { opacity: current ? 1 : 0.7, y: 0, filter: "blur(0px)" }
+            : { opacity: 0, y: 14, filter: "blur(4px)" }
+        }
+        transition={{ duration: 0.55, ease: EASE }}
+        style={{ pointerEvents: reached ? "auto" : "none" }}
+      >
+        <p className="font-display text-[0.875rem] font-semibold tabular-nums tracking-[0.04em] text-ember-300">
+          {m.year}
+        </p>
+        <h3 className="mt-1 font-display text-[1.125rem] font-semibold tracking-[-0.015em] text-white transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1 sm:text-[1.1875rem]">
+          {m.title}
+        </h3>
+        <p className="mt-1.5 max-w-prose text-[0.9rem] leading-[1.65] text-white/62">{m.body}</p>
+      </motion.div>
+    </li>
+  );
+}
+
+export function GrowthTimeline() {
   const listRef = useRef(null);
   const markerRefs = useRef([]);
+  const { offsets } = useMarkerOffsets(listRef, markerRefs);
 
-  const progress = usePinProgress(trackRef, panelRef);
-  const offsets = useMarkerOffsets(listRef, markerRefs);
+  /* Where the trigger line sits along the rail, 0 → 1, and the furthest
+     marker it has crossed. Read off live geometry, so scrolling back up
+     hides milestones again. */
+  const target = useMotionValue(0);
+  const fill = useSpring(target, { stiffness: 140, damping: 28, mass: 0.4 });
+  const [reached, setReached] = useState(-1);
+  const { scrollY } = useScroll();
 
-  /* Snap-based positioning */
-  const active = Math.round(progress * LAST);
-  const tokenY = offsets[active] ?? 0;
+  const update = () => {
+    const list = listRef.current;
+    if (!list || !offsets.length) return;
+    const line = window.innerHeight * TRIGGER - list.getBoundingClientRect().top;
+    const first = offsets[0];
+    const span = offsets[offsets.length - 1] - first;
+    target.set(span > 0 ? Math.min(1, Math.max(0, (line - first) / span)) : 0);
+    let idx = -1;
+    offsets.forEach((o, i) => {
+      if (line >= o) idx = i;
+    });
+    setReached(idx);
+  };
+
+  useMotionValueEvent(scrollY, "change", update);
+  useLayoutEffect(update, [offsets]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const first = offsets[0] ?? 0;
+  const last = offsets[offsets.length - 1] ?? 0;
 
   return (
-    <div ref={trackRef} className="tl-track">
-      <div ref={panelRef} className="tl-panel">
-        <Reveal>
-          <Eyebrow>How it grew</Eyebrow>
-        </Reveal>
+    <div>
+      <div className="flex items-center justify-between gap-6">
+        <Eyebrow>How it grew</Eyebrow>
+        <StepCounter value={Math.max(1, reached + 1)} total={milestones.length} />
+      </div>
 
-        <div ref={listRef} className="relative mt-10">
-          {/* Base line + the stretch already travelled. The rail stops on
-              the last milestone rather than at the bottom of the list, so it
-              does not trail off below 2022's paragraph. */}
-          <span
-            aria-hidden="true"
-            className="absolute top-0 w-px bg-white/14"
-            style={{ left: TOKEN / 2, height: offsets[LAST] ?? 0 }}
+      <div ref={listRef} className="relative mt-8">
+        {/* base rail, marker centre to marker centre */}
+        <span
+          aria-hidden="true"
+          className="absolute w-px bg-white/14"
+          style={{ left: MARKER / 2, top: first, height: Math.max(0, last - first) }}
+        />
+        {/* travelled rail */}
+        <span
+          aria-hidden="true"
+          className="absolute w-px overflow-hidden"
+          style={{ left: MARKER / 2, top: first, height: Math.max(0, last - first) }}
+        >
+          <motion.span
+            className="tl-rail-fill absolute inset-0 origin-top"
+            style={{ scaleY: fill }}
           />
-          <span
-            aria-hidden="true"
-            className="absolute top-0 w-px bg-ember-500/55"
-            style={{ left: TOKEN / 2, height: Math.max(0, tokenY) }}
-          />
+        </span>
 
-          {/* the travelling token ring */}
-          <div
-            aria-hidden="true"
-            className="tl-token pointer-events-none"
-            style={{
-              width: TOKEN,
-              height: TOKEN,
-              transform: `translate3d(0, ${tokenY - TOKEN / 2}px, 0)`,
-              transition: 'transform 0.5s var(--ease-out-expo)'
-            }}
-          />
-
-          {/* Copy sits to the right of the rail and slides in from further
-              right as it becomes active; `overflow-x-clip` keeps that offset
-              from ever reaching the page's own scroll width. */}
-          <ol className="relative overflow-x-clip">
-            {milestones.map((m, i) => (
-              <li key={m.year} className="relative pb-8 last:pb-0">
-                <span
-                  ref={(node) => {
-                    markerRefs.current[i] = node;
-                  }}
-                  aria-hidden="true"
-                  className="absolute left-0 top-0 flex items-center justify-center"
-                  style={{ width: TOKEN, height: TOKEN }}
-                >
-                  <span className="absolute inset-0 rounded-full bg-royal-900" />
-                  
-                  <img
-                    src={m.image}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full rounded-full object-cover transition-opacity duration-500"
-                    style={{ opacity: i <= active ? 1 : 0 }}
-                  />
-
-                  <span
-                    className="relative tl-dot"
-                    style={{ opacity: i > active ? 1 : 0 }}
-                  />
-                </span>
-
-                <div
-                  className="tl-item"
-                  data-state={i === active ? "current" : i < active ? "past" : "ahead"}
-                  style={{ paddingLeft: TOKEN + 32 }}
-                >
-                  <p className="font-display text-[0.9375rem] font-semibold tabular-nums tracking-[0.02em] text-ember-300">
-                    {m.year}
-                  </p>
-                  <h3 className="mt-1.5 font-display text-[1.25rem] font-semibold tracking-[-0.015em] text-white">
-                    {m.title}
-                  </h3>
-                  <p className="mt-2 max-w-md text-[0.9375rem] leading-[1.65] text-white/62">
-                    {m.body}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <ol className="relative">
+          {milestones.map((m, i) => (
+            <Milestone
+              key={m.title}
+              m={m}
+              reached={i <= reached}
+              current={i === reached}
+              markerRef={(node) => {
+                markerRefs.current[i] = node;
+              }}
+            />
+          ))}
+        </ol>
       </div>
     </div>
   );
-}
-
-/* ------------------------------------------------------------------ */
-/* Static fallback — narrow screens and reduced motion                 */
-/* ------------------------------------------------------------------ */
-
-function StaticTimeline() {
-  return (
-    <div>
-      <Reveal>
-        <Eyebrow>How it grew</Eyebrow>
-      </Reveal>
-
-      <ol className="relative mt-10">
-        {milestones.map((m, i) => (
-          <Reveal key={m.year} delay={stagger(i)}>
-            <li className="relative pb-8 last:pb-0">
-              {i < LAST && (
-                <span
-                  aria-hidden="true"
-                  className="absolute left-[1.375rem] top-12 h-full w-px bg-white/14"
-                />
-              )}
-
-              <div className="flex gap-5">
-                <img
-                  src={m.image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-white/30"
-                />
-                <div className="min-w-0">
-                  <p className="font-display text-[0.9375rem] font-semibold tabular-nums tracking-[0.02em] text-ember-300">
-                    {m.year}
-                  </p>
-                  <h3 className="mt-1.5 font-display text-[1.125rem] font-semibold tracking-[-0.015em] text-white sm:text-[1.25rem]">
-                    {m.title}
-                  </h3>
-                  <p className="mt-2 text-[0.9375rem] leading-[1.7] text-white/62">{m.body}</p>
-                </div>
-              </div>
-            </li>
-          </Reveal>
-        ))}
-      </ol>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-
-export function GrowthTimeline() {
-  return useDriven() ? <PinnedTimeline /> : <StaticTimeline />;
 }

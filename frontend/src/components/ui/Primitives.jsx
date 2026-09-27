@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
 import { stagger } from "./stagger";
+import { Magnetic } from "./Motion";
 
 /* ------------------------------------------------------------------ */
 /* Reveal — scroll-triggered entrance                                  */
@@ -86,7 +87,7 @@ export function Eyebrow({ children, className = "" }) {
    up rather than as a card popping. `active:` returns it to the surface so
    a press still feels like a press. */
 const BASE =
-  "group/btn inline-flex items-center justify-center gap-2.5 font-sans font-semibold " +
+  "group/btn relative isolate overflow-hidden inline-flex items-center justify-center gap-2.5 font-sans font-semibold " +
   "tracking-[-0.01em] transition-[background-color,color,border-color,transform,box-shadow] " +
   "duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 active:translate-y-0 " +
   "disabled:opacity-55 disabled:pointer-events-none disabled:hover:translate-y-0";
@@ -102,9 +103,9 @@ const SIZES = {
 
 const VARIANTS = {
   primary:
-    "bg-royal-600 text-white hover:bg-royal-700 hover:shadow-[0_12px_26px_-14px_rgba(20,34,68,0.75)]",
+    "btn-sheen bg-royal-600 text-white hover:bg-royal-700 hover:shadow-[0_12px_26px_-14px_rgba(20,34,68,0.75)]",
   ember:
-    "bg-ember-500 text-white hover:bg-ember-600 hover:shadow-[0_12px_26px_-14px_rgba(156,38,23,0.8)]",
+    "btn-sheen bg-ember-500 text-white hover:bg-ember-600 hover:shadow-[0_12px_26px_-14px_rgba(156,38,23,0.8)]",
   outline:
     "border border-royal-600/30 text-royal-700 hover:border-royal-600 hover:bg-royal-600 hover:text-white " +
     "hover:shadow-[0_12px_26px_-14px_rgba(20,34,68,0.7)]",
@@ -141,26 +142,29 @@ export function Button({
     </>
   );
 
+  /* Every button leans slightly toward the pointer and presses in on tap. */
+  let el;
   if (to) {
-    return (
+    el = (
       <Link to={to} className={cls} {...rest}>
         {inner}
       </Link>
     );
-  }
-  if (href) {
-    return (
+  } else if (href) {
+    el = (
       <a href={href} className={cls} {...rest}>
         {inner}
       </a>
     );
+  } else {
+    const Tag = as ?? "button";
+    el = (
+      <Tag className={cls} {...rest}>
+        {inner}
+      </Tag>
+    );
   }
-  const Tag = as ?? "button";
-  return (
-    <Tag className={cls} {...rest}>
-      {inner}
-    </Tag>
-  );
+  return <Magnetic>{el}</Magnetic>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -218,7 +222,7 @@ export function SectionHeading({
       </SplitText>
       {lead && (
         <Reveal delay={stagger(2)}>
-          <p className="t-lead mt-5">{lead}</p>
+          <p className="t-lead mt-6">{lead}</p>
         </Reveal>
       )}
       {children}
@@ -246,6 +250,10 @@ export function Figure({
      opens on — see `.img-mask`; on a row of thumbnails it reads as
      fidget. Needs a `<Reveal>` somewhere above it to trigger from. */
   mask = false,
+  /* The picture drifts a few percent inside its frame as the frame crosses
+     the viewport — see `.fig-parallax`. Off for portraits, where the crop
+     is chosen around a face. */
+  parallax = zoom,
   position = "center",
   loading = "lazy",
   children,
@@ -255,18 +263,20 @@ export function Figure({
       className={`relative overflow-hidden bg-royal-900/5 ${mask ? "img-mask" : ""} ${className}`}
       style={{ aspectRatio: ratio }}
     >
-      <img
-        src={src}
-        srcSet={srcSet}
-        sizes={srcSet ? sizes : undefined}
-        alt={alt}
-        loading={loading}
-        decoding="async"
-        style={{ objectPosition: position }}
-        className={`h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          zoom ? "group-hover:scale-[1.05]" : ""
-        } ${imgClassName}`}
-      />
+      <div className={parallax ? "fig-parallax" : "absolute inset-0"}>
+        <img
+          src={src}
+          srcSet={srcSet}
+          sizes={srcSet ? sizes : undefined}
+          alt={alt}
+          loading={loading}
+          decoding="async"
+          style={{ objectPosition: position }}
+          className={`h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            zoom ? "group-hover:scale-[1.06]" : ""
+          } ${imgClassName}`}
+        />
+      </div>
       {children}
     </figure>
   );
@@ -276,51 +286,41 @@ export function Figure({
 /* Fact — a labelled figure/stat, used only for verifiable numbers     */
 /* ------------------------------------------------------------------ */
 
-const COUNT_MS = 1150;
-
-/** Where a count starts: a year climbs its last stretch, a count starts at 0. */
-function countFrom(target) {
-  return target > 999 ? target - 22 : 0;
-}
+const REEL = [..."01234567890123456789"];
 
 /**
- * Counts a figure up as it comes into view.
+ * Rolls a figure into place like a mechanical counter as it comes into view.
  *
- * Only ever used on a value that is entirely digits — "04" counts, "NCVT"
- * and "Co-ed" do not — and the result is padded back to the width it was
- * written at, so `04` never renders as `4`. The type is tabular, so the
- * digits do not shuffle sideways while they change.
+ * Every digit is its own reel of 0–9 printed twice, and each reel turns
+ * through one full revolution before settling on its digit — so a `0` still
+ * spins rather than sitting there — with the reels on the right stopping a
+ * beat after those on the left. Only ever used on a value that is entirely
+ * digits, which is also what keeps the written width (`04` stays `04`).
  *
- * With reduced motion (or no IntersectionObserver) `useReveal` reports
- * visible straight away and the state starts on the answer, so the figure
- * is simply printed.
+ * The motion is a transform transition in the stylesheet (`.odo-reel`); the
+ * reels are hidden from assistive tech, which reads the plain value instead.
+ * Reduced motion shows the settled figure.
  */
-function CountUp({ value }) {
-  const target = Number(value);
+function Odometer({ value }) {
   const [ref, visible] = useReveal({ threshold: 0.35 });
-  const [shown, setShown] = useState(() => (visible ? target : countFrom(target)));
 
-  useEffect(() => {
-    if (!visible) return;
-    /* `useReveal` reports visible from the first render under reduced
-       motion, so the state was initialised on the answer already — there
-       is nothing to do but leave it there. */
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const from = countFrom(target);
-    const started = performance.now();
-    let frame = requestAnimationFrame(function step(now) {
-      const p = Math.min(1, (now - started) / COUNT_MS);
-      /* Out-cubic: most of the distance early, then a slow last few. */
-      const eased = 1 - Math.pow(1 - p, 3);
-      setShown(Math.round(from + (target - from) * eased));
-      if (p < 1) frame = requestAnimationFrame(step);
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [visible, target]);
-
-  return <span ref={ref}>{String(shown).padStart(value.length, "0")}</span>;
+  return (
+    <span ref={ref} data-visible={visible} className="odo">
+      <span className="sr-only">{value}</span>
+      {[...value].map((digit, i) => (
+        <span key={i} aria-hidden="true" className="odo-col">
+          <span
+            className="odo-reel"
+            style={{ "--odo-to": 10 + Number(digit), "--odo-index": i }}
+          >
+            {REEL.map((d, j) => (
+              <span key={j}>{d}</span>
+            ))}
+          </span>
+        </span>
+      ))}
+    </span>
+  );
 }
 
 export function Fact({ value, label, sub, dark = false }) {
@@ -334,7 +334,7 @@ export function Fact({ value, label, sub, dark = false }) {
         }`}
         style={{ fontVariationSettings: '"opsz" 72' }}
       >
-        {counts ? <CountUp value={value} /> : value}
+        {counts ? <Odometer value={value} /> : value}
       </p>
       <p
         className={`mt-3 text-[0.8125rem] font-semibold uppercase tracking-[0.13em] ${
@@ -366,9 +366,13 @@ export function Fact({ value, label, sub, dark = false }) {
 export function ReadMore({
   children,
   lines = 6,
+  /* Phones never show more than this many lines before the toggle. */
+  mobileLines = 5,
+  /* Clamp on phones only; on a laptop the text is shown in full. */
+  mobileOnly = false,
   dark = false,
   className = "",
-  moreLabel = "Read more",
+  moreLabel = "… Read more",
   lessLabel = "Show less",
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -391,22 +395,16 @@ export function ReadMore({
       observer?.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [expanded, children, lines]);
+  }, [expanded, children, lines, mobileLines, mobileOnly]);
 
   return (
     <div className={className}>
       <div
         ref={bodyRef}
-        style={
-          expanded
-            ? undefined
-            : {
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: lines,
-                overflow: "hidden",
-              }
-        }
+        /* `.rm-clamp` in index.css: `--rm-sm` lines on a phone, `--rm-lg`
+           from 768px up (or no clamp at all there, with `mobileOnly`). */
+        className={expanded ? undefined : `rm-clamp ${mobileOnly ? "rm-mobile-only" : ""}`}
+        style={expanded ? undefined : { "--rm-sm": Math.min(lines, mobileLines), "--rm-lg": lines }}
       >
         {children}
       </div>

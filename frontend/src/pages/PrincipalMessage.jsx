@@ -1,18 +1,20 @@
 import { Link } from "react-router-dom";
+import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
-import { Figure, Reveal } from "../components/ui/Primitives";
+import { Figure, ReadMore, Reveal } from "../components/ui/Primitives";
 import { director, principal } from "../data/leadership";
-import { photo } from "../data/photos";
 import { campusImages } from "../data/about";
+import { photo } from "../data/photos";
+import { shots } from "../data/shots";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
 const gallery = [
   { src: campusImages.classroom, alt: "A teaching session in a Satpuda classroom" },
   { src: campusImages.readingRoom, alt: "Students reading together in the library" },
-  { src: campusImages.electronicsBench, alt: "Practical work at an electronics bench" },
+  { src: shots.elecBench.src, alt: shots.elecBench.alt },
 ];
 
 export default function PrincipalMessage() {
@@ -26,6 +28,7 @@ export default function PrincipalMessage() {
   return (
     <>
       <PageHero
+        motif="none"
         eyebrow="Leadership"
         title="Principal's Message"
         lead={principal.standfirst}
@@ -36,7 +39,9 @@ export default function PrincipalMessage() {
       {/* ---------------- letter ---------------- */}
       <section className="section bg-paper">
         <div className="shell-narrow">
-          {/* portrait band — a different composition from the Director page */}
+          {/* portrait band — a different composition from the Director page.
+              A 16:9 band on a phone crops the portrait through the face, so
+              there it keeps the photograph's own proportions. */}
           <Reveal className="group">
             <Figure
               mask
@@ -45,11 +50,12 @@ export default function PrincipalMessage() {
               ratio="16 / 9"
               position="50% 24%"
               zoom={false}
+              className="max-sm:aspect-[900/783]!"
             />
           </Reveal>
 
           <Reveal delay={stagger(1)}>
-            <div className="-mt-14 ml-0 max-w-xl bg-paper p-7 sm:-mt-20 sm:ml-8 sm:p-10">
+            <div className="relative mx-4 -mt-8 max-w-xl bg-paper p-6 sm:mx-0 sm:-mt-20 sm:ml-8 sm:p-10">
               <h2 className="font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink sm:text-[1.875rem]">
                 {principal.name}
               </h2>
@@ -62,21 +68,45 @@ export default function PrincipalMessage() {
             </div>
           </Reveal>
 
-          {/* the letter itself */}
-          <div className="section-body">
-            <Reveal>
+          {/* The letter itself, on a sheet that is laid down onto the
+              desk as it arrives — tipped back from its top edge, settling
+              flat — with the salutation underlined in one pen stroke. */}
+          <motion.div
+            className="letter-sheet section-body bg-white px-6 py-10 shadow-[0_30px_60px_-40px_rgba(20,34,68,0.45)] sm:px-12 sm:py-14"
+            initial={{ opacity: 0, rotateX: 18, y: 50 }}
+            whileInView={{ opacity: 1, rotateX: 0, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+            style={{ transformPerspective: 1400, transformOrigin: "50% 0%" }}
+          >
+            <div className="relative inline-block">
               <p className="font-display text-[1.5rem] tracking-[-0.022em] text-royal-700 sm:text-[1.75rem]">
                 {principal.salutation}
               </p>
-            </Reveal>
-
-            <div className="mt-8 space-y-6 text-[1.0625rem] leading-[1.8] text-ink-soft">
-              {principal.paragraphs.map((p, i) => (
-                <Reveal key={i} delay={stagger(1 + i)}>
-                  <p>{p}</p>
-                </Reveal>
-              ))}
+              <svg aria-hidden="true" viewBox="0 0 200 14" preserveAspectRatio="none" className="absolute -bottom-2 left-0 h-3.5 w-full">
+                <motion.path
+                  d="M3 9 C60 3 130 12 197 5"
+                  fill="none"
+                  stroke="var(--color-ember-500)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0 }}
+                  whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.9 }}
+                />
+              </svg>
             </div>
+
+            <ReadMore mobileOnly className="mt-8">
+              <div className="space-y-6 text-[1.0625rem] leading-[1.8] text-ink-soft">
+                {principal.paragraphs.map((p, i) => (
+                  <Reveal key={i} delay={stagger(1 + i)}>
+                    <p>{p}</p>
+                  </Reveal>
+                ))}
+              </div>
+            </ReadMore>
 
             <Reveal delay={stagger(2)}>
               <div className="mt-12 flex items-end justify-between gap-6 border-t border-stone-line pt-8">
@@ -99,7 +129,7 @@ export default function PrincipalMessage() {
                 </p>
               </div>
             </Reveal>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -121,7 +151,7 @@ export default function PrincipalMessage() {
             >
               <div className="flex items-center gap-6">
                 <div className="w-20 shrink-0 sm:w-24">
-                  <Figure src={director.portrait} alt="" ratio="1 / 1" position="50% 10%" />
+                  <Figure src={director.portrait} alt="" ratio="1 / 1" position="50% 10%" parallax={false} />
                 </div>
                 <div>
                   <p className="text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-600">

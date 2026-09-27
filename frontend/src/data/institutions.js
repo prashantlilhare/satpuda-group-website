@@ -1,12 +1,9 @@
 import imgEngineering from "../assets/images/institutions/engineering.webp";
-import imgTeacherEd from "../assets/images/institutions/teacher-education.webp";
 import imgIti from "../assets/images/institutions/iti.webp";
-import imgSchool from "../assets/images/institutions/school.webp";
 import imgEngineeringSmall from "../assets/images/institutions/engineering-700w.webp";
-import imgTeacherEdSmall from "../assets/images/institutions/teacher-education-700w.webp";
 import imgItiSmall from "../assets/images/institutions/iti-700w.webp";
-import imgSchoolSmall from "../assets/images/institutions/school-700w.webp";
 import { photo } from "./photos";
+import { dedShots, schoolShots } from "./shots";
 
 /**
  * The four institutions of Satpuda Group.
@@ -40,8 +37,8 @@ export const institutions = [
     name: "Teacher Education — D.Ed & B.Ed",
     shortName: "D.Ed & B.Ed",
     kicker: "Teacher Education",
-    image: imgTeacherEd,
-    imageAlt: "Students seated in a Satpuda classroom during a teaching session",
+    image: dedShots.teaching.src,
+    imageAlt: dedShots.teaching.alt,
     /* Thumbnail for the homepage list — the group's own photograph. */
     thumb: photo("0049", "A primary class presenting a science project", "50% 45%"),
     summary:
@@ -77,8 +74,8 @@ export const institutions = [
     name: "Satpuda Valley Public School",
     shortName: "School",
     kicker: "CBSE · Co-educational",
-    image: imgSchool,
-    imageAlt: "Satpuda students playing basketball on the campus sports court",
+    image: schoolShots.assemblyLines.src,
+    imageAlt: schoolShots.assemblyLines.alt,
     thumb: photo("0052", "School students with a model of their campus", "50% 40%"),
     summary:
       "A CBSE-affiliated, co-educational school on the Satpuda campus, educating students in Balaghat since 2009.",
@@ -93,12 +90,18 @@ export const institutions = [
 export const getInstitution = (id) => institutions.find((i) => i.id === id);
 
 /**
- * Group milestones — the four steps the "How it grew" timeline scrubs
- * through, in order. Copy is drawn from the institution entries above;
- * `image` is reused from the same folder rather than duplicated, and is
- * only ever drawn small (the timeline token), so the 700w variant is
- * enough.
+ * Group milestones — the steps the "How it grew" timeline scrubs through, in
+ * order. `image` is reused from the same folder rather than duplicated, and
+ * is only ever drawn small (the timeline token), so the 700w variant is
+ * enough. Two milestones can share a year; the timeline keys them by title.
  */
+/* A milestone picture from the campus photo library, carried with its
+   srcset so the 64px token fetches the smaller file. */
+function milestonePhoto(id, alt) {
+  const p = photo(id, alt);
+  return { image: p.src, imageSrcSet: p.srcSet, imageAlt: alt };
+}
+
 export const milestones = [
   {
     year: "1999",
@@ -108,23 +111,39 @@ export const milestones = [
     imageAlt: "Trainees on the Satpuda ITI workshop floor",
   },
   {
-    year: "2009",
-    title: "Satpuda Valley Public School",
-    body: "A CBSE-affiliated, co-educational school joins the group, extending its work from vocational training into foundational schooling.",
-    image: imgSchoolSmall,
-    imageAlt: "Satpuda Valley Public School students on the campus sports court",
+    year: "2006",
+    title: "D.Ed — teacher education begins",
+    body: "The group starts preparing teachers, with a D.Ed programme for the foundational and primary years — pedagogy, child development and classroom practice.",
+    image: dedShots.faculty.src,
+    imageSrcSet: dedShots.faculty.srcSet,
+    imageAlt: dedShots.faculty.alt,
   },
   {
-    year: "2016",
-    title: "D.Ed & B.Ed",
-    body: "Teacher education joins the group — pedagogy, child development, curriculum design and supervised classroom practice.",
-    image: imgTeacherEdSmall,
-    imageAlt: "A teacher education session in a Satpuda classroom",
+    year: "2009",
+    title: "B.Ed",
+    body: "Teacher education extends to graduates, with a B.Ed programme preparing teachers for secondary and senior secondary classrooms.",
+    image: dedShots.teaching.src,
+    imageSrcSet: dedShots.teaching.srcSet,
+    imageAlt: dedShots.teaching.alt,
+  },
+  {
+    year: "2009",
+    title: "Satpuda Valley Public School",
+    body: "The same year, a CBSE-affiliated, co-educational school joins the group — and gives its trainee teachers real classrooms on their own campus.",
+    image: schoolShots.assemblyLines.src,
+    imageSrcSet: schoolShots.assemblyLines.srcSet,
+    imageAlt: schoolShots.assemblyLines.alt,
+  },
+  {
+    year: "2017",
+    title: "Polytechnic",
+    body: "Three-year diploma engineering arrives, approved by the Directorate of Technical Education, Madhya Pradesh — a technical route open straight after Class 10.",
+    ...milestonePhoto("0037", "The electrical engineering laboratory in use"),
   },
   {
     year: "2022",
-    title: "Engineering & Polytechnic",
-    body: "The Manjhapur campus adds AICTE-approved degree and diploma engineering, affiliated to RGPV Bhopal, across five disciplines.",
+    title: "Engineering college",
+    body: "The Manjhapur campus adds AICTE-approved B.Tech degrees, affiliated to RGPV Bhopal, across five engineering disciplines.",
     image: imgEngineeringSmall,
     imageAlt: "The Satpuda College of Engineering & Polytechnic building",
   },

@@ -1,4 +1,5 @@
 import { Mail } from "lucide-react";
+import { motion } from "motion/react";
 import { FacebookIcon, WhatsAppIcon } from "../ui/BrandIcons";
 import { contact, socials } from "../../data/site";
 
@@ -51,19 +52,34 @@ export function SocialRail() {
       style={{ paddingRight: "env(safe-area-inset-right, 0px)" }}
     >
       <ul className="flex flex-col items-end gap-2">
-        {links.map(({ key, label, href, external, Icon, hover }) => (
-          <li key={key}>
+        {/* Slides in from the edge a moment after load, one button at a time. */}
+        {links.map(({ key, label, href, external, Icon, hover }, i) => (
+          <motion.li
+            key={key}
+            className="relative"
+            initial={{ x: 56, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            whileHover={{ x: -4 }}
+            transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.8 + i * 0.1 }}
+          >
+            {/* WhatsApp is the quickest way in, so it alone breathes. */}
+            {key === "whatsapp" && (
+              <span
+                aria-hidden="true"
+                className="rail-ping pointer-events-none absolute inset-0 rounded-l-xl bg-[#25d366]"
+              />
+            )}
             <a
               href={href}
               target={external ? "_blank" : undefined}
               rel={external ? "noreferrer noopener" : undefined}
               aria-label={label}
-              className={`group/rail flex h-11 w-11 items-center justify-center rounded-l-xl border border-r-0 border-sand bg-white/95 text-royal-700 shadow-[0_10px_26px_-14px_rgba(20,34,68,0.6)] backdrop-blur-sm transition-[background-color,color,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-white focus-visible:text-white sm:h-12 sm:w-12 ${hover}`}
+              className={`group/rail relative flex h-11 w-11 items-center justify-center rounded-l-xl border border-r-0 border-sand bg-white text-royal-700 shadow-[0_10px_26px_-14px_rgba(20,34,68,0.6)] transition-[background-color,color,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-white focus-visible:text-white sm:h-12 sm:w-12 ${hover}`}
             >
-              <Icon className="h-[1.15rem] w-[1.15rem] sm:h-5 sm:w-5" />
+              <Icon className="h-[1.15rem] w-[1.15rem] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/rail:scale-115 group-hover/rail:-rotate-8 sm:h-5 sm:w-5" />
               <span className="sr-only">{label}</span>
             </a>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </div>

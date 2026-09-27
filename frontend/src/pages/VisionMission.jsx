@@ -2,10 +2,12 @@ import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { PhotoGrid } from "../components/shared/PhotoGrid";
 import { photo } from "../data/photos";
-import { Eyebrow, Figure, Reveal, SplitText } from "../components/ui/Primitives";
+import { Eyebrow, Figure, ReadMore, Reveal, SplitText } from "../components/ui/Primitives";
 import { campusImages, mission, values, vision } from "../data/about";
 import { site } from "../data/site";
 import { useSeo } from "../hooks/useSeo";
+import { ScrollWords } from "../components/ui/ScrollWords";
+import { ScrambleText } from "../components/ui/ScrambleText";
 import { stagger } from "../components/ui/stagger";
 
 /* A mission is easier to believe when it is shown: four institutions on one
@@ -64,6 +66,7 @@ export default function VisionMission() {
   return (
     <>
       <PageHero
+        motif="none"
         eyebrow="About us"
         title="Vision & Mission"
         lead="Our purpose, our promise, and the standard we ask to be held to."
@@ -82,7 +85,7 @@ export default function VisionMission() {
               </Reveal>
 
               <Reveal delay={stagger(1)} className="mt-8 lg:mt-12">
-                <h2 className="flex flex-col space-y-9 sm:space-y-12 lg:space-y-16 xl:space-y-20">
+                <h2 className="flex flex-col space-y-5 sm:space-y-7 lg:space-y-9">
                   <span className="font-display text-[3.5rem] sm:text-[4.5rem] lg:text-[5.25rem] xl:text-[6rem] font-extrabold tracking-[-0.035em] text-royal-700 leading-none">
                     Innovate.
                   </span>
@@ -99,9 +102,11 @@ export default function VisionMission() {
             {/* Right Column: Statement + Lab Photo */}
             <div className="space-y-8 lg:space-y-10">
               <Reveal delay={stagger(1)}>
-                <p className="font-display text-[1.45rem] sm:text-[1.75rem] lg:text-[2rem] font-medium leading-[1.3] tracking-[-0.022em] text-ink">
-                  {vision.statement}
-                </p>
+                <ReadMore mobileOnly>
+                  <ScrollWords className="font-display text-[1.45rem] sm:text-[1.75rem] lg:text-[2rem] font-medium leading-[1.3] tracking-[-0.022em] text-ink">
+                    {vision.statement}
+                  </ScrollWords>
+                </ReadMore>
               </Reveal>
 
               <Reveal delay={stagger(2)} className="group">
@@ -135,7 +140,7 @@ export default function VisionMission() {
               </Reveal>
 
               <Reveal delay={stagger(1)} className="mt-8 lg:mt-12">
-                <h2 className="flex flex-col space-y-9 sm:space-y-12 lg:space-y-16 xl:space-y-20">
+                <h2 className="flex flex-col space-y-5 sm:space-y-7 lg:space-y-9">
                   <span className="font-display text-[3.5rem] sm:text-[4.5rem] lg:text-[5.25rem] xl:text-[6rem] font-extrabold tracking-[-0.035em] text-white leading-none">
                     Empower.
                   </span>
@@ -159,9 +164,11 @@ export default function VisionMission() {
                 saying them a second time. */}
             <div className="space-y-8 lg:space-y-10">
               <Reveal delay={stagger(1)}>
-                <p className="font-display text-[1.45rem] sm:text-[1.75rem] lg:text-[2rem] font-medium leading-[1.3] tracking-[-0.022em] text-white">
-                  {mission.statement}
-                </p>
+                <ReadMore mobileOnly dark>
+                  <ScrollWords className="font-display text-[1.45rem] sm:text-[1.75rem] lg:text-[2rem] font-medium leading-[1.3] tracking-[-0.022em] text-white">
+                    {mission.statement}
+                  </ScrollWords>
+                </ReadMore>
               </Reveal>
 
               <MissionPhoto className="hidden lg:block" />
@@ -185,13 +192,13 @@ export default function VisionMission() {
           <div className="section-body grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-16">
             {values.map((v, i) => (
               <Reveal key={v.title} delay={stagger(i % 3)}>
-                <article className="group border-t border-stone-line py-7 transition-colors duration-400 hover:border-royal-600">
+                <article className="rule-card group border-t border-stone-line py-7 transition-colors duration-400 hover:border-royal-600">
                   <div className="flex items-baseline gap-4">
                     <span className="font-display text-xs font-semibold tabular-nums text-ember-600">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <h3 className="font-display text-[1.25rem] font-semibold tracking-[-0.018em] text-ink">
-                      {v.title}
+                      <ScrambleText delay={i * 140}>{v.title}</ScrambleText>
                     </h3>
                   </div>
                   <p className="mt-3 pl-8 text-[0.9375rem] leading-[1.7] text-ink-soft">{v.body}</p>

@@ -22,7 +22,7 @@ function FooterLink({ to, children }) {
     <li>
       <Link
         to={to}
-        className="link-underline inline-block py-1.5 text-[0.9375rem] text-white/65 transition-colors duration-300 hover:text-white"
+        className="link-underline inline-block py-1.5 text-[0.9375rem] text-white/65 transition-[color,translate] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-x-1 hover:text-white"
       >
         {children}
       </Link>

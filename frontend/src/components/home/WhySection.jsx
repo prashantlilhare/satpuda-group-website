@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useInView } from "motion/react";
+import { Lightbox } from "../shared/Lightbox";
 import { SectionHeading } from "../ui/Primitives";
 import { galleryRows } from "../../data/gallery";
 import { useReveal } from "../../hooks/useReveal";
@@ -28,23 +30,18 @@ const PASSES = 3;
    460w file wherever the 880w one would be wasted. */
 const SIZES = "(max-width: 639px) 46vw, (max-width: 1023px) 30vw, 23vw";
 
-function Tile({ frame, loaded, duplicate, held, onToggle }) {
+function Tile({ frame, loaded, duplicate, onOpen }) {
   return (
     /* Passes two and three are the same photographs over again, so they are
        hidden from assistive tech: the row should be announced once, and only
        the first pass is reachable by tab. */
-    <li
-      className="gallery-tile"
-      data-shape={frame.shape}
-      data-held={held || undefined}
-      aria-hidden={duplicate || undefined}
-    >
+    <li className="gallery-tile" data-shape={frame.shape} aria-hidden={duplicate || undefined}>
       {loaded && (
         <button
           type="button"
           className="gallery-tile-hit"
-          onClick={onToggle}
-          aria-pressed={held}
+          onClick={(e) => onOpen(frame, e.currentTarget.getBoundingClientRect())}
+          aria-label={duplicate ? undefined : `View larger: ${frame.alt}`}
           tabIndex={duplicate ? -1 : undefined}
         >
           <img
@@ -67,41 +64,28 @@ function Tile({ frame, loaded, duplicate, held, onToggle }) {
  * Each row runs its own animation on its own track, at its own duration.
  * `direction` picks which way a shared keyframe pair is played — "right"
  * runs it in reverse — so the two directions cannot drift apart in speed or
- * easing, but the three animations remain entirely separate: stopping one
- * is invisible to the other two.
- *
- * Which is what the hold below relies on. A click parks this row on the
- * picture that was clicked; the row keeps that picture forward and stays
- * still until the same one is clicked again. Nothing outside this component
- * knows about it, so the other two rows carry on regardless. Clicking a
- * second picture in a row that is already held simply moves the hold.
+ * easing, but the three animations remain entirely separate: hovering one
+ * row holds that row still (see `.gallery-row:hover` in the stylesheet) and
+ * the other two carry on regardless.
  */
-function GalleryRow({ row, loaded }) {
-  const [held, setHeld] = useState(null);
-  const toggle = (key) => () => setHeld((current) => (current === key ? null : key));
-
+function GalleryRow({ row, loaded, onOpen }) {
   return (
     <div className="gallery-row">
       <ul
         className="gallery-track"
         data-direction={row.direction}
-        data-paused={held !== null || undefined}
         style={{ "--gallery-drift": row.drift }}
       >
         {Array.from({ length: PASSES }, (_, pass) =>
-          row.frames.map((frame, i) => {
-            const key = `${pass}-${i}`;
-            return (
-              <Tile
-                key={key}
-                frame={frame}
-                loaded={loaded}
-                duplicate={pass > 0}
-                held={held === key}
-                onToggle={toggle(key)}
-              />
-            );
-          }),
+          row.frames.map((frame, i) => (
+            <Tile
+              key={`${pass}-${i}`}
+              frame={frame}
+              loaded={loaded}
+              duplicate={pass > 0}
+              onOpen={onOpen}
+            />
+          )),
         )}
       </ul>
     </div>
@@ -117,6 +101,13 @@ const NEAR = { threshold: 0, rootMargin: "0px 0px 35% 0px" };
 
 export function WhySection() {
   const [ref, near] = useReveal(NEAR);
+  const [viewing, setViewing] = useState(null);
+  const open = useCallback((frame, origin) => setViewing({ frame, origin }), []);
+  const close = useCallback(() => setViewing(null), []);
+  /* The rows only drift while they are on screen — three long tracks of
+     photographs are not worth compositing for a reader further down. */
+  const marqueeRef = useRef(null);
+  const onScreen = useInView(marqueeRef);
 
   return (
     <section ref={ref} className="section why-section bg-paper-dim">
@@ -129,14 +120,18 @@ export function WhySection() {
 
       {/* Full-bleed: the rows run edge to edge, outside the shell's gutter. */}
       <div
+        ref={marqueeRef}
+        data-paused={!onScreen || undefined}
         className="section-body gallery-marquee"
         role="group"
         aria-label="Photographs from across the Satpuda Group campus"
       >
         {galleryRows.map((row) => (
-          <GalleryRow key={row.id} row={row} loaded={near} />
+          <GalleryRow key={row.id} row={row} loaded={near} onOpen={open} />
         ))}
       </div>
+
+      {viewing && <Lightbox frame={viewing.frame} origin={viewing.origin} onClose={close} />}
     </section>
   );
 }

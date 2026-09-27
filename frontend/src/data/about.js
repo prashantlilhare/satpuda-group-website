@@ -1,27 +1,22 @@
-import librarySmart from "../assets/images/campus/library-smart.webp";
 import libraryStacks from "../assets/images/campus/library-stacks.webp";
 import readingRoom from "../assets/images/campus/reading-room.webp";
 import seminarHall from "../assets/images/campus/seminar-hall.webp";
 import computerLab from "../assets/images/campus/computer-lab.webp";
-import sports from "../assets/images/campus/sports.webp";
 import culture from "../assets/images/campus/culture.webp";
 import campusAerial from "../assets/images/campus/campus-aerial.webp";
 import workshop from "../assets/images/campus/workshop.webp";
-import electronicsBench from "../assets/images/campus/electronics-bench.webp";
 import classroom from "../assets/images/campus/classroom.webp";
 import campusFront from "../assets/images/campus/campus-front.webp";
+import { shots } from "./shots";
 
 export const campusImages = {
-  librarySmart,
   libraryStacks,
   readingRoom,
   seminarHall,
   computerLab,
-  sports,
   culture,
   campusAerial,
   workshop,
-  electronicsBench,
   classroom,
   campusFront,
 };
@@ -103,15 +98,15 @@ export const differentiators = [
 export const campusExperience = [
   {
     title: "Libraries & reading rooms",
-    body: "A smart library with catalogue terminals and quiet reading desks, alongside open reference stacks.",
-    image: librarySmart,
-    alt: "The Satpuda smart library with reading desks and catalogue terminals",
+    body: "Open reference stacks, departmental collections and quiet reading desks.",
+    image: shots.library.src,
+    alt: shots.library.alt,
   },
   {
     title: "Laboratories & workshops",
     body: "Computing, electrical, civil, mechanical and mining laboratories, plus trade workshops for ITI students.",
-    image: electronicsBench,
-    alt: "Students working at an electronics and measurement bench",
+    image: shots.mechEngineLab.src,
+    alt: shots.mechEngineLab.alt,
   },
   {
     title: "Seminars & industry exposure",
@@ -121,8 +116,8 @@ export const campusExperience = [
   },
   {
     title: "Sport & campus life",
-    body: "Courts and grounds in regular use — basketball, cricket, athletics and indoor games.",
-    image: sports,
-    alt: "Students playing basketball on the campus court",
+    body: "Courts, grounds and an indoor hall in regular use — kabaddi, cricket, athletics and indoor games.",
+    image: shots.kabaddi.src,
+    alt: shots.kabaddi.alt,
   },
 ];
