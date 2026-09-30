@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
-import logo from "../../assets/logo/satpuda-group-logo.png";
+import logo from "../../assets/logo/satpuda-group-logo.webp";
 import { FacebookIcon, InstagramIcon } from "../ui/BrandIcons";
 import { aboutLinks, contact, instituteLinks, nav, site, socials } from "../../data/site";
 
 const ICONS = { instagram: InstagramIcon, facebook: FacebookIcon };
 
-function Column({ title, children }) {
+function Column({ title, children, className = "" }) {
   return (
-    <div>
+    <div className={className}>
       <h3 className="text-[0.6875rem] font-semibold uppercase tracking-[0.17em] text-ember-300">
         {title}
       </h3>
-      <div className="mt-6">{children}</div>
+      <div className="mt-4 sm:mt-6">{children}</div>
     </div>
   );
 }
@@ -36,11 +36,11 @@ export function Footer() {
   return (
     <footer className="on-dark bg-royal-950 text-white">
       <div className="shell section-tight">
-        <div className="grid gap-14 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1.4fr] lg:gap-10">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-10 sm:gap-y-14 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1.4fr] lg:gap-10">
           {/* --- brand --- */}
-          <div className="max-w-sm">
+          <div className="col-span-2 max-w-sm lg:col-span-1">
             <Link to="/" className="inline-flex items-center gap-3.5" aria-label={`${site.name} — home`}>
-              <img src={logo} alt="" width="512" height="512" className="h-14 w-14" />
+              <img src={logo} alt="" width="512" height="512" loading="lazy" decoding="async" className="h-14 w-14" />
               <span className="flex flex-col leading-none">
                 <span
                   className="font-display text-xl font-semibold tracking-[-0.022em] text-white"
@@ -93,7 +93,7 @@ export function Footer() {
           </Column>
 
           {/* --- contact --- */}
-          <Column title="Contact">
+          <Column title="Contact" className="col-span-2 lg:col-span-1">
             <address className="not-italic">
               <div className="flex gap-3.5">
                 <MapPin aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-ember-400" />

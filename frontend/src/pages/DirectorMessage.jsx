@@ -180,7 +180,7 @@ export default function DirectorMessage() {
           <Reveal>
             <Link
               to="/about/principal-message"
-              className="group flex flex-col gap-6 border-t border-stone-line pt-8 sm:flex-row sm:items-center sm:justify-between"
+              className="group flex items-center justify-between gap-4 border-t border-stone-line pt-8 sm:gap-6"
             >
               <div className="flex items-center gap-6">
                 <div className="w-20 shrink-0 sm:w-24">

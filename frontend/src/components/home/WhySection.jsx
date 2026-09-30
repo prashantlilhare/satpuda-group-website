@@ -49,6 +49,7 @@ function Tile({ frame, loaded, duplicate, onOpen }) {
             srcSet={`${frame.small} 460w, ${frame.src} 880w`}
             sizes={SIZES}
             alt={duplicate ? "" : frame.alt}
+            loading="lazy"
             decoding="async"
             draggable="false"
           />

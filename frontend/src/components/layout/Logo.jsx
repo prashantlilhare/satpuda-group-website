@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo/satpuda-group-logo-circle.png";
+import logo from "../../assets/logo/satpuda-group-logo-circle.webp";
 import { site } from "../../data/site";
 
 /**
@@ -26,7 +26,8 @@ export function Logo({ variant = "dark", showWordmark = true, className = "" }) 
         alt=""
         width="512"
         height="512"
-        className="h-11 w-11 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/logo:scale-[1.04] sm:h-[3.25rem] sm:w-[3.25rem]"
+        decoding="async"
+        className="h-10 w-10 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/logo:scale-[1.04] sm:h-[3.25rem] sm:w-[3.25rem]"
       />
       {showWordmark && (
         <span className="flex min-w-0 flex-col leading-none">
@@ -40,7 +41,7 @@ export function Logo({ variant = "dark", showWordmark = true, className = "" }) 
           </span>
           <span
             lang="sa"
-            className={`motto mt-1.5 truncate text-[0.75rem] leading-[1.35] sm:text-[0.8125rem] ${
+            className={`motto mt-1 truncate text-[0.75rem] sm:mt-1.5 leading-[1.35] sm:text-[0.8125rem] ${
               onLight ? "text-ember-600" : "text-ember-300"
             }`}
           >

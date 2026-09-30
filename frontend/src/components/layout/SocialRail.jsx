@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Mail } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { FacebookIcon, WhatsAppIcon } from "../ui/BrandIcons";
 import { contact, socials } from "../../data/site";
 
@@ -41,17 +42,30 @@ const links = [
  * menu. Sits at `z-30`, below the header (`z-50`) and below the mobile menu
  * panel (`z-40`), so opening the menu covers it rather than fighting it.
  *
- * Kept to a single narrow column, vertically centred and off the thumb path at
- * the bottom of a phone screen, so it never lands on top of body copy or a
- * button. Labels slide out on hover where there is a pointer to hover with.
+ * Kept to a single narrow column, vertically centred from `sm` up. On a phone
+ * a centred rail sat over the middle of every line of copy (hero headline,
+ * comparison figures), so there it is smaller and stacked just above the
+ * back-to-top button instead.
  */
 export function SocialRail() {
+  // Phones only: the rail waits until the first screen (usually the hero, with
+  // its slide controls in that same corner) has been scrolled past — the same
+  // threshold the back-to-top button uses, so the two arrive together.
+  const { scrollY } = useScroll();
+  const [past, setPast] = useState(false);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const next = y > window.innerHeight * 0.9;
+    setPast((prev) => (prev === next ? prev : next));
+  });
+
   return (
     <div
-      className="fixed right-0 top-1/2 z-30 -translate-y-1/2 print:hidden"
+      className={`fixed bottom-[5.25rem] right-0 z-30 transition-[translate,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] print:hidden sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 ${
+        past ? "" : "max-sm:pointer-events-none max-sm:translate-x-full max-sm:opacity-0"
+      }`}
       style={{ paddingRight: "env(safe-area-inset-right, 0px)" }}
     >
-      <ul className="flex flex-col items-end gap-2">
+      <ul className="flex flex-col items-end gap-1.5 sm:gap-2">
         {/* Slides in from the edge a moment after load, one button at a time. */}
         {links.map(({ key, label, href, external, Icon, hover }, i) => (
           <motion.li
@@ -66,7 +80,7 @@ export function SocialRail() {
             {key === "whatsapp" && (
               <span
                 aria-hidden="true"
-                className="rail-ping pointer-events-none absolute inset-0 rounded-l-xl bg-[#25d366]"
+                className="rail-ping pointer-events-none absolute inset-0 rounded-l-lg sm:rounded-l-xl bg-[#25d366]"
               />
             )}
             <a
@@ -74,9 +88,9 @@ export function SocialRail() {
               target={external ? "_blank" : undefined}
               rel={external ? "noreferrer noopener" : undefined}
               aria-label={label}
-              className={`group/rail relative flex h-11 w-11 items-center justify-center rounded-l-xl border border-r-0 border-sand bg-white text-royal-700 shadow-[0_10px_26px_-14px_rgba(20,34,68,0.6)] transition-[background-color,color,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-white focus-visible:text-white sm:h-12 sm:w-12 ${hover}`}
+              className={`group/rail relative flex h-9 w-9 items-center justify-center rounded-l-lg sm:rounded-l-xl border border-r-0 border-sand bg-white text-royal-700 shadow-[0_10px_26px_-14px_rgba(20,34,68,0.6)] transition-[background-color,color,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-white focus-visible:text-white sm:h-12 sm:w-12 ${hover}`}
             >
-              <Icon className="h-[1.15rem] w-[1.15rem] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/rail:scale-115 group-hover/rail:-rotate-8 sm:h-5 sm:w-5" />
+              <Icon className="h-4 w-4 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/rail:scale-115 group-hover/rail:-rotate-8 sm:h-5 sm:w-5" />
               <span className="sr-only">{label}</span>
             </a>
           </motion.li>

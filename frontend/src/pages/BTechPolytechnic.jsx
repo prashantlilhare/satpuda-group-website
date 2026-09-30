@@ -132,6 +132,8 @@ export default function BTechPolytechnic() {
           <img
             src={diplomaBranchImages[hoveredDiploma ?? 0]?.src || campusImages.campusFront}
             alt={diplomaBranches[hoveredDiploma ?? 0]?.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
             style={{ objectPosition: diplomaBranchImages[hoveredDiploma ?? 0]?.focus }}
           />

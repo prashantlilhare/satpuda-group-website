@@ -51,18 +51,19 @@ export const institutions = [
   {
     id: "iti",
     to: "/institutes/iti",
-    name: "Satpuda ITI, Garra",
+    name: "Satpuda ITIs",
     shortName: "ITI",
     kicker: "Vocational Training",
     image: imgIti,
     imageAlt: "Satpuda trainees on an industrial workshop floor during practical training",
     thumb: photo("0027", "An ITI trainee explaining a wiring board", "50% 45%"),
     summary:
-      "Craftsman Training Scheme trades affiliated to NCVT — hands-on, job-oriented technical training for students after Class 10.",
-    blurb: "NCVT trade training that puts tools in students' hands from day one.",
+      "15 NCVT-affiliated ITI campuses across Madhya Pradesh — hands-on, job-oriented Craftsman Training Scheme trades for students after Class 10.",
+    blurb: "NCVT trade training on 15 campuses, with tools in students' hands from day one.",
     established: 1999,
     credentials: [
       "Affiliated to NCVT / DGT",
+      "15 campuses across 8 districts of M.P.",
       "Accredited by QCI, New Delhi",
     ],
     highlights: ["Electrician", "Fitter", "Mechanic Diesel", "COPA"],

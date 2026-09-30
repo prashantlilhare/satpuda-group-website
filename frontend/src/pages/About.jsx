@@ -39,7 +39,7 @@ export default function About() {
       {/* ---------------- editorial opening ---------------- */}
       <section className="section bg-paper">
         <div className="shell">
-          <div className="grid gap-10 sm:gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <div className="grid gap-10 sm:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
             {/* Left Column: Bold Headline & Trust Highlight Card — heading
                 sits at the top, card at the bottom, so both edges line up
                 with the photo grid beside it. */}

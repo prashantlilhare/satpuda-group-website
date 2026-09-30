@@ -125,9 +125,9 @@ function MobileAccordion({ item, index, onNavigate }) {
         aria-expanded={expanded}
         aria-controls={panelId}
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 py-5 text-left"
+        className="flex w-full items-center justify-between gap-4 py-4 text-left sm:py-5"
       >
-        <span className="font-display text-[1.75rem] font-semibold tracking-[-0.025em] text-white">
+        <span className="font-display text-[1.5rem] font-semibold tracking-[-0.025em] text-white sm:text-[1.75rem]">
           {item.label}
         </span>
         <span
@@ -308,7 +308,7 @@ export function Navbar() {
         }}
         aria-hidden={scrolled}
       >
-        <div className="shell flex h-11 items-center justify-between gap-6">
+        <div className="shell flex h-[var(--nav-utility-h)] items-center justify-between gap-6">
           <p className="motto truncate text-[0.8125rem] text-ember-200">
             {site.motto}
             <span className="ml-2.5 hidden text-white/60 sm:inline">
@@ -405,7 +405,7 @@ export function Navbar() {
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
-              className="flex h-11 w-11 items-center justify-center border border-sand text-royal-700 transition-colors duration-300 hover:border-royal-600 hover:bg-royal-600 hover:text-white lg:hidden"
+              className="flex h-10 w-10 items-center justify-center border border-sand text-royal-700 transition-colors duration-300 hover:border-royal-600 hover:bg-royal-600 hover:text-white sm:h-11 sm:w-11 lg:hidden"
             >
               {menuOpen ? (
                 <X aria-hidden="true" className="h-5 w-5" />
@@ -469,7 +469,7 @@ export function Navbar() {
                       end
                       onClick={closeMenu}
                       className={({ isActive }) =>
-                        `block py-5 font-display text-[1.75rem] font-semibold tracking-[-0.025em] transition-colors duration-300 ${
+                        `block py-4 font-display text-[1.5rem] font-semibold sm:py-5 sm:text-[1.75rem] tracking-[-0.025em] transition-colors duration-300 ${
                           isActive ? "text-ember-400" : "text-white"
                         }`
                       }
@@ -482,7 +482,7 @@ export function Navbar() {
             </ul>
           </nav>
   
-          <div className="mt-10 space-y-3">
+          <div className="mt-8 space-y-3 sm:mt-10">
             <Link
               to="/contact"
               onClick={closeMenu}

@@ -322,6 +322,7 @@ export function RoundCarousel({ items }) {
                 srcSet={near ? item.srcSet : undefined}
                 sizes={`${Math.round(size.w)}px`}
                 alt={item.alt}
+                loading="lazy"
                 decoding="async"
                 draggable="false"
                 style={{ objectPosition: item.focus ?? "center" }}
