@@ -1082,6 +1082,48 @@
   }
 }
 
+/* Placed students on the B.Tech page: two rows of cards drifting in
+   opposite directions, faded out at both edges of the window. The list is
+   rendered twice and each card carries its own right padding, so half the
+   track is exactly one pass. */
+.placement-row {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.placement-track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: marquee-x var(--placement-duration, 80s) linear infinite;
+}
+
+.placement-track[data-direction="right"] {
+  animation-direction: reverse;
+}
+
+/* Pointing at a row stops it, so a card can be read. */
+.placement-row:hover .placement-track,
+.placement-row:focus-within .placement-track,
+.placement-row[data-paused] .placement-track {
+  animation-play-state: paused;
+}
+
+/* No drift under reduced motion: the row scrolls by hand instead. */
+@media (prefers-reduced-motion: reduce) {
+  .placement-track {
+    animation: none;
+  }
+
+  .placement-row {
+    overflow-x: auto;
+    padding-inline: 1rem;
+    mask-image: none;
+  }
+}
+
 /* Off screen, the tickers and gallery rows hold still (set from
    IntroSection / WhySection) instead of animating for nobody. */
 [data-paused] > .marquee-track,

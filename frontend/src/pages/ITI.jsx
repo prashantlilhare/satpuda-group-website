@@ -12,6 +12,8 @@ import { Eyebrow, Fact, ReadMore, Reveal, SectionHeading, SplitText } from "../c
 import { itiTrades } from "../data/programs";
 import { campusMapUrl, campusesOffering, itiCampuses, itiDistricts } from "../data/itiCampuses";
 import { CampusSheet } from "../components/shared/CampusSheet";
+import { ItiPlacementChart } from "../components/shared/ItiPlacementChart";
+import { itiPlacements, itiRecruiters } from "../data/achievements";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
@@ -422,17 +424,32 @@ function CampusCard({ campus: c, hidden, onView }) {
  *
  * A row of district chips (with counts) narrows the grid; cards leaving
  * and entering settle with a short layout transition rather than a jump.
+ * Only the first six show until "View all" is pressed — picking a district
+ * folds the list back to six.
  * Each card carries what an applicant actually needs — where it is, which
  * trades it runs, who heads it and a number to call — and opens into the
  * campus's full record (`CampusSheet`), which scales up out of the card.
  */
+/* How many campus cards show before "View all". */
+const FIRST_CAMPUSES = 6;
+
 function CampusDirectory() {
   const [district, setDistrict] = useState("All");
   /* the campus whose full record is open, with the card's rect to grow from */
   const [open, setOpen] = useState(null);
+  const [all, setAll] = useState(false);
+  const listRef = useRef(null);
   const still = useReducedMotion();
-  const shown = district === "All" ? itiCampuses : itiCampuses.filter((c) => c.district === district);
+  const matching = district === "All" ? itiCampuses : itiCampuses.filter((c) => c.district === district);
+  const shown = all ? matching : matching.slice(0, FIRST_CAMPUSES);
   const chips = ["All", ...itiDistricts];
+
+  const toggleAll = () => {
+    /* folding back up leaves the reader below a list that just got
+       shorter, so bring the top of the list back into view */
+    if (all) listRef.current?.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
+    setAll(!all);
+  };
 
   return (
     <div className="section-body">
@@ -446,7 +463,10 @@ function CampusDirectory() {
                 key={d}
                 type="button"
                 aria-pressed={active}
-                onClick={() => setDistrict(d)}
+                onClick={() => {
+                  setDistrict(d);
+                  setAll(false);
+                }}
                 className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[0.8125rem] font-semibold transition-colors duration-300 ${
                   active
                     ? "border-royal-700 bg-royal-700 text-white"
@@ -461,7 +481,7 @@ function CampusDirectory() {
         </div>
       </Reveal>
 
-      <motion.ul layout={!still} className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <motion.ul ref={listRef} layout={!still} className="mt-8 scroll-mt-32 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout" initial={false}>
           {shown.map((c) => (
             <motion.li
@@ -477,6 +497,31 @@ function CampusDirectory() {
           ))}
         </AnimatePresence>
       </motion.ul>
+
+      {matching.length > FIRST_CAMPUSES && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={toggleAll}
+            aria-expanded={all}
+            className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-full border border-royal-700 px-6 text-[0.875rem] font-semibold text-royal-700 transition-[background-color,color,transform] duration-200 ease-out hover:bg-royal-700 hover:text-white active:scale-[0.97]"
+          >
+            {all ? "Show fewer" : `View all ${matching.length} campuses`}
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className={`h-4 w-4 transition-transform duration-200 ease-out ${all ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {open && <CampusSheet campus={open.campus} origin={open.origin} onClose={() => setOpen(null)} />}
 
@@ -531,6 +576,19 @@ export default function ITI() {
         image={photo("0055", "Trade projects along the ITI workshop hall", "50% 45%")}
       />
 
+      {/* ---------------- placements ---------------- */}
+      <section className="section bg-paper-dim">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Placements & achievements"
+            title="Trained here, hired across India."
+            lead="Campus placement drives at Satpuda ITIs, year by year — from the group's own placement record."
+          />
+
+          <ItiPlacementChart years={itiPlacements} recruiters={itiRecruiters} className="section-body" />
+        </div>
+      </section>
+
       {/* ---------------- key facts strip ---------------- */}
       <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
@@ -550,9 +608,6 @@ export default function ITI() {
           </div>
         </div>
       </section>
-
-      {/* ---------------- principal ---------------- */}
-      <PrincipalDesk institution="iti" />
 
       {/* ---------------- about ---------------- */}
       <section className="section bg-paper">
@@ -699,10 +754,12 @@ export default function ITI() {
         </div>
       </section>
 
+      {/* ---------------- principal ---------------- */}
+      <PrincipalDesk institution="iti" tone="paper" />
+
       {/* ---------------- gallery ---------------- */}
       <InstituteGallery
         items={ringPhotos}
-        tone="paper"
         title="On the trade floor, in pictures."
         lead="Workshops, trade projects and the days the institute marks together — drag the ring or use the arrows."
       />
