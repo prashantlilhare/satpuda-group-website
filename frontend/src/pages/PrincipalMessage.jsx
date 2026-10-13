@@ -147,7 +147,7 @@ export default function PrincipalMessage() {
           <Reveal delay={stagger(2)}>
             <Link
               to="/about/director-message"
-              className="group section-body flex flex-col gap-6 border-t border-stone-line pt-8 sm:flex-row sm:items-center sm:justify-between"
+              className="group section-body flex items-center justify-between gap-4 border-t border-stone-line pt-8 sm:gap-6"
             >
               <div className="flex items-center gap-6">
                 <div className="w-20 shrink-0 sm:w-24">

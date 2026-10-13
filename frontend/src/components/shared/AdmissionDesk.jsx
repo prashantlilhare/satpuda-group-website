@@ -13,7 +13,7 @@ const EASE = [0.16, 1, 0.3, 1];
    seats, fees and dates change every session and are left to the office. */
 const PROGRAMMES = [
   { name: "School (CBSE)", org: "Satpuda Valley Public School", entry: "Class-wise", length: "Class 1 onwards", to: "/institutes/school" },
-  { name: "ITI trades", org: "Satpuda ITI, Garra", entry: "After Class 10", length: "1–2 years", to: "/institutes/iti" },
+  { name: "ITI trades", org: "Satpuda ITIs · 15 campuses", entry: "After Class 10", length: "1–2 years", to: "/institutes/iti" },
   { name: "Diploma (Polytechnic)", org: "College of Engineering & Polytechnic", entry: "After Class 10", length: "3 years", to: "/institutes/btech-polytechnic" },
   { name: "B.Tech", org: "College of Engineering & Polytechnic", entry: "After Class 12 (PCM)", length: "4 years", to: "/institutes/btech-polytechnic" },
   { name: "D.Ed", org: "Teacher education", entry: "After Class 12", length: "2 years", to: "/institutes/ded-bed" },

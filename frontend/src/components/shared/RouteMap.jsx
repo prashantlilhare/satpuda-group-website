@@ -56,7 +56,7 @@ function RouteNode({ title, sub, accent = false }) {
  * the diploma — and a branch climbs from the diploma line into the degree
  * line partway along: lateral entry into the second year. The lines draw
  * in when the map arrives, then a dot keeps running each route so it
- * reads as a way through rather than a table. On a phone the same two
+ * reads as a way through rather than a table. Below `lg` the same two
  * routes stack as short vertical lists.
  */
 export function RouteMap({ className = "" }) {
@@ -67,7 +67,7 @@ export function RouteMap({ className = "" }) {
   return (
     <div ref={ref} className={className}>
       {/* laptop: the map */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         {ROUTES.map((r, i) => (
           <Fragment key={r.from}>
             <div className="flex items-center">
@@ -118,8 +118,8 @@ export function RouteMap({ className = "" }) {
         ))}
       </div>
 
-      {/* phone: the same routes, stacked */}
-      <div className="grid gap-5 md:hidden">
+      {/* phone and tablet: the same routes, stacked */}
+      <div className="grid gap-5 md:grid-cols-2 lg:hidden">
         {ROUTES.map((r, i) => (
           <Reveal key={r.from} delay={stagger(i)}>
             <div className="rounded-2xl border border-stone-line bg-white p-5">

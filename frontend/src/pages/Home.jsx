@@ -1,5 +1,8 @@
-import { HeroSlider } from "../components/home/HeroSlider";
+// Old photo-wall hero, kept for now — swap back by un-commenting both lines.
+// import { HeroSlider } from "../components/home/HeroSlider";
+import { HomeHero } from "../components/home/HomeHero";
 import { IntroSection } from "../components/home/IntroSection";
+import { AchievementsSection } from "../components/home/AchievementsSection";
 import { InstitutionsSection } from "../components/home/InstitutionsSection";
 import { ProgramsSection } from "../components/home/ProgramsSection";
 import { WhySection } from "../components/home/WhySection";
@@ -19,8 +22,10 @@ export default function Home() {
 
   return (
     <>
-      <HeroSlider />
+      {/* <HeroSlider /> */}
+      <HomeHero />
       <IntroSection />
+      <AchievementsSection />
       <InstitutionsSection />
       <ProgramsSection />
       <WhySection />

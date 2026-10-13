@@ -14,11 +14,19 @@ const EASE = [0.16, 1, 0.3, 1];
  * different rates — depth from three flat shapes. On arrival an ember line
  * traces the far ridge from left to right.
  *
+ * `farFill` and `midFill` colour the two rear ridges — the defaults suit a
+ * dark hero; a light one passes its own.
+ *
  * `target` is the ref of the element whose scroll drives the parallax.
  * Reduced motion (through the layout's MotionConfig) leaves the hills
  * standing still and the line already drawn.
  */
-export function HeroRidge({ target, fill = "var(--color-paper)" }) {
+export function HeroRidge({
+  target,
+  fill = "var(--color-paper)",
+  farFill = "rgb(255 255 255 / 0.07)",
+  midFill = "rgb(12 21 41 / 0.55)",
+}) {
   const { scrollYProgress } = useScroll({ target, offset: ["start start", "end start"] });
   const farY = useTransform(scrollYProgress, [0, 1], [0, 46]);
   const midY = useTransform(scrollYProgress, [0, 1], [0, 22]);
@@ -31,7 +39,7 @@ export function HeroRidge({ target, fill = "var(--color-paper)" }) {
       className="hero-ridge pointer-events-none absolute inset-x-0 bottom-[-1px] z-[5] w-full"
     >
       <motion.g style={{ y: farY }}>
-        <path d={FAR + CLOSE} fill="rgb(255 255 255 / 0.07)" />
+        <path d={FAR + CLOSE} fill={farFill} />
         <motion.path
           d={FAR}
           fill="none"
@@ -43,7 +51,7 @@ export function HeroRidge({ target, fill = "var(--color-paper)" }) {
           transition={{ pathLength: { duration: 2.2, ease: EASE, delay: 0.5 }, opacity: { duration: 0.3, delay: 0.5 } }}
         />
       </motion.g>
-      <motion.path d={MID + CLOSE} fill="rgb(12 21 41 / 0.55)" style={{ y: midY }} />
+      <motion.path d={MID + CLOSE} fill={midFill} style={{ y: midY }} />
       <path d={NEAR + CLOSE} fill={fill} />
     </svg>
   );

@@ -1,7 +1,7 @@
 import principalEngPortrait from "../assets/images/leadership/principal-ashok-kumar-gupta.webp";
 import principalSchoolPortrait from "../assets/images/institutions/valley-school-principle.webp";
-import principalItiPortrait from "../assets/images/leadership/principal-iti-rakesh-patle.jpg";
-import principalTeacherEdPortrait from "../assets/images/leadership/dean-teacher-education-meenakshi-verma.jpg";
+import principalItiPortrait from "../assets/images/leadership/principal-iti-rakesh-patle.webp";
+import principalTeacherEdPortrait from "../assets/images/institutions/ded-bed-principal.webp";
 
 /**
  * The head of each institution, introduced at the top of its page.
@@ -32,14 +32,13 @@ export const principals = {
 
   school: {
     placeholder: true,
-    name: "Dr. Sunita Sharma",
+    name: "Miss Purnima Deshmukh",
     role: "Principal",
     org: "Satpuda Valley Public School",
-    qualifications: "M.Sc. · B.Ed. · M.Ed. · Ph.D. (Education)",
     portrait: principalSchoolPortrait,
     /* supplied already cut to a circle, on a transparent ground */
     portraitRound: true,
-    portraitAlt: "Portrait of Dr. Sunita Sharma, Principal of Satpuda Valley Public School",
+    portraitAlt: "Portrait of Miss Purnima Deshmukh, Principal of Satpuda Valley Public School",
     quote:
       "Curiosity is built early — our job is to give it room, and then give it direction.",
     summary:
@@ -48,12 +47,11 @@ export const principals = {
 
   iti: {
     placeholder: true,
-    name: "Er. Rakesh Patle",
+    name: "Mr. Kamal Bramhe",
     role: "Principal",
-    org: "Satpuda ITI, Garra",
-    qualifications: "B.Tech (Mechanical)",
+    org: "Satpuda ITI, Manjhapur (Head campus)",
     portrait: principalItiPortrait,
-    portraitAlt: "Portrait of Er. Rakesh Patle, Principal of Satpuda ITI",
+    portraitAlt: "Portrait of Mr. Kamal Bramhe, Principal of Satpuda ITI",
     quote:
       "A trade is learned with your hands — so most of the week here is spent on the workshop floor.",
     summary:
@@ -61,13 +59,11 @@ export const principals = {
   },
 
   "ded-bed": {
-    placeholder: true,
-    name: "Dr. Meenakshi Verma",
-    role: "Dean & Principal",
+    /* Name and photograph confirmed by the group; no designation is shown. */
+    name: "Devendra Rahangdale",
     org: "Teacher Education — D.Ed & B.Ed",
-    qualifications: "M.A. · M.Ed. · Ph.D. (Education)",
     portrait: principalTeacherEdPortrait,
-    portraitAlt: "Portrait of Dr. Meenakshi Verma, Dean of Teacher Education",
+    portraitAlt: "Portrait of Devendra Rahangdale, Teacher Education — D.Ed & B.Ed",
     quote:
       "A good teacher is made in the classroom — theory tells you why, practice teaches you how.",
     summary:

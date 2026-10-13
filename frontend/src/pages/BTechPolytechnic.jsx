@@ -5,11 +5,14 @@ import { InstituteGallery } from "../components/shared/InstituteGallery";
 import { PrincipalDesk } from "../components/shared/PrincipalDesk";
 import { AboutCollage } from "../components/shared/AboutCollage";
 import { RouteMap } from "../components/shared/RouteMap";
+import { PlacementMarquee } from "../components/shared/PlacementMarquee";
+import { EdgeStrip } from "../components/shared/EdgeStrip";
 import { Eyebrow, Fact, Figure, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { btechBranches, diplomaBranches, engineeringAdmission } from "../data/programs";
 import { campusImages } from "../data/about";
 import { photo } from "../data/photos";
 import { shots } from "../data/shots";
+import { placedStudents, placementHighlights } from "../data/placements";
 import { getInstitution } from "../data/institutions";
 import { useSeo } from "../hooks/useSeo";
 import { Stamp } from "../components/ui/Stamp";
@@ -68,6 +71,34 @@ const facilities = [
     body: "Technical sessions, guest lectures and departmental presentations for the whole cohort.",
     image: campusImages.seminarHall,
     alt: "A full seminar hall during a technical session",
+  },
+];
+
+/* Why Satpuda: what a visitor can see on campus that sets it apart. */
+const edge = [
+  {
+    tag: "Mining",
+    title: "Mining, taught in a mining district.",
+    body: "Balaghat sits in a mineral belt. Mining students are briefed on working sites and visit plants, not just read about them.",
+    image: shots.miningBriefing,
+  },
+  {
+    tag: "Labs",
+    title: "Equipment the industry uses.",
+    body: "A collaborative-robot cell, a CNC simulator and a PCB design and manufacturing lab — run by the students themselves.",
+    image: photo("0046", "A collaborative robot being demonstrated in the laboratory", "50% 45%"),
+  },
+  {
+    tag: "Site visits",
+    title: "The syllabus, out on site.",
+    body: "Bridge construction sites, industrial visits and a project expo take every branch out of the classroom.",
+    image: shots.civilSiteVisit,
+  },
+  {
+    tag: "Ways in",
+    title: "Diploma to degree, one campus.",
+    body: "Start the diploma after Class 10 and step into the second year of the B.Tech, or join the degree after Class 12.",
+    image: { src: campusImages.campusFront, alt: "The Satpuda College of Engineering & Polytechnic building", focus: "50% 50%" },
   },
 ];
 
@@ -132,6 +163,8 @@ export default function BTechPolytechnic() {
           <img
             src={diplomaBranchImages[hoveredDiploma ?? 0]?.src || campusImages.campusFront}
             alt={diplomaBranches[hoveredDiploma ?? 0]?.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
             style={{ objectPosition: diplomaBranchImages[hoveredDiploma ?? 0]?.focus }}
           />
@@ -156,6 +189,19 @@ export default function BTechPolytechnic() {
         image={photo("0037", "The electrical engineering laboratory in use", "50% 45%")}
       />
 
+      {/* ---------------- placements ---------------- */}
+      <section className="section overflow-x-clip bg-paper">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Placements & achievements"
+            title="Our students, now at work."
+            lead="Offers made to Satpuda's B.Tech and diploma students — with the company and the package."
+          />
+
+          <PlacementMarquee highlights={placementHighlights} students={placedStudents} className="section-body" />
+        </div>
+      </section>
+
       {/* ---------------- approvals ---------------- */}
       <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
@@ -175,65 +221,21 @@ export default function BTechPolytechnic() {
         </div>
       </section>
 
-      {/* ---------------- principal ---------------- */}
-      <PrincipalDesk institution="btech-polytechnic" />
-
-      {/* ---------------- overview ---------------- */}
-      <section className="section bg-paper">
+      {/* ---------------- WHY SATPUDA ---------------- */}
+      <section className="section bg-paper-dim">
         <div className="shell">
-          <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
-            <div>
-              <Reveal>
-                <Eyebrow>The college</Eyebrow>
-              </Reveal>
-              <Reveal delay={stagger(1)}>
-                <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
-                  Engineering taught where the industry actually is.
-                </SplitText>
-              </Reveal>
-              <Reveal delay={stagger(2)}>
-                <ReadMore lines={4} className="mt-6">
-                  <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
-                    <p>
-                      Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
-                      three-year diploma programmes on the group's campus at Manjhapur, Balaghat. The
-                      degree programmes are approved by the All India Council for Technical Education
-                      and affiliated to Rajiv Gandhi Proudyogiki Vishwavidyalaya, Bhopal; the diploma
-                      programmes are approved by the Directorate of Technical Education, Government of
-                      Madhya Pradesh.
-                    </p>
-                    <p>
-                      The branch mix is deliberate. Balaghat sits in a mineral belt, and mining
-                      engineering here is not a theoretical offering — it is taught in a district
-                      where mines operate. Civil, mechanical and electrical engineering serve the
-                      construction and infrastructure work around the region, and computer science
-                      opens routes that are not geographically limited at all.
-                    </p>
-                  </div>
-                </ReadMore>
-              </Reveal>
+          <SectionHeading
+            eyebrow="Why Satpuda"
+            title="What makes engineering here different."
+            lead="Not claims on a brochure — four things you can see for yourself on a campus visit."
+          />
 
-              <div className="mt-10 grid grid-cols-2 gap-8 sm:max-w-md">
-                <Reveal delay={stagger(3)}>
-                  <div className="border-t border-stone-line pt-5">
-                    <Fact value="05" label="B.Tech branches" />
-                  </div>
-                </Reveal>
-                <Reveal delay={stagger(4)}>
-                  <div className="border-t border-stone-line pt-5">
-                    <Fact value="05" label="Diploma branches" />
-                  </div>
-                </Reveal>
-              </div>
-            </div>
-
-            <AboutCollage items={aboutPhotos} />
-          </div>
+          <EdgeStrip items={edge} className="section-body" />
         </div>
       </section>
 
       {/* ---------------- ADMISSION ---------------- */}
-      <section className="section bg-paper-dim">
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="Ways in"
@@ -287,7 +289,7 @@ export default function BTechPolytechnic() {
       </section>
 
       {/* ---------------- B.TECH BRANCHES ---------------- */}
-      <section className="section bg-paper">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="Degree programmes"
@@ -448,6 +450,63 @@ export default function BTechPolytechnic() {
           </div>
         </div>
       </section>
+
+      {/* ---------------- overview ---------------- */}
+      <section className="section bg-paper-dim">
+        <div className="shell">
+          <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
+            <div>
+              <Reveal>
+                <Eyebrow>The college</Eyebrow>
+              </Reveal>
+              <Reveal delay={stagger(1)}>
+                <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
+                  Engineering taught where the industry actually is.
+                </SplitText>
+              </Reveal>
+              <Reveal delay={stagger(2)}>
+                <ReadMore lines={4} className="mt-6">
+                  <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
+                    <p>
+                      Satpuda College of Engineering & Polytechnic runs four-year B.Tech degrees and
+                      three-year diploma programmes on the group's campus at Manjhapur, Balaghat. The
+                      degree programmes are approved by the All India Council for Technical Education
+                      and affiliated to Rajiv Gandhi Proudyogiki Vishwavidyalaya, Bhopal; the diploma
+                      programmes are approved by the Directorate of Technical Education, Government of
+                      Madhya Pradesh.
+                    </p>
+                    <p>
+                      The branch mix is deliberate. Balaghat sits in a mineral belt, and mining
+                      engineering here is not a theoretical offering — it is taught in a district
+                      where mines operate. Civil, mechanical and electrical engineering serve the
+                      construction and infrastructure work around the region, and computer science
+                      opens routes that are not geographically limited at all.
+                    </p>
+                  </div>
+                </ReadMore>
+              </Reveal>
+
+              <div className="mt-10 grid grid-cols-2 gap-8 sm:max-w-md">
+                <Reveal delay={stagger(3)}>
+                  <div className="border-t border-stone-line pt-5">
+                    <Fact value="05" label="B.Tech branches" />
+                  </div>
+                </Reveal>
+                <Reveal delay={stagger(4)}>
+                  <div className="border-t border-stone-line pt-5">
+                    <Fact value="05" label="Diploma branches" />
+                  </div>
+                </Reveal>
+              </div>
+            </div>
+
+            <AboutCollage items={aboutPhotos} />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- principal ---------------- */}
+      <PrincipalDesk institution="btech-polytechnic" tone="paper" />
 
       {/* ---------------- gallery ---------------- */}
       <InstituteGallery

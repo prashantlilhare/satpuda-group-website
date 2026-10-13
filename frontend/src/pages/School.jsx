@@ -7,8 +7,9 @@ import { PrincipalDesk } from "../components/shared/PrincipalDesk";
 import { AboutCollage } from "../components/shared/AboutCollage";
 import { SchoolNotebook } from "../components/shared/SchoolNotebook";
 import { Lightbox } from "../components/shared/Lightbox";
+import { SchoolResults } from "../components/shared/SchoolResults";
 import { Eyebrow, Fact, ReadMore, Reveal, SectionHeading, SplitText, TextLink } from "../components/ui/Primitives";
-import { schoolPillars } from "../data/programs";
+import { schoolPillars, schoolResults } from "../data/programs";
 import { campusImages } from "../data/about";
 import { photo } from "../data/photos";
 import { schoolShots } from "../data/shots";
@@ -41,6 +42,13 @@ const aboutPhotos = [
   schoolShots.assemblySeated,
 ];
 
+/* Under the results: the school on the sports field. */
+const sportPhotos = [
+  { ...schoolShots.footballTrophy, caption: "Inter School Football Tournament, 2024" },
+  { ...schoolShots.footballBoys, caption: "The boys' football squad" },
+  { ...schoolShots.girlsTeam, caption: "Our girls' team with their coaches" },
+];
+
 /* The gallery ring near the foot of the page. */
 const ringPhotos = [
   { ...schoolShots.flagHoisting, caption: "Hoisting the flag on Independence Day" },
@@ -59,6 +67,20 @@ const ringPhotos = [
   { ...photo("0030", "A school student presenting a nutrition pyramid model", "50% 42%"), caption: "The nutrition pyramid" },
   { ...photo("0031", "Junior students explaining their school model to visitors", "50% 40%"), caption: "Juniors presenting their school model" },
   { ...photo("0053", "Young students presenting a rope-way project", "50% 45%"), caption: "A rope-way project in the corridor" },
+  { ...schoolShots.sportsDay, caption: "March-past on sports day" },
+  { ...schoolShots.housePyramid, caption: "A human pyramid on the ground" },
+  { ...schoolShots.kabaddi, caption: "Kabaddi on the mats" },
+  { ...schoolShots.yoga, caption: "Yoga on the school ground" },
+  { ...schoolShots.turfAssembly, caption: "A mass yoga session on the turf" },
+  { ...schoolShots.houseCaptains, caption: "Investiture of the house captains" },
+  { ...schoolShots.basantPanchami, caption: "Basant Panchami in the pre-primary" },
+  { ...schoolShots.orangeDay, caption: "Orange Colour Day" },
+  { ...schoolShots.fancyDress, caption: "Fancy dress for the little ones" },
+  { ...schoolShots.plantation, caption: "Planting saplings on campus" },
+  { ...schoolShots.natureTrip, caption: "Out on a nature trip" },
+  { ...schoolShots.computerLab, caption: "In the computer lab" },
+  { ...schoolShots.library, caption: "Reading hour in the library" },
+  { ...schoolShots.careerGuidance, caption: "A career guidance session" },
 ];
 
 export default function School() {
@@ -83,6 +105,30 @@ export default function School() {
         image={photo("0050", "School students presenting their projects in the corridor", "50% 45%")}
       />
 
+      {/* ---------------- achievements ---------------- */}
+      <section className="section bg-paper-dim">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Achievements"
+            title="Results the school is proud of."
+            lead="Board toppers, entrance results and the sports ground — a few of the names from recent years."
+          />
+
+          <Reveal delay={stagger(1)}>
+            <SchoolResults
+              {...schoolResults}
+              sport={sportPhotos}
+              onView={(frame, origin) => setViewing({ frame, origin })}
+              className="section-body"
+            />
+          </Reveal>
+        </div>
+      </section>
+
+      {viewing && (
+        <Lightbox frame={viewing.frame} origin={viewing.origin} onClose={() => setViewing(null)} tone="gray" />
+      )}
+
       {/* ---------------- key facts ---------------- */}
       <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
@@ -102,9 +148,6 @@ export default function School() {
           </div>
         </div>
       </section>
-
-      {/* ---------------- principal ---------------- */}
-      <PrincipalDesk institution="school" />
 
       {/* ---------------- about ---------------- */}
       <section className="section bg-paper">
@@ -229,10 +272,6 @@ export default function School() {
             ))}
           </ul>
 
-          {viewing && (
-            <Lightbox frame={viewing.frame} origin={viewing.origin} onClose={() => setViewing(null)} tone="gray" />
-          )}
-
           <Reveal delay={stagger(2)}>
             <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
               Class-wise admission criteria, the fee structure, session dates and transport routes
@@ -243,11 +282,15 @@ export default function School() {
         </div>
       </section>
 
+      {/* ---------------- principal ---------------- */}
+      <PrincipalDesk institution="school" />
+
       {/* ---------------- gallery ---------------- */}
       <InstituteGallery
+        tone="paper"
         items={ringPhotos}
         title="A year at the school."
-        lead="Exhibitions, the STEM room, sport and culture — drag the ring or use the arrows."
+        lead="Exhibitions, sports day, festivals and the classroom — drag the ring or use the arrows."
       />
 
       <CTASection

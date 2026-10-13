@@ -61,9 +61,6 @@ export default function DEdBEd() {
         image={dedBed.teaching}
       />
 
-      {/* ---------------- principal ---------------- */}
-      <PrincipalDesk institution="ded-bed" />
-
       {/* ---------------- why teaching ---------------- */}
       <section className="section bg-paper">
         <div className="shell">
@@ -245,8 +242,12 @@ export default function DEdBEd() {
         </div>
       </section>
 
+      {/* ---------------- principal ---------------- */}
+      <PrincipalDesk institution="ded-bed" />
+
       {/* ---------------- gallery ---------------- */}
       <InstituteGallery
+        tone="paper"
         items={ringPhotos}
         title="Where teachers are made."
         lead="Our trainees, faculty and the days we celebrate together — drag the ring or use the arrows."

@@ -250,6 +250,7 @@ export function LeadershipSection() {
                           alt={card.portraitAlt}
                           className="h-full w-full object-cover object-top transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
                           loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-royal-100 text-2xl font-bold text-royal-700">
@@ -402,6 +403,7 @@ export function LeadershipSection() {
                           alt={card.portraitAlt}
                           className="h-full w-full object-cover object-top"
                           loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-royal-100 text-lg font-bold text-royal-700">

@@ -11,12 +11,14 @@ import { stagger } from "../ui/stagger";
  * Deliberately brief — a card, not a letter. Where a full message exists
  * (`messageLink`), it links out to it.
  */
-export function PrincipalDesk({ institution }) {
+/* `tone` picks the band colour, so the section can sit beside the gallery
+   on either side without two bands of the same colour running together. */
+export function PrincipalDesk({ institution, tone = "dim" }) {
   const p = principals[institution];
   if (!p) return null;
 
   return (
-    <section className="section bg-paper-dim">
+    <section className={`section ${tone === "paper" ? "bg-paper" : "bg-paper-dim"}`}>
       <div className="shell">
         <div className="grid items-center gap-10 md:grid-cols-[0.8fr_1.2fr] lg:grid-cols-[0.62fr_1fr] lg:gap-20">
           {p.portraitRound ? (
@@ -79,8 +81,13 @@ export function PrincipalDesk({ institution }) {
                 <h2 className="font-display text-[1.375rem] font-semibold tracking-[-0.02em] text-ink sm:text-[1.5rem]">
                   {p.name}
                 </h2>
+                {/* `role` is left out where an institution has asked for no designation. */}
                 <p className="mt-2 text-[0.8125rem] font-semibold uppercase tracking-[0.13em] text-ember-600">
-                  {p.role} <span className="text-stone-300">·</span>{" "}
+                  {p.role && (
+                    <>
+                      {p.role} <span className="text-stone-300">·</span>{" "}
+                    </>
+                  )}
                   <span className="font-normal normal-case tracking-normal text-ink-mute">{p.org}</span>
                 </p>
                 {p.qualifications && (

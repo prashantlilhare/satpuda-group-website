@@ -44,7 +44,7 @@ export const shots = {
   cultural: shot("cultural-evening", "Students gathered on stage at the college cultural evening", "50% 50%"),
 };
 
-/* Satpuda Valley Public School — Independence Day on campus. */
+/* Satpuda Valley Public School — Independence Day, sport and the school year. */
 export const schoolShots = {
   flagHoisting: shot("school-flag-hoisting", "The national flag being hoisted at the school on Independence Day", "40% 65%"),
   assemblyLines: shot("school-assembly-lines", "School students standing in lines at the Independence Day assembly", "50% 55%"),
@@ -54,6 +54,24 @@ export const schoolShots = {
   principalSpeech: shot("school-principal-speech", "The principal addressing students from the podium", "35% 45%"),
   address: shot("school-independence-address", "A guest addressing the school on Independence Day", "35% 45%"),
   lampLighting: shot("school-lamp-lighting", "Guests lighting the lamp to open a school programme", "55% 50%"),
+  /* Sport, festivals and the school week. */
+  footballTrophy: shot("school-football-trophy", "A school footballer receiving the trophy at the Inter School Football Tournament 2024", "55% 40%"),
+  footballBoys: shot("school-football-boys", "The school's boys' football team in kit on the ground", "50% 45%"),
+  girlsTeam: shot("school-girls-team", "The girls' team with their teachers and coaches on the school ground", "50% 50%"),
+  kabaddi: shot("school-kabaddi", "Students playing kabaddi on mats in the school courtyard", "40% 50%"),
+  yoga: shot("school-yoga", "A student holding a wheel pose during a yoga session", "45% 50%"),
+  turfAssembly: shot("school-turf-assembly", "Students seated in rows on the hockey turf for a mass yoga session", "50% 50%"),
+  sportsDay: shot("school-sports-day", "Students in house colours lined up for the sports day march-past", "50% 65%"),
+  housePyramid: shot("school-human-pyramid", "Students forming a human pyramid on the sports ground", "50% 40%"),
+  houseCaptains: shot("school-house-captains", "House captains with their flags and sashes at the investiture ceremony", "50% 50%"),
+  basantPanchami: shot("school-basant-panchami", "Pre-primary children in yellow celebrating Basant Panchami with their teachers", "50% 55%"),
+  orangeDay: shot("school-orange-day", "A young pupil dressed as an orange for Orange Colour Day", "50% 55%"),
+  fancyDress: shot("school-fancy-dress", "Little ones in costume for the fancy dress competition", "50% 55%"),
+  plantation: shot("school-plantation", "Young students with saplings at a plantation drive", "50% 50%"),
+  natureTrip: shot("school-nature-trip", "Students and teachers seated together in the forest on a nature trip", "50% 45%"),
+  computerLab: shot("school-computer-lab", "Students working at computers in the school lab", "50% 45%"),
+  library: shot("school-library", "Junior students reading at the library tables", "45% 55%"),
+  careerGuidance: shot("school-career-guidance", "Senior students listening at a career guidance session", "50% 50%"),
 };
 
 /* D.Ed & B.Ed — faculty, classroom teaching and trainees. 6 and 7 are

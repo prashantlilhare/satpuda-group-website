@@ -1,9 +1,9 @@
 import directorPortrait from "../assets/images/leadership/director-anshul-jaiswal.webp";
 import principalPortrait from "../assets/images/leadership/principal-ashok-kumar-gupta.webp";
-import principalSchoolPortrait from "../assets/images/leadership/principal-school-sunita-sharma.jpg";
-import principalItiPortrait from "../assets/images/leadership/principal-iti-rakesh-patle.jpg";
-import deanEducationPortrait from "../assets/images/leadership/dean-teacher-education-meenakshi-verma.jpg";
-import deanCorporatePortrait from "../assets/images/leadership/dean-corporate-neeraj-bisen.jpg";
+import principalSchoolPortrait from "../assets/images/leadership/principal-school-sunita-sharma.webp";
+import principalItiPortrait from "../assets/images/leadership/principal-iti-rakesh-patle.webp";
+import deanEducationPortrait from "../assets/images/leadership/dean-teacher-education-meenakshi-verma.webp";
+import deanCorporatePortrait from "../assets/images/leadership/dean-corporate-neeraj-bisen.webp";
 
 /**
  * Leadership messages.

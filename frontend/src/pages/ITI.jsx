@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion, useScroll, useSpring } from "motion/react";
+import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useSpring } from "motion/react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { InstituteGallery } from "../components/shared/InstituteGallery";
@@ -10,11 +10,13 @@ import { campusImages } from "../data/about";
 import { photo } from "../data/photos";
 import { Eyebrow, Fact, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { itiTrades } from "../data/programs";
-import { getInstitution } from "../data/institutions";
+import { campusMapUrl, campusesOffering, itiCampuses, itiDistricts } from "../data/itiCampuses";
+import { CampusSheet } from "../components/shared/CampusSheet";
+import { ItiPlacementChart } from "../components/shared/ItiPlacementChart";
+import { itiPlacements, itiRecruiters } from "../data/achievements";
 import { useSeo } from "../hooks/useSeo";
 import { stagger } from "../components/ui/stagger";
 
-const inst = getInstitution("iti");
 
 /* The institute's own workshop floor and annual project exhibition. */
 const tradeFloor = [
@@ -100,6 +102,13 @@ function TradeRow({ trade, index }) {
         </h3>
         <p className="trade-load-1 mt-2 inline-block text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-mute transition-colors duration-300 group-hover:text-royal-600">
           {trade.type}
+        </p>
+        <p className="mt-2 text-[0.8125rem] text-ink-mute">
+          Taught at{" "}
+          <span className="font-semibold text-ink">
+            {campusesOffering(trade.name)} of {itiCampuses.length}
+          </span>{" "}
+          campuses
         </p>
       </div>
 
@@ -293,6 +302,239 @@ function WorkshopWeek() {
   );
 }
 
+/* The small tag used for "Head office" and "Est. 2010". */
+const tagClass = "rounded-md px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.12em]";
+
+/**
+ * One campus in the directory. The whole card opens the full record;
+ * the phone, email and map links inside it still work on their own.
+ * While its record is open the card steps out of sight, so the panel
+ * reads as the card itself grown into a page.
+ */
+function CampusCard({ campus: c, hidden, onView }) {
+  const ref = useRef(null);
+  const person = c.principal
+    ? { label: "Principal", value: c.principal }
+    : c.contactPerson
+      ? { label: "Contact", value: c.contactPerson }
+      : null;
+  const view = () => onView({ campus: c, origin: ref.current.getBoundingClientRect() });
+
+  return (
+    <article
+      ref={ref}
+      onClick={(e) => !e.target.closest("a, button") && view()}
+      style={{ opacity: hidden ? 0 : 1 }}
+      className="group relative flex h-full cursor-pointer flex-col rounded-2xl border border-stone-line bg-paper p-6 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:border-royal-600/40 hover:shadow-[0_22px_44px_-28px_rgba(20,34,68,0.55)]"
+    >
+      {/* a thin ember line drawn across the top on hover */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-6 top-0 h-[2px] origin-left scale-x-0 bg-ember-500 transition-transform duration-500 ease-out group-hover:scale-x-100"
+      />
+
+      <div className="flex min-h-[1.375rem] items-center justify-between gap-3">
+        <p className="flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-royal-700">
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5 text-ember-500" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z" />
+            <circle cx="12" cy="9.5" r="2.5" />
+          </svg>
+          {c.district}
+        </p>
+        <div className="flex items-center gap-1.5">
+          {c.head && <span className={`${tagClass} bg-royal-800 text-white`}>Head office</span>}
+          {c.established && (
+            <span className={`${tagClass} border border-stone-line tabular-nums text-ink-mute`}>Est. {c.established}</span>
+          )}
+        </div>
+      </div>
+
+      <h3 className="mt-4 font-display text-[1.25rem] font-semibold leading-snug tracking-[-0.015em] text-ink transition-colors duration-300 group-hover:text-royal-700">
+        {c.name}
+      </h3>
+      <p className="mt-1 text-[0.875rem] text-ink-mute">{c.location}</p>
+
+      <div className="mt-5">
+        {c.trades.length ? (
+          <ul aria-label="Trades" className="flex flex-wrap gap-1.5">
+            {c.trades.map(([t]) => (
+              <li key={t} className="rounded-md bg-royal-700/[0.07] px-2 py-1 text-[0.75rem] font-medium text-royal-800">
+                {t}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-[0.8125rem] italic text-ink-mute">Trades not published — ask the campus</p>
+        )}
+      </div>
+
+      <dl className="mt-5 space-y-2 border-t border-stone-line pt-4 text-[0.84rem]">
+        {person && (
+          <div className="flex gap-2">
+            <dt className="w-16 shrink-0 text-ink-mute">{person.label}</dt>
+            <dd className="font-semibold text-ink">{person.value}</dd>
+          </div>
+        )}
+        <div className="flex gap-2">
+          <dt className="w-16 shrink-0 text-ink-mute">Phone</dt>
+          <dd>
+            <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="tabular-nums text-ink-soft hover:text-royal-700">
+              {c.phone}
+            </a>
+          </dd>
+        </div>
+        <div className="flex gap-2">
+          <dt className="w-16 shrink-0 text-ink-mute">Email</dt>
+          <dd className="min-w-0">
+            <a href={`mailto:${c.email}`} className="break-all text-ink-soft hover:text-royal-700">
+              {c.email}
+            </a>
+          </dd>
+        </div>
+      </dl>
+
+      <div className="mt-auto flex items-center justify-between gap-3 pt-6">
+        <a
+          href={campusMapUrl(c)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-[2.75rem] items-center gap-1.5 text-[0.8125rem] font-medium text-ink-mute transition-colors hover:text-royal-700"
+        >
+          Location
+          <span className="sr-only">of {c.name} on Google Maps (opens in a new tab)</span>
+        </a>
+        <button
+          type="button"
+          onClick={view}
+          className="inline-flex min-h-[2.75rem] items-center gap-2 px-1 text-[0.875rem] font-semibold text-ink transition-colors hover:text-ember-600"
+        >
+          View institute
+          <span className="sr-only">: {c.name}</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+    </article>
+  );
+}
+
+/**
+ * The fifteen campuses, filterable by district.
+ *
+ * A row of district chips (with counts) narrows the grid; cards leaving
+ * and entering settle with a short layout transition rather than a jump.
+ * Only the first six show until "View all" is pressed — picking a district
+ * folds the list back to six.
+ * Each card carries what an applicant actually needs — where it is, which
+ * trades it runs, who heads it and a number to call — and opens into the
+ * campus's full record (`CampusSheet`), which scales up out of the card.
+ */
+/* How many campus cards show before "View all". */
+const FIRST_CAMPUSES = 6;
+
+function CampusDirectory() {
+  const [district, setDistrict] = useState("All");
+  /* the campus whose full record is open, with the card's rect to grow from */
+  const [open, setOpen] = useState(null);
+  const [all, setAll] = useState(false);
+  const listRef = useRef(null);
+  const still = useReducedMotion();
+  const matching = district === "All" ? itiCampuses : itiCampuses.filter((c) => c.district === district);
+  const shown = all ? matching : matching.slice(0, FIRST_CAMPUSES);
+  const chips = ["All", ...itiDistricts];
+
+  const toggleAll = () => {
+    /* folding back up leaves the reader below a list that just got
+       shorter, so bring the top of the list back into view */
+    if (all) listRef.current?.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
+    setAll(!all);
+  };
+
+  return (
+    <div className="section-body">
+      <Reveal>
+        <div role="group" aria-label="Filter campuses by district" className="flex flex-wrap gap-2">
+          {chips.map((d) => {
+            const active = d === district;
+            const count = d === "All" ? itiCampuses.length : itiCampuses.filter((c) => c.district === d).length;
+            return (
+              <button
+                key={d}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  setDistrict(d);
+                  setAll(false);
+                }}
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[0.8125rem] font-semibold transition-colors duration-300 ${
+                  active
+                    ? "border-royal-700 bg-royal-700 text-white"
+                    : "border-stone-line bg-paper text-ink-soft hover:border-royal-600 hover:text-royal-700"
+                }`}
+              >
+                {d === "All" ? "All campuses" : d}
+                <span className={`tabular-nums ${active ? "text-white/70" : "text-ink-mute"}`}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Reveal>
+
+      <motion.ul ref={listRef} layout={!still} className="mt-8 scroll-mt-32 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {shown.map((c) => (
+            <motion.li
+              key={c.id}
+              layout={!still}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <CampusCard campus={c} hidden={open?.campus.id === c.id} onView={setOpen} />
+            </motion.li>
+          ))}
+        </AnimatePresence>
+      </motion.ul>
+
+      {matching.length > FIRST_CAMPUSES && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={toggleAll}
+            aria-expanded={all}
+            className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-full border border-royal-700 px-6 text-[0.875rem] font-semibold text-royal-700 transition-[background-color,color,transform] duration-200 ease-out hover:bg-royal-700 hover:text-white active:scale-[0.97]"
+          >
+            {all ? "Show fewer" : `View all ${matching.length} campuses`}
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className={`h-4 w-4 transition-transform duration-200 ease-out ${all ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {open && <CampusSheet campus={open.campus} origin={open.origin} onClose={() => setOpen(null)} />}
+
+      <Reveal>
+        <p className="mt-8 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
+          Open any campus for its full record — address, trades with seats, affiliation and
+          references. Where a campus has not published a detail, it is left blank rather than guessed.
+        </p>
+      </Reveal>
+    </div>
+  );
+}
+
 /* Beside the short "about" copy: the institution at a glance. */
 const aboutPhotos = [
   { src: campusImages.workshop, alt: "Trainees on an industrial workshop floor during practical training" },
@@ -317,9 +559,9 @@ const ringPhotos = [
 
 export default function ITI() {
   useSeo({
-    title: "Satpuda ITI, Garra",
+    title: "Satpuda ITIs — 15 campuses across Madhya Pradesh",
     description:
-      "Satpuda ITI, Garra, Balaghat — NCVT-affiliated Craftsman Training Scheme trades in Electrician, Fitter, Mechanic Diesel and COPA. Established 1999 under Maharana Pratap Shikshan Samiti.",
+      "Satpuda Private ITIs — 15 NCVT-affiliated industrial training institutes across Balaghat, Chhindwara, Betul, Narmadapuram, Seoni, Mandla, Rewa and Mauganj, run by Maharana Pratap Shikshan Samiti since 1999. Electrician, Fitter, Mechanic Diesel and COPA.",
     path: "/institutes/iti",
   });
 
@@ -328,21 +570,34 @@ export default function ITI() {
       <PageHero
         motif="gears"
         eyebrow="Institute"
-        title="Satpuda ITI, Garra"
-        lead={inst.summary}
+        title="Satpuda ITIs"
+        lead={`${itiCampuses.length} NCVT-affiliated industrial training institutes across ${itiDistricts.length} districts of Madhya Pradesh — hands-on, job-oriented trade training for students after Class 10.`}
         crumbs={[{ label: "Institute" }, { label: "ITI" }]}
         image={photo("0055", "Trade projects along the ITI workshop hall", "50% 45%")}
       />
+
+      {/* ---------------- placements ---------------- */}
+      <section className="section bg-paper-dim">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Placements & achievements"
+            title="Trained here, hired across India."
+            lead="Campus placement drives at Satpuda ITIs, year by year — from the group's own placement record."
+          />
+
+          <ItiPlacementChart years={itiPlacements} recruiters={itiRecruiters} className="section-body" />
+        </div>
+      </section>
 
       {/* ---------------- key facts strip ---------------- */}
       <section className="section-strip border-b border-stone-line bg-paper">
         <div className="shell">
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {[
-              { value: "1999", label: "Established" },
-              { value: "04", label: "Trades offered" },
+              { value: String(itiCampuses.length), label: "ITI campuses" },
+              { value: String(itiDistricts.length).padStart(2, "0"), label: "Districts in M.P." },
+              { value: "1999", label: "Since" },
               { value: "NCVT", label: "Affiliation" },
-              { value: "QCI", label: "Accreditation" },
             ].map((f, i) => (
               <Reveal key={f.label} delay={stagger(i)}>
                 <div className="border-t-2 border-royal-600 pt-5">
@@ -354,33 +609,38 @@ export default function ITI() {
         </div>
       </section>
 
-      {/* ---------------- principal ---------------- */}
-      <PrincipalDesk institution="iti" />
-
       {/* ---------------- about ---------------- */}
       <section className="section bg-paper">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
             <div>
               <Reveal>
-                <Eyebrow>About the institute</Eyebrow>
+                <Eyebrow>About the network</Eyebrow>
               </Reveal>
               <Reveal delay={stagger(1)}>
                 <SplitText as="h2" className="t-h2 mt-5 block max-w-xl text-ink">
-                  The group's first institution — and still its most direct route to work.
+                  The group's first institution, now fifteen campuses strong.
                 </SplitText>
               </Reveal>
               <Reveal delay={stagger(2)}>
                 <ReadMore lines={4} className="mt-6">
                   <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink-soft">
                     <p>
-                      Satpuda ITI opened at Garra in 1999 under{" "}
+                      Satpuda Industrial Training Institute was established in 1999 under{" "}
                       <strong className="font-semibold text-ink">
                         Maharana Pratap Shikshan Samiti
                       </strong>
-                      , and it remains the foundation the rest of the group was built on. It runs
-                      trades under the Craftsman Training Scheme, affiliated to the National Council
-                      for Vocational Training and accredited by the Quality Council of India.
+                      , Balaghat, by a team of entrepreneurs and qualified engineers, with a mission
+                      to bring quality vocational training to students from rural and urban areas. It
+                      remains the foundation the rest of the group was built on.
+                    </p>
+                    <p>
+                      From Balaghat the network grew across Madhya Pradesh — Kundipura in Chhindwara
+                      in 2003; Itarsi, Seoni and Rewa in 2007; Manjhapur and Mauganj in 2010; and on
+                      to Baihar, Budhi, Katangi, Betul, Multai, Mandla and Sarni. Today{" "}
+                      {itiCampuses.length} campuses run Craftsman Training Scheme trades affiliated to
+                      the National Council for Vocational Training, with the head office at Manjhapur,
+                      Balaghat.
                     </p>
                     <p>
                       Vocational training answers a specific question: what can a student do the day
@@ -399,6 +659,18 @@ export default function ITI() {
 
             <AboutCollage items={aboutPhotos} />
           </div>
+        </div>
+      </section>
+
+      {/* ---------------- the campuses ---------------- */}
+      <section id="campuses" className="section bg-paper-dim">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Our campuses"
+            title={`${itiCampuses.length} ITIs, one standard of training.`}
+            lead={`From the head office at Manjhapur, Balaghat, the network runs west to Itarsi and north to Rewa and Mauganj. Pick a district to see the campuses there.`}
+          />
+          <CampusDirectory />
         </div>
       </section>
 
@@ -441,12 +713,12 @@ export default function ITI() {
       </section>
 
       {/* ---------------- trades ---------------- */}
-      <section className="section bg-paper-dim">
+      <section className="section bg-paper">
         <div className="shell">
           <SectionHeading
             eyebrow="Trades"
             title="Four NCVT trades."
-            lead="Three engineering trades and one non-engineering trade, each leading to a National Trade Certificate."
+            lead="Three engineering trades and one non-engineering trade, each leading to a National Trade Certificate. Not every campus runs every trade — see the campus list above."
           />
 
           <div className="section-body">
@@ -464,23 +736,26 @@ export default function ITI() {
           <Reveal delay={stagger(2)}>
             <p className="mt-10 max-w-3xl border-l-2 border-ember-500 pl-6 text-[0.9375rem] leading-relaxed text-ink-mute">
               Durations and eligibility follow the NCVT Craftsman Training Scheme. Seat availability
-              and admission dates vary by session — contact the institute for current details.
+              and admission dates vary by campus and session — contact the campus for current details.
             </p>
           </Reveal>
         </div>
       </section>
 
       {/* ---------------- on the trade floor ---------------- */}
-      <section className="section bg-paper">
+      <section className="section bg-paper-dim">
         <div className="shell">
           <SectionHeading
             eyebrow="On the trade floor"
             title="What the training actually looks like."
-            lead="Photographs from the workshop floor at Manjhapur and the institute's annual project exhibition."
+            lead="Photographs from the workshop floor at the Manjhapur head campus and the annual project exhibition."
           />
           <PhotoGrid items={tradeFloor} className="section-body" />
         </div>
       </section>
+
+      {/* ---------------- principal ---------------- */}
+      <PrincipalDesk institution="iti" tone="paper" />
 
       {/* ---------------- gallery ---------------- */}
       <InstituteGallery
@@ -492,7 +767,7 @@ export default function ITI() {
       <CTASection
         eyebrow="ITI admissions"
         title="Ask about trade admission and eligibility."
-        body="Tell us which trade interests you and what you have completed at school, and we will confirm the eligibility requirement and the admission process."
+        body="Tell us which trade and which campus interest you, and what you have completed at school — we will confirm eligibility, seats and the admission process."
       />
     </>
   );

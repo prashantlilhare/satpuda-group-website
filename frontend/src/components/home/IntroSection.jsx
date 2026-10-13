@@ -11,7 +11,7 @@ export function IntroSection() {
   const tickerOnScreen = useInView(tickerRef);
 
   return (
-    <section className="section bg-paper">
+    <section className="section bg-paper pb-0">
       <div className="shell">
         <div className="grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-20 xl:gap-28">
           {/* ---------- copy ---------- */}

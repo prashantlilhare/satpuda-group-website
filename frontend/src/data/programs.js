@@ -167,3 +167,42 @@ export const schoolPillars = [
     body: "Annual functions, cultural programmes and competitions that give every student a stage at some point in the year.",
   },
 ];
+
+/* Satpuda Valley Public School — results as the school published them. */
+export const schoolResults = {
+  board: {
+    title: "CBSE board toppers, 2023–24",
+    classes: [
+      {
+        label: "Class X",
+        toppers: [
+          { name: "Vanshika Sahare", score: 90.2 },
+          { name: "Trapti Thakre", score: 88 },
+          { name: "Zenith Singh", score: 86 },
+        ],
+      },
+      {
+        label: "Class XII",
+        toppers: [
+          { name: "Arpita Kektekar", score: 86 },
+          { name: "Sweta Singh", score: 83 },
+          { name: "Saloni Agrawal", score: 82.2 },
+        ],
+      },
+    ],
+  },
+  entrance: {
+    title: "Entrance results",
+    items: [
+      { name: "Om Pardhi", note: "Score 678 · selected for AIIMS" },
+      { name: "Sakshi Singh", note: "Score 656 · rank 2920" },
+      { name: "Soham Dhuware", note: "98.25 percentile" },
+      { name: "Akshita Meshram", note: "Score 470" },
+      { name: "Prachi Meshram", note: "Score 415" },
+    ],
+  },
+  selections: {
+    title: "Selected for Jawahar Navodaya Vidyalaya",
+    names: ["Duveesha Gondane", "Bhuvika Bhalave"],
+  },
+};
