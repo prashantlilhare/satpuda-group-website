@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
 import Home from "./pages/Home";
 
@@ -7,7 +7,6 @@ import Home from "./pages/Home";
 const About = lazy(() => import("./pages/About"));
 const VisionMission = lazy(() => import("./pages/VisionMission"));
 const DirectorMessage = lazy(() => import("./pages/DirectorMessage"));
-const PrincipalMessage = lazy(() => import("./pages/PrincipalMessage"));
 const BTechPolytechnic = lazy(() => import("./pages/BTechPolytechnic"));
 const DEdBEd = lazy(() => import("./pages/DEdBEd"));
 const ITI = lazy(() => import("./pages/ITI"));
@@ -25,7 +24,8 @@ const router = createBrowserRouter([
       { path: "/about", element: <About /> },
       { path: "/about/vision-mission", element: <VisionMission /> },
       { path: "/about/director-message", element: <DirectorMessage /> },
-      { path: "/about/principal-message", element: <PrincipalMessage /> },
+      /* the principal's message page was retired; old links land on About */
+      { path: "/about/principal-message", element: <Navigate to="/about" replace /> },
 
       { path: "/institutes/btech-polytechnic", element: <BTechPolytechnic /> },
       { path: "/institutes/ded-bed", element: <DEdBEd /> },

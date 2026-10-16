@@ -89,11 +89,6 @@ export const nav = [
         to: "/about/director-message",
         blurb: "Mr. Anshul Jaiswal on building capable, confident graduates.",
       },
-      {
-        label: "Principal's Message",
-        to: "/about/principal-message",
-        blurb: "Prof. (Dr.) Ashok Kumar Gupta welcomes students and parents.",
-      },
     ],
   },
   {

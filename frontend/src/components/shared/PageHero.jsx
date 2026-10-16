@@ -1,7 +1,7 @@
 import { Fragment, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "motion/react";
-import { ChevronRight } from "lucide-react";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
 import { Eyebrow, ReadMore, SplitText } from "../ui/Primitives";
 import { HeroMotif } from "../ui/Motifs";
 
@@ -22,6 +22,9 @@ export function PageHero({
      Without one, the band falls back to the quiet ring and corner rule;
      "none" leaves the right of the band to the photograph alone. */
   motif,
+  /* An institution's own website(s) — `[{ label, href }]`. The first is the
+     solid button; any others sit beside it as outlines. */
+  websites = [],
 }) {
   /* `image` is either a plain URL or one of the campus library's photo objects,
      which carry a 960w/1600w pair and their own focal point. */
@@ -169,6 +172,52 @@ export function PageHero({
                 {lead}
               </p>
             </ReadMore>
+          )}
+          {websites.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.55 }}
+              className={`mt-9 ${align === "center" ? "text-center" : ""}`}
+            >
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-white/55">
+                For more information
+              </p>
+              <ul className={`mt-3.5 flex flex-wrap gap-3 ${align === "center" ? "justify-center" : ""}`}>
+                {websites.map((w, i) => (
+                  <li key={w.href}>
+                    <a
+                      href={w.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`group/site inline-flex min-h-[3rem] items-center gap-3 rounded-full py-2 pl-5 pr-2 text-[0.9375rem] font-semibold tracking-[-0.01em] transition-[background-color,color,border-color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 active:translate-y-0 ${
+                        i === 0
+                          ? "bg-white text-royal-800 hover:shadow-[0_14px_30px_-14px_rgba(0,0,0,0.55)]"
+                          : "border border-white/30 text-white hover:border-white/70 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      <span className="flex flex-col items-start leading-tight">
+                        {w.label}
+                        <span className={`text-[0.75rem] font-medium ${i === 0 ? "text-royal-500" : "text-white/55"}`}>
+                          {new URL(w.href).hostname.replace(/^www\./, "")}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors duration-300 ${
+                          i === 0
+                            ? "bg-ember-500 text-white group-hover/site:bg-ember-600"
+                            : "bg-white/10 text-white group-hover/site:bg-white group-hover/site:text-royal-800"
+                        }`}
+                      >
+                        <ArrowUpRight className="h-4 w-4 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/site:-translate-y-px group-hover/site:translate-x-px" />
+                      </span>
+                      <span className="sr-only">(opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           )}
         </div>
       </motion.div>

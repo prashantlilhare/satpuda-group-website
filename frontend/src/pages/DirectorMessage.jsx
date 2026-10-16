@@ -1,11 +1,9 @@
 import { useRef } from "react";
-import { Link } from "react-router-dom";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { CTASection } from "../components/shared/CTASection";
 import { Eyebrow, Figure, ReadMore, Reveal } from "../components/ui/Primitives";
-import { director, principal } from "../data/leadership";
+import { director } from "../data/leadership";
 import { photo } from "../data/photos";
 import { useSeo } from "../hooks/useSeo";
 import { ScrollWords } from "../components/ui/ScrollWords";
@@ -171,37 +169,6 @@ export default function DirectorMessage() {
               </Reveal>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ---------------- cross-link ---------------- */}
-      <section className="section-tight bg-paper-dim">
-        <div className="shell">
-          <Reveal>
-            <Link
-              to="/about/principal-message"
-              className="group flex items-center justify-between gap-4 border-t border-stone-line pt-8 sm:gap-6"
-            >
-              <div className="flex items-center gap-6">
-                <div className="w-20 shrink-0 sm:w-24">
-                  <Figure src={principal.portrait} alt="" ratio="1 / 1" position="50% 18%" parallax={false} />
-                </div>
-                <div>
-                  <p className="text-[0.625rem] font-semibold uppercase tracking-[0.15em] text-ember-600">
-                    Next
-                  </p>
-                  <h2 className="mt-2 font-display text-[1.375rem] font-semibold tracking-[-0.02em] text-ink transition-colors duration-300 group-hover:text-royal-700 sm:text-[1.625rem]">
-                    Principal's Message
-                  </h2>
-                  <p className="mt-1.5 text-[0.9375rem] text-ink-mute">{principal.name}</p>
-                </div>
-              </div>
-              <ArrowUpRight
-                aria-hidden="true"
-                className="h-6 w-6 shrink-0 text-ink-mute transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-ember-600"
-              />
-            </Link>
-          </Reveal>
         </div>
       </section>
 

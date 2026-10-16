@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { PageHero } from "../components/shared/PageHero";
+import { getInstitution } from "../data/institutions";
 import { CTASection } from "../components/shared/CTASection";
 import { InstituteGallery } from "../components/shared/InstituteGallery";
 import { PrincipalDesk } from "../components/shared/PrincipalDesk";
@@ -103,6 +104,7 @@ export default function School() {
         lead="A CBSE-affiliated, co-educational school on the Satpuda campus at Manjhapur (Garra), Balaghat — educating students here since 2009."
         crumbs={[{ label: "Institute" }, { label: "School" }]}
         image={photo("0050", "School students presenting their projects in the corridor", "50% 45%")}
+        websites={getInstitution("school").websites}
       />
 
       {/* ---------------- achievements ---------------- */}

@@ -27,7 +27,6 @@ export const principals = {
       "We strive to create a nurturing environment that promotes critical thinking, creativity and innovation.",
     summary:
       "Leads the college's degree and diploma programmes, with a campus designed to blend academic rigour with real-world exposure — and a learning culture in which a student can ask a question without hesitation.",
-    messageLink: "/about/principal-message",
   },
 
   school: {

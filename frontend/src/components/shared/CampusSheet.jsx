@@ -212,6 +212,17 @@ export function CampusSheet({ campus, origin, onClose }) {
             </dl>
 
             <div className="mb-3 mt-6 flex flex-wrap gap-2">
+              {c.website && (
+                <a
+                  href={c.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-full bg-royal-700 px-5 text-[0.875rem] font-semibold text-white transition-colors hover:bg-royal-600"
+                >
+                  Visit campus website
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              )}
               <a
                 href={`tel:${c.phone.replace(/\s/g, "")}`}
                 className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-full bg-ember-600 px-5 text-[0.875rem] font-semibold text-white transition-colors hover:bg-ember-500"

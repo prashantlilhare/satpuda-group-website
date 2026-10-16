@@ -1132,6 +1132,372 @@
 }
 
 /* ============================================================
+   HOME — SATPUDA ITIs MARQUEE
+   ============================================================
+
+   The fifteen campuses on one dark row, oldest first. The list is
+   rendered twice and each chip carries its spacing as the slot's own
+   right padding, so half the track is exactly one pass (see the gallery
+   note above on why a `gap` would make the loop slip).
+
+   Pointing at the row holds it still so a chip can be read and clicked.
+   A glint crosses the year badges one campus after another — each chip
+   waits `--chip-index` steps — so the band is alive without anything
+   jumping about. */
+.iti-row {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.iti-track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  animation: marquee-x var(--iti-duration, 50s) linear infinite;
+}
+
+.iti-row:hover .iti-track,
+.iti-row:focus-within .iti-track,
+.iti-row[data-paused] .iti-track {
+  animation-play-state: paused;
+}
+
+.iti-chip-slot {
+  flex: none;
+  padding-right: 0.875rem;
+}
+
+.iti-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-height: 4rem;
+  padding: 0.5rem 1.125rem 0.5rem 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.875rem;
+  background: rgb(255 255 255 / 0.04);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    border-color 0.35s var(--ease-out-expo),
+    background-color 0.35s var(--ease-out-expo);
+}
+
+.iti-chip-year {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: 3.75rem;
+  height: 3rem;
+  overflow: hidden;
+  border-radius: 0.625rem;
+  background: rgb(217 58 38 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(244 168 159 / 0.22);
+  color: var(--color-ember-300);
+  transition:
+    background-color 0.35s var(--ease-out-expo),
+    color 0.35s var(--ease-out-expo);
+}
+
+/* The walking glint: a narrow light passing over the badge, then a long
+   rest. 15 chips x 0.8s = 12s, so the light reaches the last campus just as
+   the first is due again. */
+.iti-chip-year::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  transform: translateX(-160%) skewX(-20deg);
+  animation: iti-glint 12s var(--ease-in-out-soft) infinite;
+  animation-delay: calc(var(--chip-index, 0) * 0.8s);
+  pointer-events: none;
+}
+
+@keyframes iti-glint {
+  0% {
+    transform: translateX(-160%) skewX(-20deg);
+  }
+  9%,
+  100% {
+    transform: translateX(320%) skewX(-20deg);
+  }
+}
+
+.iti-chip-arrow {
+  color: rgb(255 255 255 / 0.35);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    color 0.35s var(--ease-out-expo);
+}
+
+.iti-chip:hover,
+.iti-chip:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgb(233 112 95 / 0.55);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.iti-chip:hover .iti-chip-year,
+.iti-chip:focus-visible .iti-chip-year {
+  background: var(--color-ember-500);
+  color: #fff;
+}
+
+.iti-chip:hover .iti-chip-year > span:first-child,
+.iti-chip:focus-visible .iti-chip-year > span:first-child {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.iti-chip:hover .iti-chip-arrow,
+.iti-chip:focus-visible .iti-chip-arrow {
+  color: var(--color-ember-300);
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iti-track,
+  .iti-chip-year::after {
+    animation: none;
+  }
+
+  .iti-row {
+    overflow-x: auto;
+    padding-inline: 1rem;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* ============================================================
+   HOME — SATPUDA ITI NETWORK (photo cards)
+   ============================================================
+
+   Same seamless loop as above: the list twice, half the track per pass.
+   Here the spacing is the group's own end padding, so each half is one
+   whole pass including its trailing gap.
+
+   Hovering a card lifts it, draws the ember rule across its top and
+   nudges the arrow. So the row is never quite static, the ember rule
+   also walks along the cards one at a time on a slow cycle. */
+.itin-row {
+  --itin-gap: 1rem;
+  overflow: hidden;
+  overflow: clip;
+  padding-block: 1.25rem 1.75rem;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+
+@media (min-width: 640px) {
+  .itin-row {
+    --itin-gap: 1.25rem;
+  }
+}
+
+.itin-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x var(--itin-duration, 110s) linear infinite;
+}
+
+.itin-group {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--itin-gap);
+  margin: 0;
+  padding: 0 var(--itin-gap) 0 0;
+  list-style: none;
+}
+
+.itin-row:hover .itin-track,
+.itin-row:focus-within .itin-track,
+.itin-row[data-paused] .itin-track {
+  animation-play-state: paused;
+}
+
+.itin-row:focus-within {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.itin-card {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 1px 2px rgb(12 21 41 / 0.05), 0 10px 24px -18px rgb(12 21 41 / 0.35);
+  transition: transform 0.3s var(--ease-out-expo);
+}
+
+/* the deeper shadow fades in rather than animating box-shadow itself */
+.itin-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 2px 4px rgb(12 21 41 / 0.06), 0 22px 44px -20px rgb(12 21 41 / 0.32);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.itin-media,
+.itin-card-arrow {
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+.itin-card-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: itin-rule 28s var(--ease-in-out-soft) infinite;
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+/* 14 cards x 2s = 28s: one card's rule draws, then the next card's. */
+.itin-group > li:nth-child(1) .itin-card-rule { animation-delay: 0s; }
+.itin-group > li:nth-child(2) .itin-card-rule { animation-delay: 2s; }
+.itin-group > li:nth-child(3) .itin-card-rule { animation-delay: 4s; }
+.itin-group > li:nth-child(4) .itin-card-rule { animation-delay: 6s; }
+.itin-group > li:nth-child(5) .itin-card-rule { animation-delay: 8s; }
+.itin-group > li:nth-child(6) .itin-card-rule { animation-delay: 10s; }
+.itin-group > li:nth-child(7) .itin-card-rule { animation-delay: 12s; }
+.itin-group > li:nth-child(8) .itin-card-rule { animation-delay: 14s; }
+.itin-group > li:nth-child(9) .itin-card-rule { animation-delay: 16s; }
+.itin-group > li:nth-child(10) .itin-card-rule { animation-delay: 18s; }
+.itin-group > li:nth-child(11) .itin-card-rule { animation-delay: 20s; }
+.itin-group > li:nth-child(12) .itin-card-rule { animation-delay: 22s; }
+.itin-group > li:nth-child(13) .itin-card-rule { animation-delay: 24s; }
+.itin-group > li:nth-child(14) .itin-card-rule { animation-delay: 26s; }
+
+@keyframes itin-rule {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  4% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  4.01% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  9%,
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+.itin-card:active {
+  transform: scale(0.98);
+  transition-duration: 0.14s;
+}
+
+.itin-card:focus-visible {
+  border-radius: 0.875rem;
+}
+
+.itin-card:focus-visible::after {
+  opacity: 1;
+}
+
+.itin-card:focus-visible .itin-card-rule {
+  animation: none;
+  transform: scaleX(1);
+}
+
+.itin-card:focus-visible .itin-card-arrow {
+  transform: translate(2px, -2px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .itin-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .itin-card:hover:active {
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  .itin-card:hover::after {
+    opacity: 1;
+  }
+
+  .itin-card:hover .itin-media {
+    transform: scale(1.05);
+  }
+
+  .itin-card:hover .itin-card-rule {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .itin-card:hover .itin-card-arrow {
+    transform: translate(2px, -2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itin-row {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--spacing-gutter);
+    overscroll-behavior-x: contain;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .itin-track {
+    animation: none;
+    padding-inline-start: var(--spacing-gutter);
+  }
+
+  .itin-group[aria-hidden="true"] {
+    display: none;
+  }
+
+  .itin-group > li {
+    scroll-snap-align: start;
+  }
+
+  .itin-card-rule {
+    animation: none;
+  }
+
+  .itin-card,
+  .itin-card:hover,
+  .itin-card:active,
+  .itin-media {
+    transform: none !important;
+  }
+}
+
+/* A campus reached from the home marquee: a ring that settles once. */
+.campus-spotlight {
+  animation: campus-spotlight 2.4s var(--ease-out-expo) 0.9s 1;
+}
+
+@keyframes campus-spotlight {
+  0% {
+    box-shadow: 0 0 0 0 rgb(217 58 38 / 0.55);
+    border-color: var(--color-ember-500);
+  }
+  60% {
+    box-shadow: 0 0 0 10px rgb(217 58 38 / 0);
+    border-color: var(--color-ember-500);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(217 58 38 / 0);
+  }
+}
+
+/* ============================================================
    HOME — "HOW IT GREW" TIMELINE
    ============================================================ */
 
