@@ -30,10 +30,7 @@ export const institutions = [
     ],
     highlights: ["5 B.Tech branches", "5 diploma branches", "10-acre campus"],
     /* The institution's own website(s), linked from the top of its page. */
-    websites: [
-      { label: "Engineering College website", href: "https://satpudaengineeringcollege.com/" },
-      { label: "Polytechnic website", href: "https://www.satpudapolytechnic.com/" },
-    ],
+    websites: [{ label: "Engineering & Polytechnic website", href: "https://satpudaengineeringcollege.com/" }],
     featured: true,
   },
   {
