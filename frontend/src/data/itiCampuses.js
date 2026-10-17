@@ -23,6 +23,7 @@ export const itiCampuses = [
     itiCode: "PR23000129",
     district: "Balaghat",
     established: 2010,
+    website: "", // campus link — to be supplied
     address: "Satpuda Campus, Manjhapur, Lalburra Road, Garra, Madhya Pradesh 481001",
     phone: "+91 6262604120",
     email: "satpudamanjhapur@gmail.com",
@@ -37,6 +38,7 @@ export const itiCampuses = [
     dgetRef: "DGET-6/12/274/2015",
     district: "Balaghat",
     established: 2015,
+    website: "", // campus link — to be supplied
     address: "Ward No. 13, Budhi, Balaghat, Madhya Pradesh 481001",
     phone: "+91 6262604122",
     email: "newsatpudaitibudi@gmail.com",
@@ -51,6 +53,7 @@ export const itiCampuses = [
     dgetRef: "DGET-6/12/73/2015-TC",
     district: "Balaghat",
     established: 2015,
+    website: "", // campus link — to be supplied
     address: "Balaghat Road, Near State Bank, Katangi, Balaghat, Madhya Pradesh 481445",
     phone: "+91 6262604117",
     email: "newsatpudakatangi@gmail.com",
@@ -64,6 +67,7 @@ export const itiCampuses = [
     itiCode: "PR23000323",
     district: "Balaghat",
     established: 2014,
+    website: "", // campus link — to be supplied
     address: "Compounder Tola, Somani Mill, Baihar, Madhya Pradesh 481111",
     phone: "+91 6262604125",
     email: "maharanapratap.itibaihar@gmail.com",
@@ -77,6 +81,7 @@ export const itiCampuses = [
     location: "Kundipura, Chhindwara",
     district: "Chhindwara",
     established: 2003,
+    website: "", // campus link — to be supplied
     address: "Near Kundipura Thana, Chhindwara, Madhya Pradesh 480001",
     phone: "+91 6262604123",
     email: "satpudachindwara@gmail.com",
@@ -90,6 +95,7 @@ export const itiCampuses = [
     location: "Chhindwara",
     district: "Chhindwara",
     established: null,
+    website: "", // campus link — to be supplied
     address: "Behind Phataka Godown, Chhindwara, Madhya Pradesh 480001",
     phone: "+91 6262604124",
     email: "satpudachhindwara@gmail.com",
@@ -102,6 +108,7 @@ export const itiCampuses = [
     location: "Chikhali Khurd, Betul",
     district: "Betul",
     established: 2015,
+    website: "", // campus link — to be supplied
     address: "Chikhali Khurd, Multai, Betul, Madhya Pradesh 460557",
     phone: "+91 6262604128",
     email: "satpudabetul@gmail.com",
@@ -115,6 +122,7 @@ export const itiCampuses = [
     location: "Multai, Betul",
     district: "Betul",
     established: 2015,
+    website: "", // campus link — to be supplied
     address: "Chikhali Khurd, Chhindwara Road, Multai, Madhya Pradesh 460661",
     phone: "+91 6262604130",
     email: "satpudamultai@gmail.com",
@@ -128,6 +136,7 @@ export const itiCampuses = [
     location: "Salaiya, Sarni",
     district: "Betul",
     established: 2017,
+    website: "", // campus link — to be supplied
     address: "Salaiya, Near Geeta Mandir, Sarni, Madhya Pradesh 460449",
     phone: "+91 6262604127",
     email: "satpudasarni@gmail.com",
@@ -141,6 +150,7 @@ export const itiCampuses = [
     location: "Itarsi, Narmadapuram",
     district: "Narmadapuram",
     established: 2007,
+    website: "", // campus link — to be supplied
     address: "Near FCI, Jamani Road, Itarsi, Madhya Pradesh 461114",
     phone: "+91 6262604126",
     email: "satpudaitarsi@gmail.com",
@@ -155,6 +165,7 @@ export const itiCampuses = [
     itiCode: "PR23000096",
     district: "Seoni",
     established: 2007,
+    website: "", // campus link — to be supplied
     address: "Nagpur Road, Seladehi, Seoni, Madhya Pradesh 480661",
     phone: "+91 6262604131",
     email: "satpudaseoni@gmail.com",
@@ -169,6 +180,7 @@ export const itiCampuses = [
     itiCode: "PR23000099",
     district: "Mandla",
     established: 2015,
+    website: "", // campus link — to be supplied
     address: "Nainpur Road, Maharajpur Poundi, Mandla, Madhya Pradesh 481661",
     phone: "+91 6262604118",
     email: "satpudamandla@gmail.com",
@@ -183,6 +195,7 @@ export const itiCampuses = [
     itiCode: "PR23000162",
     district: "Rewa",
     established: 2007,
+    website: "", // campus link — to be supplied
     address: "Chorhata, Rewa, Madhya Pradesh 486001",
     phone: "+91 6262604134",
     email: "sitc.rewa.2011@gmail.com",
@@ -196,6 +209,7 @@ export const itiCampuses = [
     location: "Boda Bagh, Rewa",
     district: "Rewa",
     established: null,
+    website: "", // campus link — to be supplied
     address: "Ward No. 8, Plot No. 849/1/1, Anand Nagar, Boda Bagh, Rewa, Madhya Pradesh 486001",
     phone: "+91 6262604134",
     email: "shikshaiti@gmail.com",
@@ -208,6 +222,7 @@ export const itiCampuses = [
     location: "Mauganj",
     district: "Mauganj",
     established: 2010,
+    website: "", // campus link — to be supplied
     address: "Mauganj Rewa Sidhi Road, Mauganj, Madhya Pradesh 486331",
     phone: "+91 6262604132",
     email: "satpudapvtitimauganj@gmail.com",

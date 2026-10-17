@@ -4,6 +4,7 @@ import { HomeHero } from "../components/home/HomeHero";
 import { IntroSection } from "../components/home/IntroSection";
 import { AchievementsSection } from "../components/home/AchievementsSection";
 import { InstitutionsSection } from "../components/home/InstitutionsSection";
+import { ItiNetworkSection } from "../components/home/ItiNetworkSection";
 import { ProgramsSection } from "../components/home/ProgramsSection";
 import { WhySection } from "../components/home/WhySection";
 import { CampusSection } from "../components/home/CampusSection";
@@ -27,6 +28,7 @@ export default function Home() {
       <IntroSection />
       <AchievementsSection />
       <InstitutionsSection />
+      <ItiNetworkSection />
       <ProgramsSection />
       <WhySection />
       <CampusSection />

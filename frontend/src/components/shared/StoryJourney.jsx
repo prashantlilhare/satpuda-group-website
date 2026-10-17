@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
 import { Figure, ReadMore, Reveal, SplitText } from "../ui/Primitives";
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -126,38 +125,6 @@ function YearRoll({ year, direction }) {
 /* Chapter                                                              */
 /* ------------------------------------------------------------------ */
 
-/** "Before" is struck through as it scrolls in, and "after" writes in behind it. */
-function Shift({ before, after }) {
-  return (
-    <div className="mt-7 space-y-2.5 border-l-2 border-ember-500 pl-5">
-      <p className="text-[0.9375rem] text-ink-mute">
-        <span className="mr-2 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-ink-mute/80">Before</span>
-        <span className="relative">
-          {before}
-          <motion.span
-            aria-hidden="true"
-            className="absolute inset-x-0 top-1/2 h-[1.5px] origin-left bg-ember-500/70"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: "0px 0px -25% 0px" }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.35 }}
-          />
-        </span>
-      </p>
-      <motion.p
-        className="flex items-start gap-2 text-[1.0625rem] font-semibold leading-snug text-ink"
-        initial={{ opacity: 0, x: -14 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "0px 0px -25% 0px" }}
-        transition={{ duration: 0.7, ease: EASE, delay: 0.9 }}
-      >
-        <ArrowRight aria-hidden="true" className="mt-[0.2rem] h-4 w-4 shrink-0 text-ember-600" />
-        {after}
-      </motion.p>
-    </div>
-  );
-}
-
 function Chapter({ chapter, index, total, chapters, onActive }) {
   const ref = useRef(null);
 
@@ -199,8 +166,6 @@ function Chapter({ chapter, index, total, chapters, onActive }) {
         <SplitText as="h3" className="mt-4 block font-display text-[clamp(1.75rem,3.2vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.022em] text-ink">
           {chapter.title}
         </SplitText>
-
-        <Shift before={chapter.before} after={chapter.after} />
 
         <Reveal delay={140}>
           <ReadMore mobileOnly className="mt-6 max-w-xl">

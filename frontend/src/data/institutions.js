@@ -29,6 +29,8 @@ export const institutions = [
       "Approved by DTE, Government of Madhya Pradesh",
     ],
     highlights: ["5 B.Tech branches", "5 diploma branches", "10-acre campus"],
+    /* The institution's own website(s), linked from the top of its page. */
+    websites: [{ label: "Engineering & Polytechnic website", href: "https://satpudaengineeringcollege.com/" }],
     featured: true,
   },
   {
@@ -67,6 +69,7 @@ export const institutions = [
       "Accredited by QCI, New Delhi",
     ],
     highlights: ["Electrician", "Fitter", "Mechanic Diesel", "COPA"],
+    websites: [{ label: "Visit the Satpuda ITI website", href: "https://satpuda-iti.vercel.app/" }],
     featured: false,
   },
   {
@@ -84,6 +87,7 @@ export const institutions = [
     established: 2009,
     credentials: ["CBSE affiliated", "Co-educational"],
     highlights: ["Science & computer labs", "Sports & culture", "Library"],
+    websites: [{ label: "Visit the school website", href: "https://satpudavalleyschool.com/" }],
     featured: false,
   },
 ];

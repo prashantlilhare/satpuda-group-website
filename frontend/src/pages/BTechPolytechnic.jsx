@@ -187,6 +187,7 @@ export default function BTechPolytechnic() {
         lead={inst.summary}
         crumbs={[{ label: "Institute" }, { label: "B.Tech & Polytechnic" }]}
         image={photo("0037", "The electrical engineering laboratory in use", "50% 45%")}
+        websites={inst.websites}
       />
 
       {/* ---------------- placements ---------------- */}

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useSpring } from "motion/react";
 import { PageHero } from "../components/shared/PageHero";
+import { getInstitution } from "../data/institutions";
 import { CTASection } from "../components/shared/CTASection";
 import { InstituteGallery } from "../components/shared/InstituteGallery";
 import { PrincipalDesk } from "../components/shared/PrincipalDesk";
 import { AboutCollage } from "../components/shared/AboutCollage";
 import { PhotoGrid } from "../components/shared/PhotoGrid";
 import { campusImages } from "../data/about";
+import { getLenis } from "../lib/smoothScroll";
 import { photo } from "../data/photos";
 import { Eyebrow, Fact, ReadMore, Reveal, SectionHeading, SplitText } from "../components/ui/Primitives";
 import { itiTrades } from "../data/programs";
@@ -311,7 +314,7 @@ const tagClass = "rounded-md px-1.5 py-0.5 text-[0.625rem] font-semibold upperca
  * While its record is open the card steps out of sight, so the panel
  * reads as the card itself grown into a page.
  */
-function CampusCard({ campus: c, hidden, onView }) {
+function CampusCard({ campus: c, hidden, spotlight, onView }) {
   const ref = useRef(null);
   const person = c.principal
     ? { label: "Principal", value: c.principal }
@@ -323,9 +326,10 @@ function CampusCard({ campus: c, hidden, onView }) {
   return (
     <article
       ref={ref}
+      id={`campus-${c.id}`}
       onClick={(e) => !e.target.closest("a, button") && view()}
       style={{ opacity: hidden ? 0 : 1 }}
-      className="group relative flex h-full cursor-pointer flex-col rounded-2xl border border-stone-line bg-paper p-6 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:border-royal-600/40 hover:shadow-[0_22px_44px_-28px_rgba(20,34,68,0.55)]"
+      className={`group relative flex h-full scroll-mt-32 cursor-pointer flex-col rounded-2xl ${spotlight ? "campus-spotlight" : ""} border border-stone-line bg-paper p-6 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:border-royal-600/40 hover:shadow-[0_22px_44px_-28px_rgba(20,34,68,0.55)]`}
     >
       {/* a thin ember line drawn across the top on hover */}
       <span
@@ -393,6 +397,21 @@ function CampusCard({ campus: c, hidden, onView }) {
         </div>
       </dl>
 
+      {c.website && (
+        <a
+          href={c.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-full bg-royal-700 px-5 text-[0.8125rem] font-semibold text-white transition-colors hover:bg-ember-600"
+        >
+          Visit campus website
+          <span className="sr-only">: {c.name} (opens in a new tab)</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 17L17 7M9 7h8v8" />
+          </svg>
+        </a>
+      )}
+
       <div className="mt-auto flex items-center justify-between gap-3 pt-6">
         <a
           href={campusMapUrl(c)}
@@ -444,6 +463,32 @@ function CampusDirectory() {
   const shown = all ? matching : matching.slice(0, FIRST_CAMPUSES);
   const chips = ["All", ...itiDistricts];
 
+  /* Deep link from the home page's ITI marquee: #campus-<id>. Clear the
+     district filter, unfold the list if the campus sits past the first six,
+     then bring its card into view and ring it once. */
+  const { hash } = useLocation();
+  const [spotlight, setSpotlight] = useState(null);
+  useEffect(() => {
+    const id = hash.startsWith("#campus-") ? hash.slice("#campus-".length) : null;
+    const index = itiCampuses.findIndex((c) => c.id === id);
+    if (index < 0) return;
+    setDistrict("All");
+    if (index >= FIRST_CAMPUSES) setAll(true);
+    const t = setTimeout(() => {
+      const card = document.getElementById(`campus-${id}`);
+      if (!card) return;
+      const lenis = getLenis();
+      if (lenis) lenis.scrollTo(card, { offset: -128, duration: 1.2 });
+      else card.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
+      setSpotlight(id);
+    }, 450);
+    const done = setTimeout(() => setSpotlight(null), 4200);
+    return () => {
+      clearTimeout(t);
+      clearTimeout(done);
+    };
+  }, [hash, still]);
+
   const toggleAll = () => {
     /* folding back up leaves the reader below a list that just got
        shorter, so bring the top of the list back into view */
@@ -492,7 +537,7 @@ function CampusDirectory() {
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
-              <CampusCard campus={c} hidden={open?.campus.id === c.id} onView={setOpen} />
+              <CampusCard campus={c} hidden={open?.campus.id === c.id} spotlight={spotlight === c.id} onView={setOpen} />
             </motion.li>
           ))}
         </AnimatePresence>
@@ -574,6 +619,7 @@ export default function ITI() {
         lead={`${itiCampuses.length} NCVT-affiliated industrial training institutes across ${itiDistricts.length} districts of Madhya Pradesh — hands-on, job-oriented trade training for students after Class 10.`}
         crumbs={[{ label: "Institute" }, { label: "ITI" }]}
         image={photo("0055", "Trade projects along the ITI workshop hall", "50% 45%")}
+        websites={getInstitution("iti").websites}
       />
 
       {/* ---------------- placements ---------------- */}
