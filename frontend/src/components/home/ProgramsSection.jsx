@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { Reveal, SectionHeading, TextLink } from "../ui/Primitives";
 import { btechBranches, diplomaBranches, itiTrades, teacherEducation } from "../../data/programs";
+import { lateralEntry } from "../../data/brochure";
 import { stagger } from "../ui/stagger";
 
 const families = [
@@ -82,6 +83,62 @@ function useActiveRow(count) {
   return [register, active];
 }
 
+/**
+ * Lateral entry, from the brochure: two routes that each save a year. Each
+ * route is a from → to pair joined by a line that draws in once; the year
+ * saved sits on the join.
+ */
+function LateralEntry() {
+  return (
+    <div className="border-t border-stone-line py-8 sm:py-9">
+      <p className="text-[0.8125rem] font-medium uppercase tracking-[0.1em] text-ember-600">
+        Lateral entry · save a year
+      </p>
+      <h3 className="mt-2.5 font-display text-[1.5rem] font-semibold tracking-[-0.022em] text-ink sm:text-[1.75rem]">
+        Already hold an ITI, diploma or B.Sc?
+      </h3>
+
+      <ol className="mt-7 space-y-4">
+        {lateralEntry.routes.map((r, i) => (
+          <Reveal as="li" key={r.to} delay={stagger(i + 1)}>
+            <div className="lateral-route group grid items-stretch gap-3 sm:grid-cols-[1fr_auto_1fr] sm:gap-0">
+              <div className="rounded-lg border border-stone-line bg-white p-4 transition-colors duration-300 group-hover:border-royal-300">
+                <p className="font-display text-[1.0625rem] font-semibold text-ink">{r.from}</p>
+                <p className="mt-1 text-[0.8125rem] leading-snug text-ink-mute">{r.fromNote}</p>
+              </div>
+
+              <div className="relative flex items-center justify-center px-2 py-1 sm:w-52 sm:py-0">
+                <span aria-hidden="true" className="lateral-line absolute left-1/2 top-0 h-full w-px origin-top bg-royal-200 sm:left-0 sm:top-1/2 sm:h-px sm:w-full sm:origin-left" />
+                <span className="relative z-10 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-ember-500 px-3 py-1.5 text-[0.75rem] font-semibold text-white">
+                  {r.saving}
+                  <ArrowRight aria-hidden="true" className="h-3.5 w-3.5 max-sm:rotate-90 transition-transform duration-300 group-hover:translate-x-0.5" />
+                </span>
+              </div>
+
+              <div className="rounded-lg border border-royal-200 bg-royal-50 p-4 transition-colors duration-300 group-hover:border-royal-400">
+                <p className="font-display text-[1.0625rem] font-semibold text-royal-800">{r.to}</p>
+                <p className="mt-1 text-[0.8125rem] leading-snug text-ink-soft">{r.toNote}</p>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </ol>
+
+      <p className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.875rem] text-ink-mute">
+        <span className="inline-flex items-center gap-2">
+          <Phone aria-hidden="true" className="h-4 w-4 text-ember-500" />
+          Lateral entry desk
+        </span>
+        {lateralEntry.phones.map((p) => (
+          <a key={p.href} href={p.href} className="link-underline font-semibold text-royal-700 hover:text-ember-600">
+            {p.label}
+          </a>
+        ))}
+      </p>
+    </div>
+  );
+}
+
 export function ProgramsSection() {
   const [registerRow, activeRow] = useActiveRow(families.length);
 
@@ -156,6 +213,8 @@ export function ProgramsSection() {
                 </Link>
               </Reveal>
             ))}
+
+            <LateralEntry />
 
             <Reveal delay={stagger(5)}>
               <div className="border-t border-stone-line pt-8">

@@ -378,15 +378,15 @@ export function LeadershipSection() {
             onScroll={handleMobileScroll}
             onTouchStart={holdAutoplay}
             onTouchMove={holdAutoplay}
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-6 scrollbar-none"
+            className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 scrollbar-none"
           >
             {leadershipCards.map((card) => (
               <article
                 key={card.id}
-                className="relative snap-center shrink-0 w-[88vw] max-w-[380px] rounded-2xl border border-stone-line bg-white p-6 shadow-xs flex flex-col justify-between"
+                className="relative snap-center shrink-0 w-[74vw] max-w-[300px] rounded-xl border border-stone-line bg-white p-4 shadow-xs flex flex-col"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="rounded-full border border-ember-200 bg-ember-50 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ember-600">
                       {card.category}
                     </span>
@@ -395,8 +395,8 @@ export function LeadershipSection() {
                     </span>
                   </div>
 
-                  <div className="flex gap-4 items-center">
-                    <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl border border-stone-line bg-royal-900/5">
+                  <div className="flex gap-3 items-center">
+                    <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded-xl border border-stone-line bg-royal-900/5">
                       {card.portrait ? (
                         <img
                           src={card.portrait}
@@ -412,7 +412,7 @@ export function LeadershipSection() {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-display text-lg font-semibold text-ink leading-tight">
+                      <h3 className="font-display text-base font-semibold text-ink leading-tight">
                         {card.name}
                       </h3>
                       <p className="text-[11px] font-semibold uppercase text-ember-600 mt-0.5">
@@ -424,27 +424,17 @@ export function LeadershipSection() {
                     </div>
                   </div>
 
-                  <blockquote className="mt-4 border-l-2 border-ember-500 pl-3">
-                    <p className="font-display text-xs italic text-ink leading-relaxed">
+                  <blockquote className="mt-3 border-l-2 border-ember-500 pl-3">
+                    <p className="line-clamp-4 font-display text-xs italic text-ink leading-relaxed">
                       “{card.quote}”
                     </p>
                   </blockquote>
 
-                  <p className="mt-3 text-xs leading-relaxed text-ink-mute">
+                  <p className="mt-2.5 line-clamp-3 text-xs leading-relaxed text-ink-mute">
                     {card.description}
                   </p>
                 </div>
 
-                <div className="mt-5 border-t border-stone-line pt-3 flex flex-wrap gap-1.5">
-                  {card.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded border border-stone-line bg-paper-dim px-2 py-0.5 text-[10px] text-ink-mute"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
               </article>
             ))}
           </div>

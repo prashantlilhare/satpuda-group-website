@@ -111,7 +111,7 @@ export function WhySection() {
   const onScreen = useInView(marqueeRef);
 
   return (
-    <section ref={ref} className="section why-section bg-paper-dim">
+    <section ref={ref} className="section why-section bg-paper">
       <div className="shell">
         <SectionHeading
           eyebrow="Why Satpuda Group"
