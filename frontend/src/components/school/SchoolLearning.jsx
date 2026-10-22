@@ -257,6 +257,8 @@ export function SchoolRobotics({ robot, expo, banner, points, photos, onView }) 
           src={robot}
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
           className="absolute bottom-[-3.5rem] right-3 z-[2] w-32 drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] sm:right-10 sm:w-48 lg:right-[12%] lg:w-56"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: [0, -10, 0] }}

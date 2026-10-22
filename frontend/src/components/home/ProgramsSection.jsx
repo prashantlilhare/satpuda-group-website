@@ -8,6 +8,17 @@ import { stagger } from "../ui/stagger";
 
 const families = [
   {
+    to: "/institutes/school",
+    label: "School — CBSE",
+    meta: "Nursery to Class XII · CBSE affiliation No. 1030641",
+    items: [
+      "Foundation · Pre-primary to II",
+      "Development · III to V",
+      "Exploration · VI to X",
+      "XI & XII · Science, Commerce, Humanities",
+    ],
+  },
+  {
     to: "/institutes/btech-polytechnic",
     label: "B.Tech — Degree Engineering",
     meta: "4 years · AICTE approved · RGPV Bhopal",
@@ -37,7 +48,7 @@ const families = [
  * Marks whichever row is currently crossing the middle of the screen.
  *
  * The heading beside this list is pinned while the list scrolls past it, so
- * without something to say where the eye is the column reads as four equal
+ * without something to say where the eye is the column reads as five equal
  * blocks sliding by. One observer, with the root's top and bottom pulled in
  * to a narrow band across the middle of the viewport, so a row only counts
  * while it is actually being read. Two rows can occupy that band at once on
@@ -150,11 +161,11 @@ export function ProgramsSection() {
             <SectionHeading
               eyebrow="Academic programmes"
               title="What you can study here."
-              lead="Degree and diploma engineering, NCVT trade certification and teacher education — all on the Satpuda campus at Manjhapur."
+              lead="CBSE schooling from Nursery to Class XII, degree and diploma engineering, NCVT trade certification and teacher education — all on the Satpuda campus at Manjhapur."
             />
             <Reveal delay={stagger(3)}>
               <p className="mt-8 text-sm leading-relaxed text-ink-mute">
-                Programme durations and eligibility follow AICTE, RGPV and NCVT norms. For the
+                Programme durations and eligibility follow CBSE, AICTE, RGPV and NCVT norms. For the
                 current session's intake, fees and admission dates, please contact the institution
                 directly.
               </p>

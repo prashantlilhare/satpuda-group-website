@@ -36,6 +36,7 @@ export function SchoolCover({ tagline, affiliation, building, phones, website, i
         <img
           src={building.src}
           alt=""
+          loading="eager"
           fetchPriority="high"
           decoding="async"
           className="cover-building absolute inset-x-0 h-auto w-full max-w-none"

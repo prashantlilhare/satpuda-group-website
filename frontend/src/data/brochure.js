@@ -106,18 +106,20 @@ export const lateralEntry = {
   ],
 };
 
-/* JobSahi — the group's own job portal and app (p.7, p.8). The store pages
-   aren't printed in the brochure; set the two URLs here once known and the
-   badges become links. */
+/* JobSahi — the group's own job portal and app (p.7, p.8), run by Satpuda
+   Skilltech Pvt Ltd. The Android app is on Google Play (10K+ downloads,
+   checked October 2026); there is no App Store listing yet, so that badge
+   stays unlinked until one exists. */
 export const jobSahi = {
   name: "JobSahi",
   tagline: "जॉब आपकी जेब में !",
   href: "https://www.jobsahi.com",
   display: "www.JobSahi.com",
   registered: "25,000+",
+  downloads: "10K+",
   logo: jobSahiLogo,
   stores: [
-    { label: "Get it on Google Play", badge: googlePlayBadge, width: 564, height: 168, href: null },
+    { label: "Get it on Google Play", badge: googlePlayBadge, width: 564, height: 168, href: "https://play.google.com/store/apps/details?id=com.jobsahi.app" },
     { label: "Download on the App Store", badge: appStoreBadge, width: 498, height: 167, href: null },
   ],
   counselling: [
