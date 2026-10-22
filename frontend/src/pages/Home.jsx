@@ -5,6 +5,7 @@ import { IntroSection } from "../components/home/IntroSection";
 import { GroupScale } from "../components/home/GroupScale";
 import { AchievementsSection } from "../components/home/AchievementsSection";
 import { PlacementReach } from "../components/home/PlacementReach";
+import { JobSahiSection } from "../components/home/JobSahiSection";
 import { InstitutionsSection } from "../components/home/InstitutionsSection";
 import { ItiNetworkSection } from "../components/home/ItiNetworkSection";
 import { ProgramsSection } from "../components/home/ProgramsSection";
@@ -30,6 +31,8 @@ export default function Home() {
       {/* Proof first: what students go on to do, and where they are hired. */}
       <AchievementsSection />
       <PlacementReach />
+      {/* The group's own job app, for the jobs that come after. */}
+      <JobSahiSection />
       {/* Then the group in figures, and the institutions behind them. */}
       <GroupScale />
       <InstitutionsSection />
