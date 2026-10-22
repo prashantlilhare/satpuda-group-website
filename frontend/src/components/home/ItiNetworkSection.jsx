@@ -1,4 +1,5 @@
 import { memo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useInView } from "motion/react";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import { Eyebrow, Reveal, SplitText } from "../ui/Primitives";
@@ -10,6 +11,7 @@ import {
   ITI_SITE,
   itiNetwork,
   itiNetworkDistricts,
+  networkRow,
 } from "../../data/itiNetwork";
 
 const stats = [
@@ -83,14 +85,21 @@ function Media({ inst }) {
   );
 }
 
-/** One institute — the whole card opens its page on the Satpuda ITI site. */
+/**
+ * One institute — the whole card opens its page on the Satpuda ITI site, or
+ * for the college and school their own website; D.Ed & B.Ed (`to`) opens
+ * its page here.
+ */
 function Card({ inst, decorative = false }) {
   const titleId = decorative ? undefined : `itin-card-${inst.id}`;
+  const isIti = inst.href?.startsWith(ITI_SITE);
+  const Root = inst.to ? Link : "a";
+  const target = inst.to
+    ? { to: inst.to }
+    : { href: inst.href, target: "_blank", rel: "noopener noreferrer" };
   return (
-    <a
-      href={inst.href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Root
+      {...target}
       tabIndex={decorative ? -1 : undefined}
       aria-labelledby={titleId}
       className="itin-card group relative flex h-full w-[16.5rem] flex-col rounded-[0.875rem] border border-royal-100 bg-white text-left sm:w-[18.5rem]"
@@ -104,7 +113,11 @@ function Card({ inst, decorative = false }) {
           className="block min-h-[2.75rem] font-display text-[1.0625rem] font-semibold leading-snug tracking-[-0.01em] text-ink sm:min-h-[2.9rem] sm:text-[1.125rem]"
         >
           {inst.name}
-          <span className="sr-only"> (opens the Satpuda ITI site in a new tab)</span>
+          {!inst.to && (
+            <span className="sr-only">
+              {isIti ? " (opens the Satpuda ITI site in a new tab)" : " (opens its website in a new tab)"}
+            </span>
+          )}
         </span>
         <span className="mt-1.5 flex items-start gap-1.5 text-[0.8125rem] leading-snug text-ink-mute">
           <MapPin aria-hidden="true" strokeWidth={2} className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ember-500" />
@@ -122,13 +135,13 @@ function Card({ inst, decorative = false }) {
         <span className="mt-auto block pt-4">
           <span className="flex items-center justify-between border-t border-royal-50 pt-3.5">
             <span className="text-[0.875rem] font-semibold text-ink transition-colors duration-200 group-hover:text-ember-600">
-              View institute
+              {isIti || inst.to ? "View institute" : "Visit website"}
             </span>
             <ArrowUpRight aria-hidden="true" strokeWidth={2} className="itin-card-arrow h-4 w-4 text-ember-500" />
           </span>
         </span>
       </span>
-    </a>
+    </Root>
   );
 }
 
@@ -138,15 +151,15 @@ function Card({ inst, decorative = false }) {
 const Track = memo(function Track() {
   return (
     <div className="itin-track">
-      <ul className="itin-group" aria-label="Satpuda ITI institutes">
-        {itiNetwork.map((inst) => (
+      <ul className="itin-group" aria-label="Satpuda institutes, oldest first">
+        {networkRow.map((inst) => (
           <li key={inst.id} className="flex">
             <Card inst={inst} />
           </li>
         ))}
       </ul>
       <ul className="itin-group" aria-hidden="true">
-        {itiNetwork.map((inst) => (
+        {networkRow.map((inst) => (
           <li key={inst.id} className="flex">
             <Card inst={inst} decorative />
           </li>
@@ -195,13 +208,14 @@ export function ItiNetworkSection() {
               <Eyebrow>Satpuda ITI network</Eyebrow>
             </Reveal>
             <SplitText as="h2" delay={90} className="t-h2 mt-5 block text-ink">
-              Our ITI Institutes
+              Our ITI Institutions
             </SplitText>
             <Reveal delay={stagger(2)}>
               <p className="t-lead mt-6">
                 Get to know the Satpuda Group's {itiNetwork.length} ITIs, spread across{" "}
                 {itiNetworkDistricts.length} districts of Madhya Pradesh. Pick any institute to see
-                its trades, principal, contact details and more.
+                its trades, principal, contact details and more — set in the order they opened,
+                alongside our school, teacher-education college and engineering college.
               </p>
             </Reveal>
           </div>

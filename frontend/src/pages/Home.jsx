@@ -2,7 +2,9 @@
 // import { HeroSlider } from "../components/home/HeroSlider";
 import { HomeHero } from "../components/home/HomeHero";
 import { IntroSection } from "../components/home/IntroSection";
+import { GroupScale } from "../components/home/GroupScale";
 import { AchievementsSection } from "../components/home/AchievementsSection";
+import { PlacementReach } from "../components/home/PlacementReach";
 import { InstitutionsSection } from "../components/home/InstitutionsSection";
 import { ItiNetworkSection } from "../components/home/ItiNetworkSection";
 import { ProgramsSection } from "../components/home/ProgramsSection";
@@ -25,14 +27,20 @@ export default function Home() {
     <>
       {/* <HeroSlider /> */}
       <HomeHero />
-      <IntroSection />
+      {/* Proof first: what students go on to do, and where they are hired. */}
       <AchievementsSection />
+      <PlacementReach />
+      {/* Then the group in figures, and the institutions behind them. */}
+      <GroupScale />
       <InstitutionsSection />
+      {/* The ITIs across the state, then what to study and how to get in. */}
       <ItiNetworkSection />
       <ProgramsSection />
-      <WhySection />
-      <CampusSection />
+      {/* The story, the campus and the people. */}
+      <IntroSection />
       <FactsSection />
+      <CampusSection />
+      <WhySection />
       <LeadershipSection />
       <CTASection />
     </>

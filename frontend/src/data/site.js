@@ -55,6 +55,12 @@ export const socials = [
 
 /** The school keeps its own page; linked from the School page only. */
 export const schoolFacebook = "https://www.facebook.com/SatpudaValleyPublicSchoolBalaghat/";
+/* From the school's 2026 prospectus. */
+export const schoolInstagram = "https://www.instagram.com/satpuda_valley_public_school/";
+export const schoolPhones = [
+  { label: "+91 6262 604 114", href: "tel:+916262604114" },
+  { label: "+91 6262 604 115", href: "tel:+916262604115" },
+];
 
 /** Public, citable sources used to build this site. */
 export const sources = [

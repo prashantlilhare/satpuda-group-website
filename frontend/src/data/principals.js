@@ -31,13 +31,15 @@ export const principals = {
 
   school: {
     placeholder: true,
-    name: "Miss Purnima Deshmukh",
+    name: "Miss Poornima Deshmukh",
     role: "Principal",
     org: "Satpuda Valley Public School",
+    /* as given in the school's 2026 prospectus */
+    qualifications: "M.Sc (Biotech Hons) · M.Ed",
     portrait: principalSchoolPortrait,
     /* supplied already cut to a circle, on a transparent ground */
     portraitRound: true,
-    portraitAlt: "Portrait of Miss Purnima Deshmukh, Principal of Satpuda Valley Public School",
+    portraitAlt: "Portrait of Miss Poornima Deshmukh, Principal of Satpuda Valley Public School",
     quote:
       "Curiosity is built early — our job is to give it room, and then give it direction.",
     summary:

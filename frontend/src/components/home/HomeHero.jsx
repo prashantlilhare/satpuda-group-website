@@ -236,7 +236,7 @@ export function HomeHero() {
         target={sectionRef}
         farFill="rgb(41 71 145 / 0.1)"
         midFill="var(--color-royal-800)"
-        fill="var(--color-paper)"
+        fill="var(--color-royal-950)"
       />
 
       <p aria-live="polite" aria-atomic="true" className="sr-only">

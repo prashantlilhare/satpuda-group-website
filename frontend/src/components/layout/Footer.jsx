@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import logo from "../../assets/logo/satpuda-group-logo.webp";
 import { FacebookIcon, InstagramIcon } from "../ui/BrandIcons";
 import { aboutLinks, contact, instituteLinks, nav, site, socials } from "../../data/site";
+import { instituteDirectory, jobSahi } from "../../data/brochure";
 
 const ICONS = { instagram: InstagramIcon, facebook: FacebookIcon };
 
@@ -27,6 +29,173 @@ function FooterLink({ to, children }) {
         {children}
       </Link>
     </li>
+  );
+}
+
+/** A store badge — a link once the store page is known, a picture until then. */
+function StoreBadge({ store }) {
+  const img = (
+    <img
+      src={store.badge}
+      alt={store.label}
+      width={store.width}
+      height={store.height}
+      loading="lazy"
+      decoding="async"
+      className="h-11 w-auto"
+    />
+  );
+  return store.href ? (
+    <a href={store.href} target="_blank" rel="noopener noreferrer" className="transition-opacity duration-300 hover:opacity-80">
+      {img}
+    </a>
+  ) : (
+    img
+  );
+}
+
+/** One institute: its name (linked where it has a page) and its cell number. */
+function DirectoryRow({ item }) {
+  const name = (
+    <>
+      <span className="block text-[0.875rem] font-medium leading-snug text-white/85">{item.name}</span>
+      <span className="block text-[0.75rem] leading-snug text-white/50">{item.place}</span>
+    </>
+  );
+  const linkClass = "group/name block min-w-0 transition-colors hover:[&>span:first-child]:text-white";
+  return (
+    <li className="flex items-start justify-between gap-4 border-b border-white/8 py-2.5">
+      {item.to ? (
+        <Link to={item.to} className={linkClass}>
+          {name}
+        </Link>
+      ) : item.href ? (
+        <a href={item.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+          {name}
+          <span className="sr-only">(opens in a new tab)</span>
+        </a>
+      ) : (
+        <span className="block min-w-0">{name}</span>
+      )}
+      <a
+        href={item.phone.href}
+        className="shrink-0 pt-px text-[0.8125rem] tabular-nums text-ember-300 transition-colors hover:text-white"
+      >
+        {item.phone.label}
+      </a>
+    </li>
+  );
+}
+
+/**
+ * The brochure's back page, in the footer: JobSahi on the left — the
+ * portal, its apps and the free career-counselling line — and on the right
+ * every institute in the group with its own number, in the brochure's
+ * order. On a phone the fifteen ITIs fold behind a button.
+ */
+function JobSahiBand() {
+  const [allItis, setAllItis] = useState(false);
+
+  return (
+    <div className="border-t border-white/10">
+      <div className="shell grid gap-12 py-12 sm:py-14 lg:grid-cols-[19rem_1fr] lg:gap-16">
+        {/* --- JobSahi --- */}
+        <div>
+          <a
+            href={jobSahi.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-fit rounded-xl bg-white p-3 transition-transform duration-300 ease-out hover:-translate-y-0.5"
+          >
+            <img
+              src={jobSahi.logo}
+              alt="JobSahi — Satpuda Group's job portal"
+              width="273"
+              height="231"
+              loading="lazy"
+              decoding="async"
+              className="h-24 w-auto"
+            />
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
+          <h3 className="mt-6 text-[0.6875rem] font-semibold uppercase tracking-[0.17em] text-ember-300">
+            Satpuda Group's placement app
+          </h3>
+          <a
+            href={jobSahi.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group mt-2.5 inline-flex items-center gap-1.5 font-display text-xl font-semibold text-white"
+          >
+            {jobSahi.display}
+            <ArrowUpRight aria-hidden="true" className="h-4 w-4 text-white/60 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
+          <p className="mt-2 text-[0.875rem] leading-relaxed text-white/60">
+            For technical job seekers — {jobSahi.registered} candidates already registered.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2.5">
+            {jobSahi.stores.map((st) => (
+              <StoreBadge key={st.label} store={st} />
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-lg border border-white/12 p-4">
+            <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-white">
+              Free career counselling
+            </p>
+            <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              {jobSahi.counselling.map((p) => (
+                <a
+                  key={p.href}
+                  href={p.href}
+                  className="link-underline text-[0.9375rem] tabular-nums text-white/75 transition-colors hover:text-white"
+                >
+                  {p.label}
+                </a>
+              ))}
+            </p>
+          </div>
+        </div>
+
+        {/* --- every institute, with its number --- */}
+        <div>
+          <h3 className="text-[0.6875rem] font-semibold uppercase tracking-[0.17em] text-ember-300">
+            Call an institute directly
+          </h3>
+          {instituteDirectory.map((g, gi) => {
+            const folded = gi > 0 && !allItis;
+            return (
+              <div key={g.group} className="mt-6">
+                <p className="text-[0.8125rem] font-semibold text-white/60">
+                  {g.group}
+                  <span className="ml-2 font-normal text-white/40">{g.items.length}</span>
+                </p>
+                <ul
+                  id={`dir-${gi}`}
+                  className={`mt-2 grid gap-x-8 sm:grid-cols-2 xl:grid-cols-3 ${folded ? "max-sm:hidden" : ""}`}
+                >
+                  {g.items.map((item) => (
+                    <DirectoryRow key={`${item.name}-${item.place}`} item={item} />
+                  ))}
+                </ul>
+                {gi > 0 && (
+                  <button
+                    type="button"
+                    aria-expanded={allItis}
+                    aria-controls={`dir-${gi}`}
+                    onClick={() => setAllItis((v) => !v)}
+                    className="mt-3 text-[0.875rem] font-semibold text-white underline decoration-white/30 underline-offset-4 sm:hidden"
+                  >
+                    {allItis ? "Show fewer" : `Show all ${g.items.length} ITIs`}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -155,6 +324,8 @@ export function Footer() {
           </Column>
         </div>
       </div>
+
+      <JobSahiBand />
 
       {/* --- bottom bar --- */}
       <div className="border-t border-white/10">

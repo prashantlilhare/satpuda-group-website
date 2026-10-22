@@ -299,15 +299,16 @@ const REEL = [..."01234567890123456789"];
  *
  * The motion is a transform transition in the stylesheet (`.odo-reel`); the
  * reels are hidden from assistive tech, which reads the plain value instead.
- * Reduced motion shows the settled figure.
+ * Reduced motion shows the settled figure. Anything that is not a digit — a
+ * thousands comma — is set still between the reels.
  */
-function Odometer({ value }) {
+export function Odometer({ value }) {
   const [ref, visible] = useReveal({ threshold: 0.35 });
 
   return (
     <span ref={ref} data-visible={visible} className="odo">
       <span className="sr-only">{value}</span>
-      {[...value].map((digit, i) => (
+      {[...value].map((digit, i) => /\d/.test(digit) ? (
         <span key={i} aria-hidden="true" className="odo-col">
           <span
             className="odo-reel"
@@ -317,6 +318,10 @@ function Odometer({ value }) {
               <span key={j}>{d}</span>
             ))}
           </span>
+        </span>
+      ) : (
+        <span key={i} aria-hidden="true">
+          {digit}
         </span>
       ))}
     </span>
